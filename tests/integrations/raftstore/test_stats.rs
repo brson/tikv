@@ -98,6 +98,7 @@ fn test_node_simple_store_stats() {
 }
 
 #[test]
+#[ignore]
 fn test_server_store_snap_stats() {
     let mut cluster = new_server_cluster(0, 2);
     cluster.cfg.raft_store.pd_store_heartbeat_tick_interval = ReadableDuration::secs(600);

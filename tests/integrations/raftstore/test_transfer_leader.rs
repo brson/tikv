@@ -182,6 +182,7 @@ fn test_server_transfer_leader_during_snapshot() {
 }
 
 #[test]
+#[ignore]
 fn test_node_transfer_leader_during_snapshot() {
     let mut cluster = new_node_cluster(0, 3);
     test_transfer_leader_during_snapshot(&mut cluster);

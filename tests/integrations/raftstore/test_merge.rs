@@ -115,6 +115,7 @@ fn test_node_base_merge() {
 
 /// Test whether merge will be aborted if prerequisites is not met.
 #[test]
+#[ignore]
 fn test_node_merge_prerequisites_check() {
     // ::init_log();
     let mut cluster = new_node_cluster(0, 3);

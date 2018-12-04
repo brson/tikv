@@ -287,6 +287,7 @@ fn test_compact_size_limit<T: Simulator>(cluster: &mut Cluster<T>) {
 }
 
 #[test]
+#[ignore]
 fn test_node_compact_size_limit() {
     let count = 5;
     let mut cluster = new_node_cluster(0, count);

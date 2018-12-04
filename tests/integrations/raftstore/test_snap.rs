@@ -84,6 +84,7 @@ fn test_huge_snapshot<T: Simulator>(cluster: &mut Cluster<T>) {
 }
 
 #[test]
+#[ignore]
 fn test_node_huge_snapshot() {
     let count = 5;
     let mut cluster = new_node_cluster(0, count);
@@ -91,6 +92,7 @@ fn test_node_huge_snapshot() {
 }
 
 #[test]
+#[ignore]
 fn test_server_huge_snapshot() {
     let count = 5;
     let mut cluster = new_server_cluster(0, count);
