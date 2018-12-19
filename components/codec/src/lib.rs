@@ -13,6 +13,8 @@
 
 #![cfg_attr(test, feature(test))]
 
+#[cfg(all(unix))]
+extern crate jemallocator;
 #[macro_use]
 extern crate quick_error;
 #[cfg(test)]
@@ -31,3 +33,10 @@ pub mod prelude {
 
 pub use self::buffer::{BufferReader, BufferWriter};
 pub use self::error::{Error, Result};
+
+// Currently, only crates that link to TiKV use jemalloc, our production
+// allocator. This crate has a test, `test_vec_reallocate`, that is testing
+// allocator behavior, so we also link to jemalloc.
+#[cfg(all(unix, not(fuzzing)))]
+#[global_allocator]
+static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;

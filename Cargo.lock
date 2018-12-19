@@ -259,6 +259,7 @@ dependencies = [
 name = "codec"
 version = "0.0.1"
 dependencies = [
+ "jemallocator 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "panic_hook 0.0.1",
  "quick-error 1.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)",

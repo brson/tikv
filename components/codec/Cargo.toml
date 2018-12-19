@@ -9,3 +9,7 @@ panic_hook = { path = "../panic_hook" }
 
 [dev-dependencies]
 rand = "0.5"
+
+[dependencies.jemallocator]
+features = ["unprefixed_malloc_on_supported_platforms"]
+version = "0.1.9"
