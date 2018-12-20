@@ -131,4 +131,4 @@ pub mod raftstore;
 pub mod server;
 pub mod storage;
 
-pub use storage::Storage;
+pub use crate::storage::Storage;
