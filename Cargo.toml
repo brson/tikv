@@ -157,7 +157,6 @@ members = [
   "components/test_storage",
   "components/test_coprocessor",
   "components/test_util",
-  "components/codec",
   "components/panic_hook",
   "components/cop_datatype",
 ]
