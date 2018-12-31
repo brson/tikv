@@ -313,7 +313,8 @@ mod tests {
             SnapManager::new("", None),
             None,
             None,
-        ).unwrap();
+        )
+        .unwrap();
 
         server.start(cfg, security_mgr).unwrap();
 
