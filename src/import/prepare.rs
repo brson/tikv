@@ -19,9 +19,9 @@ use std::time::{Duration, Instant};
 
 use kvproto::metapb::*;
 
-use pd::RegionInfo;
-use util::escape;
-use util::rocksdb::properties::SizeProperties;
+use crate::pd::RegionInfo;
+use crate::util::escape;
+use crate::util::rocksdb::properties::SizeProperties;
 
 use super::client::*;
 use super::common::*;

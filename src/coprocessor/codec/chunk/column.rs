@@ -17,13 +17,13 @@ use cop_datatype::prelude::*;
 use cop_datatype::{FieldTypeFlag, FieldTypeTp};
 
 use super::{Error, Result};
-use coprocessor::codec::mysql::decimal::DECIMAL_STRUCT_SIZE;
-use coprocessor::codec::mysql::{
+use crate::coprocessor::codec::mysql::decimal::DECIMAL_STRUCT_SIZE;
+use crate::coprocessor::codec::mysql::{
     Decimal, DecimalEncoder, Duration, DurationEncoder, Json, JsonEncoder, Time, TimeEncoder,
 };
-use coprocessor::codec::Datum;
+use crate::coprocessor::codec::Datum;
 
-use util::codec::number::{self, NumberEncoder};
+use crate::util::codec::number::{self, NumberEncoder};
 #[cfg(test)]
 use util::codec::BytesSlice;
 

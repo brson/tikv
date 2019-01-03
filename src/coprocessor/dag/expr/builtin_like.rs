@@ -14,7 +14,7 @@
 use std::slice::Iter;
 
 use super::{EvalContext, Result, ScalarFunc};
-use coprocessor::codec::Datum;
+use crate::coprocessor::codec::Datum;
 use regex::{bytes::Regex as BytesRegex, Regex};
 
 const MAX_RECURSE_LEVEL: usize = 1024;

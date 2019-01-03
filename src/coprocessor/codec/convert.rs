@@ -18,7 +18,7 @@ use cop_datatype::{self, FieldTypeTp};
 
 use super::mysql::Res;
 use super::{Error, Result};
-use coprocessor::dag::expr::EvalContext;
+use crate::coprocessor::dag::expr::EvalContext;
 
 /// `truncate_binary` truncates a buffer to the specified length.
 #[inline]

@@ -34,24 +34,24 @@ use rocksdb::{
 };
 
 use raft::{self, RawNode};
-use raftstore::store::engine::{IterOption, Mutable};
-use raftstore::store::util as raftstore_util;
-use raftstore::store::{
+use crate::raftstore::store::engine::{IterOption, Mutable};
+use crate::raftstore::store::util as raftstore_util;
+use crate::raftstore::store::{
     init_apply_state, init_raft_state, write_initial_apply_state, write_initial_raft_state,
     write_peer_state,
 };
-use raftstore::store::{keys, CacheQueryStats, Engines, Iterable, Peekable, PeerStorage};
-use storage::mvcc::{Lock, LockType, Write, WriteType};
-use storage::types::Key;
-use storage::{CF_DEFAULT, CF_LOCK, CF_RAFT, CF_WRITE};
-use util::codec::bytes;
-use util::collections::HashSet;
-use util::config::ReadableSize;
-use util::escape;
-use util::properties::MvccProperties;
-use util::rocksdb::get_cf_handle;
-use util::rocksdb::properties::RangeProperties;
-use util::worker::Worker;
+use crate::raftstore::store::{keys, CacheQueryStats, Engines, Iterable, Peekable, PeerStorage};
+use crate::storage::mvcc::{Lock, LockType, Write, WriteType};
+use crate::storage::types::Key;
+use crate::storage::{CF_DEFAULT, CF_LOCK, CF_RAFT, CF_WRITE};
+use crate::util::codec::bytes;
+use crate::util::collections::HashSet;
+use crate::util::config::ReadableSize;
+use crate::util::escape;
+use crate::util::properties::MvccProperties;
+use crate::util::rocksdb::get_cf_handle;
+use crate::util::rocksdb::properties::RangeProperties;
+use crate::util::worker::Worker;
 
 pub type Result<T> = result::Result<T, Error>;
 type DBIterator = ::rocksdb::DBIterator<Arc<DB>>;
@@ -1275,7 +1275,7 @@ fn set_region_tombstone(db: &DB, store_id: u64, region: Region, wb: &WriteBatch)
     Ok(())
 }
 
-fn divide_db(db: &DB, parts: usize) -> ::raftstore::Result<Vec<Vec<u8>>> {
+fn divide_db(db: &DB, parts: usize) -> crate::raftstore::Result<Vec<Vec<u8>>> {
     let mut fake_region = Region::default();
     fake_region.set_start_key(vec![]);
     fake_region.set_end_key(vec![]);
@@ -1295,7 +1295,7 @@ fn divide_db(db: &DB, parts: usize) -> ::raftstore::Result<Vec<Vec<u8>>> {
     divide_db_cf(db, parts, cf)
 }
 
-fn divide_db_cf(db: &DB, parts: usize, cf: &str) -> ::raftstore::Result<Vec<Vec<u8>>> {
+fn divide_db_cf(db: &DB, parts: usize, cf: &str) -> crate::raftstore::Result<Vec<Vec<u8>>> {
     let cf = get_cf_handle(db, cf)?;
     let start = keys::data_key(b"");
     let end = keys::data_end_key(b"");

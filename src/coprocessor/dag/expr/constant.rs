@@ -14,8 +14,8 @@
 use std::borrow::Cow;
 
 use super::{Constant, Result};
-use coprocessor::codec::mysql::{Decimal, Duration, Json, Time};
-use coprocessor::codec::Datum;
+use crate::coprocessor::codec::mysql::{Decimal, Duration, Json, Time};
+use crate::coprocessor::codec::Datum;
 
 impl Datum {
     #[inline]

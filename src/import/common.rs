@@ -18,7 +18,7 @@ use kvproto::import_sstpb::*;
 use kvproto::kvrpcpb::*;
 use kvproto::metapb::*;
 
-use pd::RegionInfo;
+use crate::pd::RegionInfo;
 
 use super::client::*;
 

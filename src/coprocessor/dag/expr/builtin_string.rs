@@ -22,7 +22,7 @@ use cop_datatype;
 use cop_datatype::prelude::*;
 
 use super::{EvalContext, Result, ScalarFunc};
-use coprocessor::codec::Datum;
+use crate::coprocessor::codec::Datum;
 use safemem;
 
 const SPACE: u8 = 0o40u8;

@@ -34,12 +34,12 @@ use kvproto::kvrpcpb::{CommandPri, Context, KeyRange, LockInfo};
 
 use rocksdb::DB;
 
-use raftstore::store::engine::IterOption;
-use server::readpool::{self, ReadPool};
-use server::ServerRaftStoreRouter;
-use util;
-use util::collections::HashMap;
-use util::worker::{self, Builder, ScheduleError, Worker};
+use crate::raftstore::store::engine::IterOption;
+use crate::server::readpool::{self, ReadPool};
+use crate::server::ServerRaftStoreRouter;
+use crate::util;
+use crate::util::collections::HashMap;
+use crate::util::worker::{self, Builder, ScheduleError, Worker};
 
 use self::gc_worker::GCWorker;
 use self::metrics::*;
@@ -472,7 +472,7 @@ impl<E: Engine> TestStorageBuilder<E> {
 
     /// Build a `Storage<E>`.
     pub fn build(self) -> Result<Storage<E>> {
-        use util::worker::FutureWorker;
+        use crate::util::worker::FutureWorker;
 
         let read_pool = {
             let pd_worker = FutureWorker::new("test-future–worker");

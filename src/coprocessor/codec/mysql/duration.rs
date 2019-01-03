@@ -17,8 +17,8 @@ use std::io::Write;
 use std::time::Duration as StdDuration;
 use std::{i64, str, u64};
 use time::{self, Tm};
-use util::codec::number::{self, NumberEncoder};
-use util::codec::BytesSlice;
+use crate::util::codec::number::{self, NumberEncoder};
+use crate::util::codec::BytesSlice;
 
 use super::super::Result;
 use super::{check_fsp, parse_frac, Decimal};

@@ -25,12 +25,12 @@ pub use self::txn::{MvccTxn, MAX_TXN_WRITE_SIZE};
 pub use self::write::{Write, WriteType};
 use std::error;
 use std::io;
-use util::escape;
+use crate::util::escape;
 
 quick_error! {
     #[derive(Debug)]
     pub enum Error {
-        Engine(err: ::storage::engine::Error) {
+        Engine(err: crate::storage::engine::Error) {
             from()
             cause(err)
             description(err.description())
@@ -40,7 +40,7 @@ quick_error! {
             cause(err)
             description(err.description())
         }
-        Codec(err: ::util::codec::Error) {
+        Codec(err: crate::util::codec::Error) {
             from()
             cause(err)
             description(err.description())

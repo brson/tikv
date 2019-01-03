@@ -23,16 +23,16 @@ use tipb::checksum::{ChecksumRequest, ChecksumScanOn};
 use tipb::executor::ExecType;
 use tipb::select::DAGRequest;
 
-use server::readpool::{self, ReadPool};
-use server::Config;
-use storage::{self, Engine};
-use util::Either;
+use crate::server::readpool::{self, ReadPool};
+use crate::server::Config;
+use crate::storage::{self, Engine};
+use crate::util::Either;
 
-use coprocessor::dag::executor::ExecutorMetrics;
-use coprocessor::metrics::*;
-use coprocessor::tracker::Tracker;
-use coprocessor::util as cop_util;
-use coprocessor::*;
+use crate::coprocessor::dag::executor::ExecutorMetrics;
+use crate::coprocessor::metrics::*;
+use crate::coprocessor::tracker::Tracker;
+use crate::coprocessor::util as cop_util;
+use crate::coprocessor::*;
 
 const OUTDATED_ERROR_MSG: &str = "request outdated.";
 const BUSY_ERROR_MSG: &str = "server is busy (coprocessor full).";
@@ -66,7 +66,7 @@ impl<E: Engine> Clone for Endpoint<E> {
     }
 }
 
-impl<E: Engine> ::util::AssertSend for Endpoint<E> {}
+impl<E: Engine> crate::util::AssertSend for Endpoint<E> {}
 
 impl<E: Engine> Endpoint<E> {
     pub fn new(cfg: &Config, engine: E, read_pool: ReadPool<ReadPoolContext>) -> Self {
@@ -215,7 +215,7 @@ impl<E: Engine> Endpoint<E> {
         engine: E,
         ctx: &kvrpcpb::Context,
     ) -> impl Future<Item = E::Snap, Error = Error> {
-        let (callback, future) = ::util::future::paired_future_callback();
+        let (callback, future) = crate::util::future::paired_future_callback();
         let val = engine.async_snapshot(ctx, callback);
         future::result(val)
             .and_then(|_| future.map_err(|cancel| storage::engine::Error::Other(box_err!(cancel))))

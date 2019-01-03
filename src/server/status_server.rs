@@ -22,7 +22,7 @@ use std::net::SocketAddr;
 use std::str::FromStr;
 
 use super::Result;
-use util::metrics::dump;
+use crate::util::metrics::dump;
 
 pub struct StatusServer {
     thread_pool: ThreadPool,

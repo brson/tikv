@@ -22,10 +22,10 @@ use tipb::expression::{Expr, ExprType, FieldType, ScalarFuncSig};
 
 use cop_datatype::prelude::*;
 use cop_datatype::FieldTypeFlag;
-use coprocessor::codec::mysql::charset;
-use coprocessor::codec::mysql::{Decimal, Duration, Json, Time, MAX_FSP};
-use coprocessor::codec::{self, Datum};
-use util::codec::number;
+use crate::coprocessor::codec::mysql::charset;
+use crate::coprocessor::codec::mysql::{Decimal, Duration, Json, Time, MAX_FSP};
+use crate::coprocessor::codec::{self, Datum};
+use crate::util::codec::number;
 
 mod builtin_arithmetic;
 mod builtin_cast;
@@ -46,7 +46,7 @@ mod ctx;
 mod scalar_function;
 
 pub use self::ctx::*;
-pub use coprocessor::codec::{Error, Result};
+pub use crate::coprocessor::codec::{Error, Result};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Expression {

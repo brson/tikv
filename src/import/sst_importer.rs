@@ -21,7 +21,7 @@ use kvproto::import_sstpb::*;
 use rocksdb::{IngestExternalFileOptions, DB};
 use uuid::Uuid;
 
-use util::rocksdb::{get_cf_handle, prepare_sst_for_ingestion, validate_sst_for_ingestion};
+use crate::util::rocksdb::{get_cf_handle, prepare_sst_for_ingestion, validate_sst_for_ingestion};
 
 use super::{Error, Result};
 

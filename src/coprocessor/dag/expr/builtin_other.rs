@@ -14,7 +14,7 @@
 use std::i64;
 
 use super::{EvalContext, Result, ScalarFunc};
-use coprocessor::codec::Datum;
+use crate::coprocessor::codec::Datum;
 
 impl ScalarFunc {
     #[inline]

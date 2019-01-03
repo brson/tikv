@@ -26,11 +26,11 @@ use chrono::{DateTime, Datelike, Duration, TimeZone, Timelike, Utc};
 
 use cop_datatype::FieldTypeTp;
 
-use coprocessor::codec::mysql::duration::{Duration as MyDuration, NANOS_PER_SEC, NANO_WIDTH};
-use coprocessor::codec::mysql::{self, Decimal};
-use coprocessor::codec::{Error, Result, TEN_POW};
-use util::codec::number::{self, NumberEncoder};
-use util::codec::BytesSlice;
+use crate::coprocessor::codec::mysql::duration::{Duration as MyDuration, NANOS_PER_SEC, NANO_WIDTH};
+use crate::coprocessor::codec::mysql::{self, Decimal};
+use crate::coprocessor::codec::{Error, Result, TEN_POW};
+use crate::util::codec::number::{self, NumberEncoder};
+use crate::util::codec::BytesSlice;
 
 pub use self::extension::*;
 pub use self::weekmode::WeekMode;

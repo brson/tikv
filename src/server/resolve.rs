@@ -18,9 +18,9 @@ use std::time::Instant;
 
 use kvproto::metapb;
 
-use pd::PdClient;
-use util::collections::HashMap;
-use util::worker::{Runnable, Scheduler, Worker};
+use crate::pd::PdClient;
+use crate::util::collections::HashMap;
+use crate::util::worker::{Runnable, Scheduler, Worker};
 
 use super::metrics::*;
 use super::Result;

@@ -18,11 +18,11 @@ use std::sync::Arc;
 use tipb::executor::Aggregation;
 use tipb::expression::{Expr, ExprType};
 
-use util::collections::{OrderMap, OrderMapEntry};
+use crate::util::collections::{OrderMap, OrderMapEntry};
 
-use coprocessor::codec::datum::{self, Datum};
-use coprocessor::dag::expr::{EvalConfig, EvalContext, EvalWarnings, Expression};
-use coprocessor::*;
+use crate::coprocessor::codec::datum::{self, Datum};
+use crate::coprocessor::dag::expr::{EvalConfig, EvalContext, EvalWarnings, Expression};
+use crate::coprocessor::*;
 
 use super::aggregate::{self, AggrFunc};
 use super::ExecutorMetrics;

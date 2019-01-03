@@ -17,7 +17,7 @@ use std::sync::mpsc;
 use std::thread::Builder;
 use std::time::Duration;
 use tokio_timer::{self, timer::Handle};
-use util::time::Instant;
+use crate::util::time::Instant;
 
 pub struct Timer<T> {
     pending: BinaryHeap<Reverse<TimeoutTask<T>>>,

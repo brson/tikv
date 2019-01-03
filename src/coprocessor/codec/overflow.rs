@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use coprocessor::codec::{Error, Result};
+use crate::coprocessor::codec::{Error, Result};
 
 /// `div_i64` divides i64 a with b and returns:
 /// - an Error indicating overflow occurred or the divisor is 0

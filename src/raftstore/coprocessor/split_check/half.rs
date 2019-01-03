@@ -13,15 +13,15 @@
 
 use rocksdb::DB;
 
-use raftstore::store::keys;
-use util::config::ReadableSize;
+use crate::raftstore::store::keys;
+use crate::util::config::ReadableSize;
 
 use super::super::error::Result;
 use super::super::{Coprocessor, KeyEntry, ObserverContext, SplitCheckObserver, SplitChecker};
 use super::Host;
 use kvproto::metapb::Region;
 use kvproto::pdpb::CheckPolicy;
-use raftstore::store::util as raftstore_util;
+use crate::raftstore::store::util as raftstore_util;
 
 const BUCKET_NUMBER_LIMIT: usize = 1024;
 const BUCKET_SIZE_LIMIT_MB: u64 = 512;

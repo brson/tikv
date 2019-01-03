@@ -14,7 +14,7 @@
 use std::borrow::Cow;
 
 use super::{Error, EvalContext, Result, ScalarFunc};
-use coprocessor::codec::Datum;
+use crate::coprocessor::codec::Datum;
 use crypto::{
     digest::Digest,
     md5::Md5,

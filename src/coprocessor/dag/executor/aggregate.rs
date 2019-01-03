@@ -14,9 +14,9 @@
 use std::cmp::Ordering;
 use tipb::expression::ExprType;
 
-use coprocessor::codec::mysql::Decimal;
-use coprocessor::codec::Datum;
-use coprocessor::Result;
+use crate::coprocessor::codec::mysql::Decimal;
+use crate::coprocessor::codec::Datum;
+use crate::coprocessor::Result;
 
 use super::super::expr::{eval_arith, EvalContext};
 

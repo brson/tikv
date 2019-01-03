@@ -16,13 +16,13 @@ use std::cmp::Ordering;
 use kvproto::metapb::Region;
 use rocksdb::{SeekKey, DB};
 
-use coprocessor::codec::table as table_codec;
+use crate::coprocessor::codec::table as table_codec;
 use kvproto::pdpb::CheckPolicy;
-use raftstore::store::engine::{IterOption, Iterable};
-use raftstore::store::keys;
-use storage::types::Key;
-use storage::CF_WRITE;
-use util::escape;
+use crate::raftstore::store::engine::{IterOption, Iterable};
+use crate::raftstore::store::keys;
+use crate::storage::types::Key;
+use crate::storage::CF_WRITE;
+use crate::util::escape;
 
 use super::super::{
     Coprocessor, KeyEntry, ObserverContext, Result, SplitCheckObserver, SplitChecker,

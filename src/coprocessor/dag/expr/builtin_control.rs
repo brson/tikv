@@ -12,9 +12,9 @@
 // limitations under the License.
 
 use super::{EvalContext, Result, ScalarFunc};
-use coprocessor::codec::mysql::{Decimal, Duration, Json, Time};
-use coprocessor::codec::Datum;
-use coprocessor::dag::expr::Expression;
+use crate::coprocessor::codec::mysql::{Decimal, Duration, Json, Time};
+use crate::coprocessor::codec::Datum;
+use crate::coprocessor::dag::expr::Expression;
 use std::borrow::Cow;
 
 fn if_null<F, T>(mut f: F) -> Result<Option<T>>

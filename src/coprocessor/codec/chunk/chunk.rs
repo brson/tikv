@@ -13,7 +13,7 @@
 
 use super::column::{Column, ColumnEncoder};
 use super::Result;
-use coprocessor::codec::Datum;
+use crate::coprocessor::codec::Datum;
 use std::io::Write;
 use tipb::expression::FieldType;
 #[cfg(test)]

@@ -14,9 +14,9 @@
 use tipb::executor::Limit;
 
 use super::ExecutorMetrics;
-use coprocessor::dag::executor::{Executor, Row};
-use coprocessor::dag::expr::EvalWarnings;
-use coprocessor::Result;
+use crate::coprocessor::dag::executor::{Executor, Row};
+use crate::coprocessor::dag::expr::EvalWarnings;
+use crate::coprocessor::Result;
 
 /// Retrieves rows from the source executor and only produces part of the rows.
 pub struct LimitExecutor<'a> {

@@ -19,9 +19,9 @@ use std::vec::IntoIter;
 use tipb::executor::TopN;
 use tipb::expression::ByItem;
 
-use coprocessor::codec::datum::Datum;
-use coprocessor::dag::expr::{EvalConfig, EvalContext, EvalWarnings, Expression};
-use coprocessor::Result;
+use crate::coprocessor::codec::datum::Datum;
+use crate::coprocessor::dag::expr::{EvalConfig, EvalContext, EvalWarnings, Expression};
+use crate::coprocessor::Result;
 
 use super::topn_heap::TopNHeap;
 use super::{Executor, ExecutorMetrics, ExprColumnRefVisitor, Row};

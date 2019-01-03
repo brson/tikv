@@ -35,24 +35,24 @@ use kvproto::raft_serverpb::{
 };
 use raft::eraftpb::{ConfChange, ConfChangeType, Entry, EntryType};
 
-use import::SSTImporter;
+use crate::import::SSTImporter;
 use raft::NO_LIMIT;
-use raftstore::coprocessor::CoprocessorHost;
-use raftstore::store::engine::{Mutable, Peekable, Snapshot};
-use raftstore::store::metrics::*;
-use raftstore::store::msg::Callback;
-use raftstore::store::peer::Peer;
-use raftstore::store::peer_storage::{
+use crate::raftstore::coprocessor::CoprocessorHost;
+use crate::raftstore::store::engine::{Mutable, Peekable, Snapshot};
+use crate::raftstore::store::metrics::*;
+use crate::raftstore::store::msg::Callback;
+use crate::raftstore::store::peer::Peer;
+use crate::raftstore::store::peer_storage::{
     self, compact_raft_log, write_initial_apply_state, write_peer_state,
 };
-use raftstore::store::util::check_region_epoch;
-use raftstore::store::{cmd_resp, keys, util, Engines, Store};
-use raftstore::{Error, Result};
-use storage::{ALL_CFS, CF_DEFAULT, CF_LOCK, CF_RAFT, CF_WRITE};
-use util::collections::HashMap;
-use util::time::{duration_to_sec, Instant, SlowTimer};
-use util::worker::Runnable;
-use util::{escape, rocksdb, MustConsumeVec};
+use crate::raftstore::store::util::check_region_epoch;
+use crate::raftstore::store::{cmd_resp, keys, util, Engines, Store};
+use crate::raftstore::{Error, Result};
+use crate::storage::{ALL_CFS, CF_DEFAULT, CF_LOCK, CF_RAFT, CF_WRITE};
+use crate::util::collections::HashMap;
+use crate::util::time::{duration_to_sec, Instant, SlowTimer};
+use crate::util::worker::Runnable;
+use crate::util::{escape, rocksdb, MustConsumeVec};
 
 use super::metrics::*;
 

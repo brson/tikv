@@ -13,11 +13,11 @@
 
 use kvproto::kvrpcpb::IsolationLevel;
 
-use storage::mvcc::{
+use crate::storage::mvcc::{
     BackwardScanner, BackwardScannerBuilder, ForwardScanner, ForwardScannerBuilder,
 };
-use storage::mvcc::{Error as MvccError, MvccReader};
-use storage::{Key, KvPair, Snapshot, Statistics, Value};
+use crate::storage::mvcc::{Error as MvccError, MvccReader};
+use crate::storage::{Key, KvPair, Snapshot, Statistics, Value};
 
 use super::{Error, Result};
 

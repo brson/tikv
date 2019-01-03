@@ -17,8 +17,8 @@ use kvproto::metapb::Region;
 use kvproto::pdpb::CheckPolicy;
 use kvproto::raft_cmdpb::{RaftCmdRequest, RaftCmdResponse};
 
-use raftstore::store::msg::Msg;
-use util::transport::{RetryableSendCh, Sender};
+use crate::raftstore::store::msg::Msg;
+use crate::util::transport::{RetryableSendCh, Sender};
 
 use super::*;
 

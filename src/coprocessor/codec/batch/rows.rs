@@ -22,8 +22,8 @@ use cop_datatype::{EvalType, FieldTypeAccessor, FieldTypeFlag};
 use tipb::schema::ColumnInfo;
 
 use super::BatchColumn;
-use coprocessor::codec::mysql::Tz;
-use coprocessor::codec::{datum, Error, Result};
+use crate::coprocessor::codec::mysql::Tz;
+use crate::coprocessor::codec::{datum, Error, Result};
 
 pub struct BatchRows<E> {
     /// Multiple interested columns. Each column is either decoded, or not decoded.

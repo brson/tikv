@@ -26,10 +26,10 @@ use super::mysql::{
     PathExpression, RoundMode, Time, DEFAULT_FSP, MAX_FSP,
 };
 use super::{convert, Error, Result};
-use coprocessor::dag::expr::EvalContext;
-use util::codec::bytes::{self, BytesEncoder};
-use util::codec::{number, BytesSlice};
-use util::escape;
+use crate::coprocessor::dag::expr::EvalContext;
+use crate::util::codec::bytes::{self, BytesEncoder};
+use crate::util::codec::{number, BytesSlice};
+use crate::util::escape;
 
 pub const NIL_FLAG: u8 = 0;
 pub const BYTES_FLAG: u8 = 1;

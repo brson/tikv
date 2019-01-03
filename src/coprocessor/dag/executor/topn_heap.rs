@@ -18,9 +18,9 @@ use std::sync::Arc;
 use std::usize;
 use tipb::expression::ByItem;
 
-use coprocessor::codec::datum::Datum;
-use coprocessor::dag::executor::OriginCols;
-use coprocessor::dag::expr::{EvalContext, Result};
+use crate::coprocessor::codec::datum::Datum;
+use crate::coprocessor::dag::executor::OriginCols;
+use crate::coprocessor::dag::expr::{EvalContext, Result};
 
 const HEAP_MAX_CAPACITY: usize = 1024;
 

@@ -21,9 +21,9 @@ use std::cell::Cell;
 use std::ptr;
 use std::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
-use util::collections::HashMap;
-use util::mpsc;
-use util::Either;
+use crate::util::collections::HashMap;
+use crate::util::mpsc;
+use crate::util::Either;
 
 // The FSM is notified.
 const NOTIFYSTATE_NOTIFIED: usize = 0;

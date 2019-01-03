@@ -17,14 +17,14 @@ use byteorder::{BigEndian, WriteBytesExt};
 use crc::crc32::{self, Digest, Hasher32};
 
 use kvproto::metapb::Region;
-use raftstore::store::engine::{Iterable, Peekable, Snapshot};
-use raftstore::store::{keys, Msg};
-use storage::CF_RAFT;
-use util::worker::Runnable;
+use crate::raftstore::store::engine::{Iterable, Peekable, Snapshot};
+use crate::raftstore::store::{keys, Msg};
+use crate::storage::CF_RAFT;
+use crate::util::worker::Runnable;
 
 use super::metrics::*;
 use super::MsgSender;
-use raftstore::store::metrics::*;
+use crate::raftstore::store::metrics::*;
 
 /// Consistency checking task.
 pub enum Task {

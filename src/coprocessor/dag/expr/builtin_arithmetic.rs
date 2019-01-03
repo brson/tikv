@@ -15,8 +15,8 @@ use std::borrow::Cow;
 use std::ops::{Add, Mul, Sub};
 use std::{f64, i64, u64};
 
-use coprocessor::codec::mysql::{Decimal, Res};
-use coprocessor::codec::{div_i64, div_i64_with_u64, div_u64_with_i64, Datum};
+use crate::coprocessor::codec::mysql::{Decimal, Res};
+use crate::coprocessor::codec::{div_i64, div_i64_with_u64, div_u64_with_i64, Datum};
 
 use super::{Error, EvalContext, Result, ScalarFunc};
 

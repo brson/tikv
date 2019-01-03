@@ -15,8 +15,8 @@ use std::borrow::Cow;
 use std::i64;
 
 use super::{Error, EvalContext, Result, ScalarFunc};
-use coprocessor::codec::mysql::Decimal;
-use coprocessor::codec::Datum;
+use crate::coprocessor::codec::mysql::Decimal;
+use crate::coprocessor::codec::Datum;
 
 impl ScalarFunc {
     pub fn logical_and(&self, ctx: &mut EvalContext, row: &[Datum]) -> Result<Option<i64>> {

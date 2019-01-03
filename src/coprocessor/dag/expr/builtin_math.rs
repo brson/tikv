@@ -20,8 +20,8 @@ use rand::{Rng, SeedableRng, XorShiftRng};
 use time;
 
 use super::{Error, EvalContext, Result, ScalarFunc};
-use coprocessor::codec::mysql::{Decimal, RoundMode, DEFAULT_FSP};
-use coprocessor::codec::Datum;
+use crate::coprocessor::codec::mysql::{Decimal, RoundMode, DEFAULT_FSP};
+use crate::coprocessor::codec::Datum;
 
 impl ScalarFunc {
     #[inline]

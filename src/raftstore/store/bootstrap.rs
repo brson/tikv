@@ -17,10 +17,10 @@ use super::peer_storage::{write_initial_apply_state, write_initial_raft_state};
 use super::util::Engines;
 use kvproto::metapb;
 use kvproto::raft_serverpb::{RegionLocalState, StoreIdent};
-use raftstore::Result;
+use crate::raftstore::Result;
 use rocksdb::{Writable, WriteBatch, DB};
-use storage::{CF_DEFAULT, CF_RAFT};
-use util::rocksdb;
+use crate::storage::{CF_DEFAULT, CF_RAFT};
+use crate::util::rocksdb;
 
 const INIT_EPOCH_VER: u64 = 1;
 const INIT_EPOCH_CONF_VER: u64 = 1;

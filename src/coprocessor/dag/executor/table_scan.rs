@@ -20,12 +20,12 @@ use kvproto::coprocessor::KeyRange;
 use tipb::executor::TableScan;
 use tipb::schema::ColumnInfo;
 
-use storage::{Key, Store};
-use util::collections::HashSet;
+use crate::storage::{Key, Store};
+use crate::util::collections::HashSet;
 
-use coprocessor::codec::table;
-use coprocessor::util;
-use coprocessor::*;
+use crate::coprocessor::codec::table;
+use crate::coprocessor::util;
+use crate::coprocessor::*;
 
 use super::{Executor, ExecutorMetrics, Row};
 use super::{ScanOn, Scanner};

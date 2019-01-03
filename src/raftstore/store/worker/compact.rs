@@ -18,12 +18,12 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use rocksdb::DB;
-use storage::CF_WRITE;
-use util::escape;
-use util::rocksdb;
-use util::rocksdb::compact_range;
-use util::rocksdb::stats::get_range_entries_and_versions;
-use util::worker::Runnable;
+use crate::storage::CF_WRITE;
+use crate::util::escape;
+use crate::util::rocksdb;
+use crate::util::rocksdb::compact_range;
+use crate::util::rocksdb::stats::get_range_entries_and_versions;
+use crate::util::worker::Runnable;
 
 use super::metrics::COMPACT_RANGE_CF;
 

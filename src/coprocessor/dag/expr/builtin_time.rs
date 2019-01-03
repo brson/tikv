@@ -14,11 +14,11 @@
 use super::{EvalContext, Result, ScalarFunc};
 use chrono::offset::TimeZone;
 use chrono::{Datelike, Duration};
-use coprocessor::codec::error::Error;
-use coprocessor::codec::mysql::time::extension::DateTimeExtension;
-use coprocessor::codec::mysql::time::weekmode::WeekMode;
-use coprocessor::codec::mysql::{self, Duration as MyDuration, Time, TimeType};
-use coprocessor::codec::Datum;
+use crate::coprocessor::codec::error::Error;
+use crate::coprocessor::codec::mysql::time::extension::DateTimeExtension;
+use crate::coprocessor::codec::mysql::time::weekmode::WeekMode;
+use crate::coprocessor::codec::mysql::{self, Duration as MyDuration, Time, TimeType};
+use crate::coprocessor::codec::Datum;
 use std::borrow::Cow;
 
 fn handle_incorrect_datetime_error(ctx: &mut EvalContext, t: Cow<'_, Time>) -> Result<()> {
@@ -109,7 +109,7 @@ impl ScalarFunc {
         } else if month == 0 || t.is_zero() {
             return Ok(Some(Cow::Owned("".to_string().into_bytes())));
         }
-        use coprocessor::codec::mysql::time::MONTH_NAMES;
+        use crate::coprocessor::codec::mysql::time::MONTH_NAMES;
         Ok(Some(Cow::Owned(
             MONTH_NAMES[month - 1].to_string().into_bytes(),
         )))
@@ -125,7 +125,7 @@ impl ScalarFunc {
         if t.is_zero() {
             return handle_incorrect_datetime_error(ctx, t).map(|_| None);
         }
-        use coprocessor::codec::mysql::time::WeekdayExtension;
+        use crate::coprocessor::codec::mysql::time::WeekdayExtension;
         let weekday = t.get_time().weekday();
         Ok(Some(Cow::Owned(weekday.name().to_string().into_bytes())))
     }
@@ -159,7 +159,7 @@ impl ScalarFunc {
         if t.is_zero() {
             return handle_incorrect_datetime_error(ctx, t).map(|_| None);
         }
-        use coprocessor::codec::mysql::time::DateTimeExtension;
+        use crate::coprocessor::codec::mysql::time::DateTimeExtension;
         let day = t.get_time().days();
         Ok(Some(i64::from(day)))
     }
@@ -351,7 +351,7 @@ impl ScalarFunc {
             return handle_incorrect_datetime_error(ctx, t).map(|_| None);
         }
         let time = t.get_time();
-        use coprocessor::codec::mysql::time::DateTimeExtension;
+        use crate::coprocessor::codec::mysql::time::DateTimeExtension;
         Ok(Some(i64::from(time.day_number())))
     }
 

@@ -18,9 +18,9 @@ use std::{f64, i64};
 use chrono::TimeZone;
 
 use super::{Error, EvalContext, Result, ScalarFunc};
-use coprocessor::codec::mysql::{Decimal, Duration, Json, Time, TimeType};
-use coprocessor::codec::{datum, mysql, Datum};
-use coprocessor::dag::expr::Expression;
+use crate::coprocessor::codec::mysql::{Decimal, Duration, Json, Time, TimeType};
+use crate::coprocessor::codec::{datum, mysql, Datum};
+use crate::coprocessor::dag::expr::Expression;
 
 #[derive(Clone, Copy, PartialEq)]
 pub enum CmpOp {

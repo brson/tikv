@@ -15,17 +15,17 @@ use std::convert::{TryFrom, TryInto};
 
 use cop_datatype::{EvalType, FieldTypeAccessor, FieldTypeTp};
 
-use coprocessor::codec::datum;
-use coprocessor::codec::mysql::Tz;
-use coprocessor::codec::{Error, Result};
-use util::codec::{bytes, number};
+use crate::coprocessor::codec::datum;
+use crate::coprocessor::codec::mysql::Tz;
+use crate::coprocessor::codec::{Error, Result};
+use crate::util::codec::{bytes, number};
 
 // TODO: Move these type alias and re-exports into cop_datatype.
 // These types are ensured to be cheap to move. However clone can be expensive.
 pub type Int = i64;
 pub type Real = f64;
 pub type Bytes = Vec<u8>;
-pub use coprocessor::codec::mysql::{Decimal, Duration, Json, Time as DateTime};
+pub use crate::coprocessor::codec::mysql::{Decimal, Duration, Json, Time as DateTime};
 
 /// An array of datums in the same data type and is column oriented.
 ///

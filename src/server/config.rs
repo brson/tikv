@@ -14,14 +14,14 @@
 use std::i32;
 
 use super::Result;
-use grpc::CompressionAlgorithms;
+use crate::grpc::CompressionAlgorithms;
 
-use util::collections::HashMap;
-use util::config::{self, ReadableDuration, ReadableSize};
-use util::io_limiter::DEFAULT_SNAP_MAX_BYTES_PER_SEC;
+use crate::util::collections::HashMap;
+use crate::util::config::{self, ReadableDuration, ReadableSize};
+use crate::util::io_limiter::DEFAULT_SNAP_MAX_BYTES_PER_SEC;
 
-pub use raftstore::store::Config as RaftStoreConfig;
-pub use storage::Config as StorageConfig;
+pub use crate::raftstore::store::Config as RaftStoreConfig;
+pub use crate::storage::Config as StorageConfig;
 
 pub const DEFAULT_CLUSTER_ID: u64 = 0;
 pub const DEFAULT_LISTENING_ADDR: &str = "127.0.0.1:20160";

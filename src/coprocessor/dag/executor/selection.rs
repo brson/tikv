@@ -15,8 +15,8 @@ use std::sync::Arc;
 
 use tipb::executor::Selection;
 
-use coprocessor::dag::expr::{EvalConfig, EvalContext, EvalWarnings, Expression};
-use coprocessor::Result;
+use crate::coprocessor::dag::expr::{EvalConfig, EvalContext, EvalWarnings, Expression};
+use crate::coprocessor::Result;
 
 use super::{Executor, ExecutorMetrics, ExprColumnRefVisitor, Row};
 

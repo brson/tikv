@@ -16,7 +16,7 @@ use std::io::{BufRead, Write};
 
 use super::{BytesSlice, Error, Result};
 use std::ptr;
-use util::codec::number::{self, NumberEncoder};
+use crate::util::codec::number::{self, NumberEncoder};
 
 const ENC_GROUP_SIZE: usize = 8;
 const ENC_MARKER: u8 = b'\xff';

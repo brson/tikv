@@ -14,9 +14,9 @@
 use std::mem;
 
 use kvproto::pdpb::CheckPolicy;
-use raftstore::store::{keys, util, Msg};
+use crate::raftstore::store::{keys, util, Msg};
 use rocksdb::DB;
-use util::transport::{RetryableSendCh, Sender};
+use crate::util::transport::{RetryableSendCh, Sender};
 
 use super::super::metrics::*;
 use super::super::{Coprocessor, KeyEntry, ObserverContext, SplitCheckObserver, SplitChecker};

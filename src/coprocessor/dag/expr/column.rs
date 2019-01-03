@@ -18,8 +18,8 @@ use cop_datatype::prelude::*;
 use cop_datatype::FieldTypeTp;
 
 use super::{Column, EvalContext, Result};
-use coprocessor::codec::mysql::{Decimal, Duration, Json, Time};
-use coprocessor::codec::Datum;
+use crate::coprocessor::codec::mysql::{Decimal, Duration, Json, Time};
+use crate::coprocessor::codec::Datum;
 
 impl Column {
     pub fn eval(&self, row: &[Datum]) -> Datum {

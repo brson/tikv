@@ -16,10 +16,10 @@ use rocksdb::{DBIterator, DBVector, SeekKey, TablePropertiesCollection, DB};
 use std::cmp;
 use std::sync::Arc;
 
-use raftstore::store::engine::{IterOption, Peekable, Snapshot, SyncSnapshot};
-use raftstore::store::{keys, util, PeerStorage};
-use raftstore::Result;
-use util::set_panic_mark;
+use crate::raftstore::store::engine::{IterOption, Peekable, Snapshot, SyncSnapshot};
+use crate::raftstore::store::{keys, util, PeerStorage};
+use crate::raftstore::Result;
+use crate::util::set_panic_mark;
 
 /// Snapshot of a region.
 ///
