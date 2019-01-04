@@ -16,10 +16,10 @@ use crate::coprocessor::codec::table;
 use crate::util::codec::bytes::{self, encode_bytes};
 use crate::util::escape;
 
+use crate::raftstore::store::util;
 use kvproto::metapb::Region;
 use kvproto::raft_cmdpb::{AdminCmdType, AdminRequest, SplitRequest};
 use protobuf::RepeatedField;
-use crate::raftstore::store::util;
 use std::result::Result as StdResult;
 
 /// `SplitObserver` adjusts the split key so that it won't separate

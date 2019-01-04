@@ -20,12 +20,12 @@ use rand::XorShiftRng;
 
 use tipb::expression::{Expr, ExprType, FieldType, ScalarFuncSig};
 
-use cop_datatype::prelude::*;
-use cop_datatype::FieldTypeFlag;
 use crate::coprocessor::codec::mysql::charset;
 use crate::coprocessor::codec::mysql::{Decimal, Duration, Json, Time, MAX_FSP};
 use crate::coprocessor::codec::{self, Datum};
 use crate::util::codec::number;
+use cop_datatype::prelude::*;
+use cop_datatype::FieldTypeFlag;
 
 mod builtin_arithmetic;
 mod builtin_cast;

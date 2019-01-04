@@ -12,13 +12,13 @@
 // limitations under the License.
 
 use crate::raftstore::store::Engines;
+use crate::util::rocksdb::engine_metrics::*;
 use rocksdb::DB;
 use std::io;
 use std::sync::mpsc::{self, Sender};
 use std::sync::Arc;
 use std::thread::{Builder, JoinHandle};
 use std::time::{Duration, Instant};
-use crate::util::rocksdb::engine_metrics::*;
 
 pub const DEFAULT_FLUSHER_INTERVAL: u64 = 10000;
 pub const DEFAULT_FLUSHER_RESET_INTERVAL: u64 = 60000;

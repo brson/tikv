@@ -16,11 +16,11 @@ use std::fmt::{self, Display, Formatter};
 use byteorder::{BigEndian, WriteBytesExt};
 use crc::crc32::{self, Digest, Hasher32};
 
-use kvproto::metapb::Region;
 use crate::raftstore::store::engine::{Iterable, Peekable, Snapshot};
 use crate::raftstore::store::{keys, Msg};
 use crate::storage::CF_RAFT;
 use crate::util::worker::Runnable;
+use kvproto::metapb::Region;
 
 use super::metrics::*;
 use super::MsgSender;

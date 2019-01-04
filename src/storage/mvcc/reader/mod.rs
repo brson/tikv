@@ -18,12 +18,12 @@ mod util;
 use super::lock::{Lock, LockType};
 use super::write::{Write, WriteType};
 use super::{Error, Result};
-use kvproto::kvrpcpb::IsolationLevel;
 use crate::raftstore::store::engine::IterOption;
-use std::u64;
 use crate::storage::engine::{Cursor, ScanMode, Snapshot, Statistics};
 use crate::storage::{Key, Value, CF_LOCK, CF_WRITE};
 use crate::util::properties::MvccProperties;
+use kvproto::kvrpcpb::IsolationLevel;
+use std::u64;
 
 pub use self::backward_scanner::{BackwardScanner, BackwardScannerBuilder};
 pub use self::forward_scanner::{ForwardScanner, ForwardScannerBuilder};

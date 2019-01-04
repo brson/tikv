@@ -36,7 +36,6 @@ use kvproto::raft_serverpb::{
 use raft::eraftpb::{ConfChange, ConfChangeType, Entry, EntryType};
 
 use crate::import::SSTImporter;
-use raft::NO_LIMIT;
 use crate::raftstore::coprocessor::CoprocessorHost;
 use crate::raftstore::store::engine::{Mutable, Peekable, Snapshot};
 use crate::raftstore::store::metrics::*;
@@ -53,6 +52,7 @@ use crate::util::collections::HashMap;
 use crate::util::time::{duration_to_sec, Instant, SlowTimer};
 use crate::util::worker::Runnable;
 use crate::util::{escape, rocksdb, MustConsumeVec};
+use raft::NO_LIMIT;
 
 use super::metrics::*;
 

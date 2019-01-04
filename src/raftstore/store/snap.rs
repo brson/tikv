@@ -219,6 +219,10 @@ pub fn retry_delete_snapshot(
     false
 }
 
+use crate::util::file::{calc_crc32, delete_file_if_exist, file_exists, get_file_size};
+use crate::util::rocksdb;
+use crate::util::rocksdb::get_fastest_supported_compression_type;
+use crate::util::time::duration_to_sec;
 use crc::crc32::{self, Digest, Hasher32};
 use kvproto::raft_serverpb::{SnapshotCFFile, SnapshotMeta};
 use protobuf::RepeatedField;
@@ -226,10 +230,6 @@ use rocksdb::{DBCompressionType, EnvOptions, IngestExternalFileOptions, SstFileW
 use std::fs::{File, OpenOptions};
 use std::path::PathBuf;
 use std::time::Instant;
-use crate::util::file::{calc_crc32, delete_file_if_exist, file_exists, get_file_size};
-use crate::util::rocksdb;
-use crate::util::rocksdb::get_fastest_supported_compression_type;
-use crate::util::time::duration_to_sec;
 
 pub const SNAPSHOT_VERSION: u64 = 2;
 const META_FILE_SUFFIX: &str = ".meta";

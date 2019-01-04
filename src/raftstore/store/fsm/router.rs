@@ -15,15 +15,15 @@
 #![allow(dead_code)]
 
 use super::batch::{Fsm, FsmScheduler};
+use crate::util::collections::HashMap;
+use crate::util::mpsc;
+use crate::util::Either;
 use crossbeam::channel::{SendError, TrySendError};
 use std::borrow::Cow;
 use std::cell::Cell;
 use std::ptr;
 use std::sync::atomic::{AtomicPtr, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
-use crate::util::collections::HashMap;
-use crate::util::mpsc;
-use crate::util::Either;
 
 // The FSM is notified.
 const NOTIFYSTATE_NOTIFIED: usize = 0;

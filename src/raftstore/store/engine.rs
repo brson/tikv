@@ -16,11 +16,11 @@ use std::ops::Deref;
 use std::option::Option;
 use std::sync::Arc;
 
+use crate::util::rocksdb;
 use byteorder::{BigEndian, ByteOrder};
 use protobuf;
 use rocksdb::rocksdb_options::UnsafeSnap;
 use rocksdb::{CFHandle, DBIterator, DBVector, ReadOptions, Writable, WriteBatch, DB};
-use crate::util::rocksdb;
 
 use crate::raftstore::Error;
 use crate::raftstore::Result;

@@ -37,9 +37,9 @@ use crate::raftstore::store::{Callback as StoreCallback, ReadResponse, WriteResp
 use crate::raftstore::store::{
     Msg as StoreMsg, RegionIterator, RegionSnapshot, SeekRegionFilter, SeekRegionResult,
 };
-use rocksdb::TablePropertiesCollection;
 use crate::server::transport::RaftStoreRouter;
 use crate::storage::{self, engine, CfName, Key, Value, CF_DEFAULT};
+use rocksdb::TablePropertiesCollection;
 
 quick_error! {
     #[derive(Debug)]

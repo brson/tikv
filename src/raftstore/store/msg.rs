@@ -22,10 +22,10 @@ use kvproto::pdpb::CheckPolicy;
 use kvproto::raft_cmdpb::{RaftCmdRequest, RaftCmdResponse};
 use kvproto::raft_serverpb::RaftMessage;
 
-use raft::{SnapshotStatus, StateRole};
 use crate::raftstore::store::util::KeysInfoFormatter;
 use crate::util::escape;
 use crate::util::rocksdb::CompactedEvent;
+use raft::{SnapshotStatus, StateRole};
 
 use super::RegionSnapshot;
 

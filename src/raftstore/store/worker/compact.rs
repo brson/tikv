@@ -17,13 +17,13 @@ use std::fmt::{self, Display, Formatter};
 use std::sync::Arc;
 use std::time::Instant;
 
-use rocksdb::DB;
 use crate::storage::CF_WRITE;
 use crate::util::escape;
 use crate::util::rocksdb;
 use crate::util::rocksdb::compact_range;
 use crate::util::rocksdb::stats::get_range_entries_and_versions;
 use crate::util::worker::Runnable;
+use rocksdb::DB;
 
 use super::metrics::COMPACT_RANGE_CF;
 
