@@ -23,7 +23,7 @@ use crate::util::rocksdb;
 use crate::util::rocksdb::compact_range;
 use crate::util::rocksdb::stats::get_range_entries_and_versions;
 use crate::util::worker::Runnable;
-use rocksdb::DB;
+use ::rocksdb::DB;
 
 use super::metrics::COMPACT_RANGE_CF;
 

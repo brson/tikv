@@ -22,7 +22,7 @@ use crate::raftstore::store::{SeekRegionFilter, SeekRegionResult};
 use crate::storage::{CfName, Key, Value, CF_DEFAULT, CF_LOCK, CF_WRITE};
 use kvproto::errorpb::Error as ErrorHeader;
 use kvproto::kvrpcpb::{Context, ScanDetail, ScanInfo};
-use rocksdb::TablePropertiesCollection;
+use ::rocksdb::TablePropertiesCollection;
 
 mod btree_engine;
 mod cursor_builder;

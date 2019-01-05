@@ -20,7 +20,7 @@ use crate::storage::{CF_DEFAULT, CF_RAFT};
 use crate::util::rocksdb;
 use kvproto::metapb;
 use kvproto::raft_serverpb::{RegionLocalState, StoreIdent};
-use rocksdb::{Writable, WriteBatch, DB};
+use ::rocksdb::{Writable, WriteBatch, DB};
 
 const INIT_EPOCH_VER: u64 = 1;
 const INIT_EPOCH_CONF_VER: u64 = 1;

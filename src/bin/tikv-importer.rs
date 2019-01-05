@@ -40,8 +40,8 @@ extern crate toml;
 #[cfg(unix)]
 #[macro_use]
 mod util;
-use util::setup::*;
-use util::signal_handler;
+use self::util::setup::*;
+use self::util::signal_handler;
 
 use std::process;
 use std::sync::atomic::Ordering;

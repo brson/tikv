@@ -24,7 +24,7 @@ use kvproto::metapb::Region;
 use kvproto::raft_serverpb::RaftSnapshotData;
 use protobuf::Message;
 use raft::eraftpb::Snapshot as RaftSnapshot;
-use rocksdb::{CFHandle, Writable, WriteBatch, DB};
+use ::rocksdb::{CFHandle, Writable, WriteBatch, DB};
 
 use crate::raftstore::errors::Error as RaftStoreError;
 use crate::raftstore::store::util::check_key_in_region;
@@ -226,7 +226,7 @@ use crate::util::time::duration_to_sec;
 use crc::crc32::{self, Digest, Hasher32};
 use kvproto::raft_serverpb::{SnapshotCFFile, SnapshotMeta};
 use protobuf::RepeatedField;
-use rocksdb::{DBCompressionType, EnvOptions, IngestExternalFileOptions, SstFileWriter};
+use ::rocksdb::{DBCompressionType, EnvOptions, IngestExternalFileOptions, SstFileWriter};
 use std::fs::{File, OpenOptions};
 use std::path::PathBuf;
 use std::time::Instant;

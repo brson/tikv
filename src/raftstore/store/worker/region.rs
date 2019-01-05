@@ -21,7 +21,7 @@ use std::u64;
 
 use kvproto::raft_serverpb::{PeerState, RaftApplyState, RegionLocalState};
 use raft::eraftpb::Snapshot as RaftSnapshot;
-use rocksdb::{Writable, WriteBatch};
+use ::rocksdb::{Writable, WriteBatch};
 
 use crate::raftstore::store::engine::{Mutable, Snapshot};
 use crate::raftstore::store::peer_storage::{

@@ -19,8 +19,8 @@ use std::sync::Arc;
 use crate::util::rocksdb;
 use byteorder::{BigEndian, ByteOrder};
 use protobuf;
-use rocksdb::rocksdb_options::UnsafeSnap;
-use rocksdb::{CFHandle, DBIterator, DBVector, ReadOptions, Writable, WriteBatch, DB};
+use ::rocksdb::rocksdb_options::UnsafeSnap;
+use ::rocksdb::{CFHandle, DBIterator, DBVector, ReadOptions, Writable, WriteBatch, DB};
 
 use crate::raftstore::Error;
 use crate::raftstore::Result;

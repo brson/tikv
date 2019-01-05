@@ -33,16 +33,16 @@ use crate::util::rocksdb::engine_metrics::{
     ROCKSDB_COMPRESSION_RATIO_AT_LEVEL, ROCKSDB_CUR_SIZE_ALL_MEM_TABLES,
     ROCKSDB_NUM_FILES_AT_LEVEL, ROCKSDB_TOTAL_SST_FILES_SIZE,
 };
-use rocksdb::load_latest_options;
-use rocksdb::rocksdb::supported_compression;
-use rocksdb::set_external_sst_file_global_seq_no;
-use rocksdb::{
+use ::rocksdb::load_latest_options;
+use ::rocksdb::rocksdb::supported_compression;
+use ::rocksdb::set_external_sst_file_global_seq_no;
+use ::rocksdb::{
     CColumnFamilyDescriptor, ColumnFamilyOptions, CompactOptions, CompactionOptions,
     DBCompressionType, DBOptions, Env, Range, SliceTransform, DB,
 };
 use sys_info;
 
-pub use rocksdb::CFHandle;
+pub use ::rocksdb::CFHandle;
 
 use super::cfs_diff;
 

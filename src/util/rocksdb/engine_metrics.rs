@@ -15,7 +15,7 @@ use std::i64;
 
 use crate::util::rocksdb;
 use prometheus::{exponential_buckets, GaugeVec, HistogramVec, IntCounterVec, IntGaugeVec};
-use rocksdb::{
+use ::rocksdb::{
     DBStatisticsHistogramType as HistType, DBStatisticsTickerType as TickerType, HistogramData, DB,
 };
 use time;

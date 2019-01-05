@@ -20,8 +20,8 @@ use std::sync::mpsc::Sender;
 use std::sync::Arc;
 
 use protobuf::RepeatedField;
-use rocksdb::rocksdb_options::WriteOptions;
-use rocksdb::{Writable, WriteBatch, DB};
+use ::rocksdb::rocksdb_options::WriteOptions;
+use ::rocksdb::{Writable, WriteBatch, DB};
 use uuid::Uuid;
 
 use kvproto::import_sstpb::SSTMeta;
