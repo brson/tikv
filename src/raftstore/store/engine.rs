@@ -429,7 +429,7 @@ impl Mutable for WriteBatch {}
 mod tests {
     use super::*;
     use kvproto::metapb::Region;
-    use rocksdb::Writable;
+    use ::rocksdb::Writable;
     use std::sync::Arc;
     use tempdir::TempDir;
 

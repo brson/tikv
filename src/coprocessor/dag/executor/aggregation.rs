@@ -409,8 +409,8 @@ mod tests {
     use coprocessor::codec::mysql::decimal::Decimal;
     use coprocessor::codec::table;
     use storage::SnapshotStore;
-    use util::codec::number::NumberEncoder;
-    use util::collections::HashMap;
+    use crate::util::codec::number::NumberEncoder;
+    use crate::util::collections::HashMap;
 
     use super::super::index_scan::tests::IndexTestWrapper;
     use super::super::index_scan::IndexScanExecutor;

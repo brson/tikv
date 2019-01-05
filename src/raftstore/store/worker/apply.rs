@@ -2237,7 +2237,7 @@ mod tests {
     use raftstore::store::msg::WriteResponse;
     use raftstore::store::peer_storage::RAFT_INIT_LOG_INDEX;
     use raftstore::store::util::{new_learner_peer, new_peer};
-    use rocksdb::{Writable, WriteBatch, DB};
+    use ::rocksdb::{Writable, WriteBatch, DB};
     use tempdir::TempDir;
 
     use super::*;

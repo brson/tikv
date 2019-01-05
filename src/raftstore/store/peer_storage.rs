@@ -1450,7 +1450,7 @@ mod tests {
     use raftstore::store::util::Engines;
     use raftstore::store::worker::RegionRunner;
     use raftstore::store::worker::RegionTask;
-    use rocksdb::WriteBatch;
+    use ::rocksdb::WriteBatch;
     use std::cell::RefCell;
     use std::path::Path;
     use std::sync::atomic::*;
