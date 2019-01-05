@@ -542,7 +542,7 @@ fn process_write_impl<S: Snapshot>(
         }
         Command::ResolveLock {
             ctx,
-            mut txn_status,
+            txn_status,
             mut scan_key,
             key_locks,
         } => {
