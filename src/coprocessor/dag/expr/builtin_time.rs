@@ -394,11 +394,11 @@ impl ScalarFunc {
 
 #[cfg(test)]
 mod tests {
-    use coprocessor::codec::mysql::{Duration, Time};
-    use coprocessor::codec::Datum;
-    use coprocessor::dag::expr::tests::{datum_expr, scalar_func_expr};
-    use coprocessor::dag::expr::*;
-    use coprocessor::dag::expr::{EvalContext, Expression};
+    use crate::coprocessor::codec::mysql::{Duration, Time};
+    use crate::coprocessor::codec::Datum;
+    use crate::coprocessor::dag::expr::tests::{datum_expr, scalar_func_expr};
+    use crate::coprocessor::dag::expr::*;
+    use crate::coprocessor::dag::expr::{EvalContext, Expression};
     use std::sync::Arc;
     use tipb::expression::{Expr, ScalarFuncSig};
 
