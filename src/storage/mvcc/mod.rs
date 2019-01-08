@@ -131,8 +131,8 @@ pub type Result<T> = ::std::result::Result<T, Error>;
 pub mod tests {
     use kvproto::kvrpcpb::{Context, IsolationLevel};
 
-    use storage::CF_WRITE;
-    use storage::{Engine, Key, Modify, Mutation, Options, ScanMode, Snapshot};
+    use crate::storage::CF_WRITE;
+    use crate::storage::{Engine, Key, Modify, Mutation, Options, ScanMode, Snapshot};
 
     use super::*;
 

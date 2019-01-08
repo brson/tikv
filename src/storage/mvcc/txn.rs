@@ -377,11 +377,11 @@ impl<S: Snapshot> MvccTxn<S> {
 mod tests {
     use kvproto::kvrpcpb::{Context, IsolationLevel};
 
-    use storage::engine::Engine;
-    use storage::mvcc::tests::*;
-    use storage::mvcc::WriteType;
-    use storage::mvcc::{MvccReader, MvccTxn};
-    use storage::{Key, Mutation, Options, ScanMode, TestEngineBuilder, SHORT_VALUE_MAX_LEN};
+    use crate::storage::engine::Engine;
+    use crate::storage::mvcc::tests::*;
+    use crate::storage::mvcc::WriteType;
+    use crate::storage::mvcc::{MvccReader, MvccTxn};
+    use crate::storage::{Key, Mutation, Options, ScanMode, TestEngineBuilder, SHORT_VALUE_MAX_LEN};
 
     fn test_mvcc_txn_read_imp(k: &[u8], v: &[u8]) {
         let engine = TestEngineBuilder::new().build().unwrap();

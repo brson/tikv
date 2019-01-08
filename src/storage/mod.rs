@@ -3687,7 +3687,7 @@ mod tests {
 
     #[test]
     fn test_resolve_lock() {
-        use storage::txn::RESOLVE_LOCK_BATCH_SIZE;
+        use crate::storage::txn::RESOLVE_LOCK_BATCH_SIZE;
 
         let storage = TestStorageBuilder::new().build().unwrap();
         let (tx, rx) = channel();

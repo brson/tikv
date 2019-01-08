@@ -294,10 +294,10 @@ mod tests {
     use super::{FixtureStore, Scanner, SnapshotStore, Store};
 
     use kvproto::kvrpcpb::{Context, IsolationLevel};
-    use storage::engine::{Engine, RocksEngine, RocksSnapshot};
-    use storage::mvcc::Error as MvccError;
-    use storage::mvcc::MvccTxn;
-    use storage::{Key, KvPair, Mutation, Options, Statistics, TestEngineBuilder};
+    use crate::storage::engine::{Engine, RocksEngine, RocksSnapshot};
+    use crate::storage::mvcc::Error as MvccError;
+    use crate::storage::mvcc::MvccTxn;
+    use crate::storage::{Key, KvPair, Mutation, Options, Statistics, TestEngineBuilder};
 
     const KEY_PREFIX: &str = "key_prefix";
     const START_TS: u64 = 10;
