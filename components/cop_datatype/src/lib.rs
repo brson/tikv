@@ -20,6 +20,7 @@ extern crate bitflags;
 extern crate enum_primitive_derive;
 #[macro_use]
 extern crate failure;
+extern crate tikv_alloc;
 extern crate num_traits;
 #[cfg(test)]
 extern crate test;

@@ -1,0 +1,17 @@
+[package]
+name = "tikv_alloc"
+version = "0.1.0"
+authors = ["Brian Anderson <andersrb@gmail.com>"]
+
+[features]
+default = []
+mem-profiling = ["jemallocator/profiling"]
+system-alloc = []
+
+[dependencies]
+libc = "0.2"
+
+[dependencies.jemallocator]
+features = ["unprefixed_malloc_on_supported_platforms"]
+version = "0.1.9"
+
