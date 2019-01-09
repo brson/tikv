@@ -35,7 +35,6 @@ pub mod file;
 pub mod future;
 pub mod futurepool;
 pub mod io_limiter;
-pub mod jemalloc;
 pub mod logger;
 pub mod metrics;
 pub mod mpsc;

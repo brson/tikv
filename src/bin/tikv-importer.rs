@@ -17,8 +17,6 @@
 extern crate chrono;
 extern crate clap;
 extern crate fs2;
-#[cfg(feature = "mem-profiling")]
-extern crate jemallocator;
 extern crate libc;
 #[cfg(unix)]
 extern crate nix;
@@ -44,6 +42,7 @@ extern crate slog_global;
 extern crate slog_stdlog;
 extern crate slog_term;
 extern crate tikv;
+extern crate tikv_alloc;
 extern crate toml;
 
 #[cfg(unix)]

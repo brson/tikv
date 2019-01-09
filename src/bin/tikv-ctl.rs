@@ -17,8 +17,6 @@ extern crate chrono;
 extern crate futures;
 extern crate grpcio;
 extern crate hex;
-#[cfg(feature = "mem-profiling")]
-extern crate jemallocator;
 extern crate kvproto;
 extern crate libc;
 #[cfg(unix)]
@@ -46,6 +44,7 @@ extern crate slog_global;
 extern crate slog_stdlog;
 extern crate slog_term;
 extern crate tikv;
+extern crate tikv_alloc;
 extern crate toml;
 
 mod util;
