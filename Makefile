@@ -85,18 +85,23 @@ trace_test:
 	env CI=true SKIP_FORMAT_CHECK=true FAIL_POINT=1 ${PROJECT_DIR}/ci-build/test.sh
 
 test:
-	# When SIP is enabled, DYLD_LIBRARY_PATH will not work in subshell, so we have to set it
-	# again here. LOCAL_DIR is defined in .travis.yml.
+        # When SIP is enabled, DYLD_LIBRARY_PATH will not work in subshell, so we have to set it
+        # again here. LOCAL_DIR is defined in .travis.yml.
+        # This is testing the mem-profiling features in tikv_alloc, which are marked
+        # #[ignore] since they require special compile-time and run-time setup
 	export DYLD_LIBRARY_PATH="${DYLD_LIBRARY_PATH}:${LOCAL_DIR}/lib" && \
 	export LOG_LEVEL=DEBUG && \
 	export RUST_BACKTRACE=1 && \
-	cargo test --features "${ENABLE_FEATURES}" --all ${EXTRA_CARGO_ARGS} -- --nocapture && \
-	cargo test --features "${ENABLE_FEATURES}" --bench misc ${EXTRA_CARGO_ARGS} -- --nocapture  && \
+	true || cargo test --features "${ENABLE_FEATURES}" --all ${EXTRA_CARGO_ARGS} -- --nocapture && \
+	true || cargo test --features "${ENABLE_FEATURES}" --bench misc ${EXTRA_CARGO_ARGS} -- --nocapture  && \
 	if [[ "`uname`" == "Linux" ]]; then \
 		export MALLOC_CONF=prof:true,prof_active:false && \
-		cargo test --features "${ENABLE_FEATURES}" ${EXTRA_CARGO_ARGS} --bin tikv-server -- --nocapture --ignored; \
+		cargo test --features "${ENABLE_FEATURES},mem-profiling" ${EXTRA_CARGO_ARGS} --bin tikv-server -- --nocapture --ignored; \
 	fi
-	# TODO: remove above target once https://github.com/rust-lang/cargo/issues/2984 is resolved.
+        # The above linux-specific test is testing the jemalloc profiling features and needs
+        # to be fonfigured specially, both at build time and runtime. Forturately rebuilding
+        # with the mem-profiling feature will only rebuild starting at jemalloc-sys.
+        # TODO: remove above target once https://github.com/rust-lang/cargo/issues/2984 is resolved.
 
 bench:
 	LOG_LEVEL=ERROR RUST_BACKTRACE=1 cargo bench --all --features "${ENABLE_FEATURES}" -- --nocapture
