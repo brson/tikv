@@ -94,7 +94,7 @@ extern crate libc;
 #[cfg(feature = "mem-profiling")]
 #[macro_use]
 extern crate log;
-
+/*
 // The global allocator, usually.
 #[cfg(all(unix, not(fuzzing), not(feature = "no-jemalloc")))]
 #[global_allocator]
@@ -106,7 +106,7 @@ static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
 #[cfg(not(all(unix, not(fuzzing), not(feature = "no-jemalloc"))))]
 #[global_allocator]
 static ALLOC: std::alloc::System = std::alloc::System;
-
+*/
 pub use self::imp::*;
 
 // The implementation of this crate when jemalloc is turned on
@@ -287,4 +287,43 @@ mod imp {
         String::new()
     }
     pub fn dump_prof(_path: Option<&str>) {}
+}
+
+
+
+
+use std::alloc::{GlobalAlloc, Layout};
+
+#[cfg(all(unix, not(fuzzing), not(feature = "no-jemalloc")))]
+static REAL_GLOBAL_ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+
+#[cfg(not(all(unix, not(fuzzing), not(feature = "no-jemalloc"))))]
+static REAL_GLOBAL_ALLOC: std::alloc::System = std::alloc::System;
+
+#[global_allocator]
+static ALLOC: TikvAlloc = TikvAlloc;
+
+struct TikvAlloc;
+
+unsafe impl GlobalAlloc for TikvAlloc {
+    unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        REAL_GLOBAL_ALLOC.alloc(layout)
+    }
+
+    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+        REAL_GLOBAL_ALLOC.dealloc(ptr, layout)
+    }
+
+    unsafe fn alloc_zeroed(&self, layout: Layout) -> *mut u8 {
+        REAL_GLOBAL_ALLOC.alloc_zeroed(layout)
+    }
+
+    unsafe fn realloc(
+        &self, 
+        ptr: *mut u8, 
+        layout: Layout, 
+        new_size: usize
+    ) -> *mut u8 {
+        REAL_GLOBAL_ALLOC.realloc(ptr, layout, new_size)
+    }
 }
