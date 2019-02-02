@@ -303,19 +303,21 @@ static REAL_GLOBAL_ALLOC: std::alloc::System = std::alloc::System;
 #[global_allocator]
 static ALLOC: TikvAlloc = TikvAlloc;
 
-struct TikvAlloc;
+pub struct TikvAlloc;
+
+mod instr;
 
 unsafe impl GlobalAlloc for TikvAlloc {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        REAL_GLOBAL_ALLOC.alloc(layout)
+        instr::alloc(layout)
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        REAL_GLOBAL_ALLOC.dealloc(ptr, layout)
+        instr::dealloc(ptr, layout)
     }
 
     unsafe fn alloc_zeroed(&self, layout: Layout) -> *mut u8 {
-        REAL_GLOBAL_ALLOC.alloc_zeroed(layout)
+        instr::alloc_zeroed(layout)
     }
 
     unsafe fn realloc(
@@ -324,6 +326,6 @@ unsafe impl GlobalAlloc for TikvAlloc {
         layout: Layout, 
         new_size: usize
     ) -> *mut u8 {
-        REAL_GLOBAL_ALLOC.realloc(ptr, layout, new_size)
+        instr::realloc(ptr, layout, new_size)
     }
 }
