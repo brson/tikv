@@ -114,15 +114,17 @@ tokio-threadpool = "0.1"
 vlog = "0.1.4"
 cop_datatype = { path = "components/cop_datatype" }
 panic_hook = { path = "components/panic_hook" }
-tipb = { git = "https://github.com/pingcap/tipb.git" }
-kvproto = { git = "https://github.com/pingcap/kvproto.git" }
+tipb = { git = "https://github.com/pingcap/tipb.git", rev = "a7fd2aaa9719b64c2de3f6c6cd7cb235cb701b56" }
+kvproto = { git = "https://github.com/pingcap/kvproto.git", rev = "7e329e0c9e322cb1aad084db67267d4d5508081f" }
 log_wrappers = { path = "components/log_wrappers" }
 
 [dependencies.murmur3]
 git = "https://github.com/pingcap/murmur3.git"
+rev = "4af9e1a8f2d4206d90d81f11e513fb03c87208bf"
 
 [dependencies.rocksdb]
 git = "https://github.com/pingcap/rust-rocksdb.git"
+rev = "dc16c9b1109186a1baaf8e9babbbe7fbefdc404c"
 
 [dependencies.prometheus]
 version = "0.4.2"
@@ -146,7 +148,7 @@ arrow = "0.10.0"
 signal = "0.6"
 
 [target.'cfg(target_os = "linux")'.dependencies]
-procinfo = { git = "https://github.com/tikv/procinfo-rs" }
+procinfo = { git = "https://github.com/tikv/procinfo-rs", rev = "ac3841d271fe2e4e865afdce60bb6a166044f7c7" }
 
 [workspace]
 members = [
