@@ -21,3 +21,4 @@ slog-global = { version = "0.1", git = "https://github.com/breeswish/slog-global
 
 [dependencies.rocksdb]
 git = "https://github.com/pingcap/rust-rocksdb.git"
+rev = "dc16c9b1109186a1baaf8e9babbbe7fbefdc404c"
