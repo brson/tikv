@@ -4,9 +4,12 @@ version = "3.0.0-beta"
 edition = "2018"
 keywords = ["KV", "distributed-systems", "raft"]
 publish = false
+build = "build.rs"
 
 [features]
-default = ["tikv_alloc/default"]
+default = ["jemalloc"]
+jemalloc = ["tikv_alloc/jemalloc"]
+tcmalloc = ["tikv_alloc/tcmalloc"]
 portable = ["rocksdb/portable"]
 sse = ["rocksdb/sse"]
 mem-profiling = ["tikv_alloc/mem-profiling"]
@@ -111,7 +114,6 @@ more-asserts = "0.1"
 hyper = "0.12"
 tokio-threadpool = "0.1"
 vlog = "0.1.4"
-cop_datatype = { path = "components/cop_datatype" }
 panic_hook = { path = "components/panic_hook" }
 tipb = { git = "https://github.com/pingcap/tipb.git" }
 kvproto = { git = "https://github.com/pingcap/kvproto.git" }
@@ -146,6 +148,15 @@ signal = "0.6"
 
 [target.'cfg(target_os = "linux")'.dependencies]
 procinfo = { git = "https://github.com/tikv/procinfo-rs" }
+
+[dependencies.codec]
+#optional = true
+default-features = false
+path = "components/codec"
+
+[dependencies.cop_datatype]
+default-features = false
+path = "components/cop_datatype"
 
 [workspace]
 members = [
