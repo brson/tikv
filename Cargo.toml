@@ -18,6 +18,7 @@ no-jemalloc = ["tikv_alloc/no-jemalloc"]
 
 [lib]
 name = "tikv"
+crate-type = ["dylib"]
 
 [[bin]]
 name = "tikv-server"
