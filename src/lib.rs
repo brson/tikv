@@ -75,5 +75,6 @@ pub mod pd;
 pub mod raftstore;
 pub mod server;
 pub mod storage;
+pub mod binutil;
 
 pub use crate::storage::Storage;

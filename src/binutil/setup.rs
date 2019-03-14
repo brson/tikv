@@ -12,28 +12,28 @@
 // limitations under the License.
 
 use std::borrow::ToOwned;
-use std::process;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use chrono;
 use clap::ArgMatches;
 
-use tikv::config::{MetricConfig, TiKvConfig};
-use tikv::util::collections::HashMap;
-use tikv::util::{self, logger};
+use crate::config::{MetricConfig, TiKvConfig};
+use crate::util::collections::HashMap;
+use crate::util::{self, logger};
 
 // A workaround for checking if log is initialized.
 pub static LOG_INITIALIZED: AtomicBool = AtomicBool::new(false);
 
+#[macro_export]
 macro_rules! fatal {
     ($lvl:expr, $($arg:tt)+) => ({
-        if LOG_INITIALIZED.load(Ordering::SeqCst) {
+        if $crate::binutil::setup::LOG_INITIALIZED.load(::std::sync::atomic::Ordering::SeqCst) {
             error!($lvl, $($arg)+);
         } else {
             eprintln!($lvl, $($arg)+);
         }
         slog_global::clear_global();
-        process::exit(1)
+        ::std::process::exit(1)
     })
 }
 
