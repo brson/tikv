@@ -128,7 +128,7 @@ mod imp {
         String::from_utf8_lossy(&buf).into_owned()
     }
 
-    pub struct JemallocStats {
+    struct JemallocStats {
         pub allocated: usize,
         pub active: usize,
         pub metadata: usize,
@@ -137,18 +137,18 @@ mod imp {
         pub retained: usize,
     }
 
-    pub fn fetch_stats() -> io::Result<JemallocStats> {
+    pub fn fetch_stats() -> io::Result<Option<Vec<(&'static str, usize)>>> {
         // Stats are cached. Need to advance epoch to refresh.
         JeEpoch::new()?.advance()?;
 
-        Ok(JemallocStats {
-            allocated: stats::allocated()?,
-            active: stats::active()?,
-            metadata: stats::metadata()?,
-            resident: stats::resident()?,
-            mapped: stats::mapped()?,
-            retained: stats::retained()?,
-        })
+        Ok(Some(vec![
+            ("allocated", stats::allocated()?),
+            ("active", stats::active()?),
+            ("metadata", stats::metadata()?),
+            ("resident", stats::resident()?),
+            ("mapped", stats::mapped()?),
+            ("retained", stats::retained()?),
+        ]))
     }
 
     #[allow(clippy::cast_ptr_alignment)]
@@ -304,8 +304,15 @@ mod imp {
 
 #[cfg(not(all(unix, not(fuzzing), not(feature = "no-jemalloc"))))]
 mod imp {
+
+    use std::io;
+                                                  
     pub fn dump_stats() -> String {
         String::new()
     }
     pub fn dump_prof(_path: Option<&str>) {}
+
+    pub fn fetch_stats() -> io::Result<Option<Vec<(&'static str, usize)>>> {
+        Ok(None)
+    }
 }

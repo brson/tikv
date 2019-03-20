@@ -17,29 +17,29 @@ use prometheus::{IntGaugeVec, Opts, Result};
 
 use tikv_alloc;
 
-pub fn monitor_allocator_stats<S: Into<String>>(namespace: S) -> Result<()> {
-    prometheus::register(Box::new(AllocStatsCollector::new(namespace)?))
+pub fn monitor_jemalloc_stats<S: Into<String>>(namespace: S) -> Result<()> {
+    prometheus::register(Box::new(JemallocStatsCollector::new(namespace)?))
 }
 
-struct AllocStatsCollector {
+struct JemallocStatsCollector {
     descs: Vec<Desc>,
     metrics: IntGaugeVec,
 }
 
-impl AllocStatsCollector {
-    fn new<S: Into<String>>(namespace: S) -> Result<AllocStatsCollector> {
+impl JemallocStatsCollector {
+    fn new<S: Into<String>>(namespace: S) -> Result<JemallocStatsCollector> {
         let stats = IntGaugeVec::new(
-            Opts::new("allocator_stats", "Allocator stats").namespace(namespace.into()),
+            Opts::new("jemalloc_stats", "Jemalloc stats").namespace(namespace.into()),
             &["type"],
         )?;
-        Ok(AllocStatsCollector {
+        Ok(JemallocStatsCollector {
             descs: stats.desc().into_iter().cloned().collect(),
             metrics: stats,
         })
     }
 }
 
-impl Collector for AllocStatsCollector {
+impl Collector for JemallocStatsCollector {
     fn desc(&self) -> Vec<&Desc> {
         self.descs.iter().collect()
     }

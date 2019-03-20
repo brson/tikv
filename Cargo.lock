@@ -2116,7 +2116,6 @@ name = "tikv_alloc"
 version = "0.1.0"
 dependencies = [
  "jemalloc-ctl 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "jemalloc-sys 0.1.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "jemallocator 0.1.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "libc 0.2.45 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.9 (registry+https://github.com/rust-lang/crates.io-index)",
