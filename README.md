@@ -180,9 +180,11 @@ CARGO_BUILD_PIPELINING=true cargo build
 
 [p]: https://internals.rust-lang.org/t/evaluating-pipelined-rustc-compilation/10199
 
-### Getting the rest of the system working
+### Developing TiKV
 
-To get other components ([TiDB](https://github.com/pingcap/tidb) and [PD](https://github.com/pingcap/pd)) working, we suggest you follow the [development guide](docs/development.md), because you need the `pd-server` at least to work alongside `tikv-server` for integration level testing.
+Because TiKV depends on [Placement Driver](https://github.com/pingcap/pd) to run, and is usually run together with [TiDB](https://github.com/pingcap/tidb), you may need to build them as well.
+
+For details about this and other subjects useful for developing TiKV see the [TiKV developer guide](docs/development.md).
 
 ### Configuration
 
