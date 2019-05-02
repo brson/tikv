@@ -97,7 +97,7 @@ If you want to try the Go client, see [Try Two Types of APIs](docs/reference/cli
 
 ## Building TiKV
 
-The TiKV codebase is primarily written in Rust, but has components written in C++ (RocksDB) and Go (gRPC). To provide consistency and avoid opinion-based arguments, we make extensive use of linters and automated formatting tools. Additionally, we use nightly builds which provide access to many useful features.
+The TiKV codebase is primarily written in Rust, but has components written in C++ (RocksDB) and Go (the gRPC compiler). To provide consistency and avoid opinion-based arguments, we make extensive use of linters and automated formatting tools. Additionally, we use nightly builds which provide access to many useful features.
 
 ### Checking your prerequisites
 
