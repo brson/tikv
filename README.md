@@ -15,7 +15,7 @@ TiKV is an incubating project of the [Cloud Native Computing Foundation](https:/
 
 ---
 
-With the implementation of the Raft consensus algorithm in Rust and consensus state stored in RocksDB, TiKV guarantees data consistency. [Placement Driver (PD)](https://github.com/pingcap/pd/), which is introduced to implement auto-sharding, enables automatic data migration. The transaction model is similar to Google's Percolator with some performance improvements. TiKV also provides snapshot isolation (SI), snapshot isolation with lock (SQL: `SELECT ... FOR UPDATE`), and externally consistent reads and writes in distributed transactions.
+With the implementation of the Raft consensus algorithm in Rust and consensus state stored in RocksDB, TiKV guarantees data consistency. [Placement Driver (PD)](https://github.com/pingcap/pd/) coordinates between TiKV nodes to implement automatic data sharding and migration. The transaction model is similar to Google's Percolator with some performance improvements. TiKV also provides snapshot isolation (SI), snapshot isolation with lock (SQL: `SELECT ... FOR UPDATE`), and externally consistent reads and writes in distributed transactions.
 
 TiKV has the following key features:
 
@@ -37,7 +37,7 @@ TiKV has the following key features:
 
 - **Cooperates with [TiDB](https://github.com/pingcap/tidb)**
 
-    Thanks to the internal optimization, TiKV and TiDB can work together to be a compelling database solution with high horizontal scalability, externally-consistent transactions, support for RDBMS, and NoSQL design patterns.
+    Thanks to internal optimization, TiKV and TiDB can work together to be a compelling database solution with high horizontal scalability, externally-consistent transactions, support for RDBMS, and NoSQL design patterns.
 
 ## TiKV Adopters
 
@@ -97,7 +97,7 @@ If you want to try the Go client, see [Try Two Types of APIs](docs/reference/cli
 
 ## Setting up a development workspace
 
-The TiKV codebase is primarily written in Rust, but has components written in C++ (RocksDB) and Go (gRPC). To provide consistency and avoid opinion-based arguments, we make extensive use of linters and automated formatting tools. Additionally, due to Rust's youth we are currently utilizing nightly builds which provide access to many useful features.
+The TiKV codebase is primarily written in Rust, but has components written in C++ (RocksDB) and Go (gRPC). To provide consistency and avoid opinion-based arguments, we make extensive use of linters and automated formatting tools. Additionally, we use nightly builds which provide access to many useful features.
 
 ### Checking your prerequisites
 
@@ -126,7 +126,8 @@ cd tikv
 TiKV uses the version of the Rust toolchain specified in `rust-toolchain`. `rustup` and `cargo` will automatically utilize this file. We also make use of the `rustfmt` and `clippy` components.
 
 ```bash
-rustup component add rustfmt-preview
+rustup component add rustfmt
+rustup component add clippy
 ```
 
 ### Building & testing
@@ -161,7 +162,7 @@ make test
 cargo test $TESTNAME
 ```
 
-Our CI systems automatically test all the pull requests, so making sure the full suite passes the test before creating your PR is not strictly required. **All merged PRs must have passed CI test.**
+Our CI systems automatically test all the pull requests, so making sure the full suite passes the test before creating your PR is not strictly required. **All merged PRs must have passed CI.**
 
 Note that, to reduce compilation time, TiKV builds do not include debugging information by default. The easiest way to enable debuginfo is to precede build commands with `RUSTFLAGS=-Cdebuginfo=1` (for line numbers), or `RUSTFLAGS=-Cdebuginfo=2` (for full debuginfo).
 
@@ -193,9 +194,9 @@ Contributions are welcome! See [CONTRIBUTING](./CONTRIBUTING.md) for details on 
 
 For beginners, we have prepared many suitable tasks for you. Checkout our [Help Wanted issues](https://github.com/tikv/tikv/issues?q=is%3Aissue+is%3Aopen+label%3A%22S%3A+HelpWanted%22) for a list, in which we have also marked the difficulty level.
 
-If you are planning something big, for example, relates to multiple components or changes current behaviors, make sure to open an issue to discuss with us before going on.
+If you are planning something big, for example, a change that affects multiple components or changes existing behavior, make sure to open an issue to discuss with us before going on.
 
-The TiKV team actively develops and maintains a bunch of dependencies used in TiKV, which you may be also interested in:
+The TiKV team actively develops and maintains a number of dependencies used in TiKV, which you may be also interested in:
 
 - [rust-prometheus](https://github.com/pingcap/rust-prometheus): The Prometheus client for Rust, our metrics collecting and reporting library
 - [rust-rocksdb](https://github.com/pingcap/rust-rocksdb): Our RocksDB binding and wrapper for Rust
