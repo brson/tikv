@@ -186,10 +186,6 @@ Because TiKV depends on [Placement Driver](https://github.com/pingcap/pd) to run
 
 For details about this and other subjects useful for developing TiKV see the [TiKV developer guide](docs/development.md).
 
-### Configuration
-
-Read our configuration guide to learn about various [configuration options](https://github.com/tikv/tikv/tree/master/docs/op-guide).
-
 ## Contributing
 
 Contributions are welcome! See [CONTRIBUTING](./CONTRIBUTING.md) for details on submitting patches and the contribution workflow.
