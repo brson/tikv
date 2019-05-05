@@ -1,7 +1,11 @@
 # How to contribute
 
-This document outlines some of the conventions on development workflow, commit message formatting, contact points and other
-resources to make it easier to get your contribution accepted.
+This document describes the basic workflow for contributing to TiKV, and what is
+expected from contributors submitting pull requests. Reading and following this
+guide will make it easier to get your contribution accepted. For deeper detail
+about hacking on TiKV see the [TiKV Development Guide][dev-guide].
+
+[dev-guide]: docs/development.md
 
 ## Getting started
 
@@ -65,12 +69,3 @@ For simple commits with obvious reasoning, it can be ok to leave the body of the
 ### Signing off the Commit
 
 Commits require a [Developer Certificate of Origin](https://developercertificate.org/) and so commits must contain a "Signed-off-by" line. You can use the `-s` option to `git commit` to automatically add a `Signed-off-by` to the commit message.
-
-### Handling CI
-
-We use an ad-hoc jenkins CI deployment to test each PR. If you are submitting a
-PR for the first time, you will need someone of us to comment `/ok-to-test` to
-trigger the CI. After this, new changes on the branch will be able to trigger
-the test automatically. You will also be able to manually run the tests by commenting
-`/test`.
-
