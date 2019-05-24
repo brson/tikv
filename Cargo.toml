@@ -196,7 +196,7 @@ panic = 'abort'
 
 # The release profile, used for `cargo build --release`
 [profile.release]
-lto = true
+lto = "thin"
 opt-level = 3
 debug = true
 # TODO: remove this once rust-lang/rust#50199 and rust-lang/rust#53833 are resolved.
