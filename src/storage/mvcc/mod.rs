@@ -12,7 +12,6 @@ pub use self::reader::{Scanner, ScannerBuilder};
 pub use self::txn::{MvccTxn, MAX_TXN_WRITE_SIZE};
 pub use self::write::{Write, WriteType};
 
-use std::error;
 use std::io;
 use tikv_util::escape;
 use tikv_util::metrics::CRITICAL_ERROR;
@@ -86,12 +85,7 @@ quick_error! {
             description("pessimistic lock not found when prewrite")
             display("pessimistic lock not found, start_ts:{}, key:{:?}", start_ts, escape(key))
         }
-        Other(err: Box<dyn error::Error + Sync + Send>) {
-            from()
-            cause(err.as_ref())
-            description(err.description())
-            display("{:?}", err)
-        }
+        StaleRequest { description("stale request") }
     }
 }
 
@@ -176,7 +170,8 @@ impl Error {
                     key: key.to_owned(),
                 })
             }
-            Error::Io(_) | Error::Other(_) => None,
+            Error::StaleRequest => Some(Error::StaleRequest),
+            Error::Io(_) => None,
         }
     }
 }

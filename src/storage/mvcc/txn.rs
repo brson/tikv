@@ -205,7 +205,7 @@ impl<S: Snapshot> MvccTxn<S> {
                 txn_size: lock.txn_size,
             })
         } else {
-            Err(Error::Other("stale request".into()))
+            Err(Error::StaleRequest)
         }
     }
 
