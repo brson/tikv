@@ -6,7 +6,6 @@ pub mod sched_pool;
 pub mod scheduler;
 mod store;
 
-use std::error;
 use std::io::Error as IoError;
 
 pub use self::process::{execute_callback, ProcessResult, RESOLVE_LOCK_BATCH_SIZE};
@@ -37,12 +36,6 @@ quick_error! {
             from()
             cause(err)
             description(err.description())
-        }
-        Other(err: Box<dyn error::Error + Sync + Send>) {
-            from()
-            cause(err.as_ref())
-            description(err.description())
-            display("{:?}", err)
         }
         Io(err: IoError) {
             from()
@@ -93,7 +86,7 @@ impl Error {
                 lower_bound: lower_bound.clone(),
                 upper_bound: upper_bound.clone(),
             }),
-            Error::Other(_) | Error::ProtoBuf(_) | Error::Io(_) => None,
+            Error::ProtoBuf(_) | Error::Io(_) => None,
         }
     }
 }
