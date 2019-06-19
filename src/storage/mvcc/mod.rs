@@ -92,8 +92,8 @@ quick_error! {
 impl Error {
     pub fn maybe_clone(&self) -> Option<Error> {
         match *self {
-            Error::Engine(ref e) => Some(Error::Engine(e.clone())),
-            Error::Codec(ref e) => Some(Error::Codec(e.clone())),
+            Error::Engine(ref e) => Some(Error::Engine(e.lossy_clone())),
+            Error::Codec(ref e) => Some(Error::Codec(e.lossy_clone())),
             Error::KeyIsLocked {
                 ref key,
                 ref primary,

@@ -33,8 +33,8 @@ quick_error! {
     }
 }
 
-impl Clone for Error {
-    fn clone(&self) -> Error {
+impl Error {
+    pub fn lossy_clone(&self) -> Error {
         match *self {
             Error::KeyLength => Error::KeyLength,
             Error::KeyPadding => Error::KeyPadding,

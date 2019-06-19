@@ -675,8 +675,8 @@ impl From<engine::Error> for Error {
     }
 }
 
-impl Clone for Error {
-    fn clone(&self) -> Error {
+impl Error {
+    pub fn lossy_clone(&self) -> Error {
         match *self {
             Error::Request(ref e) => Error::Request(e.clone()),
             Error::Timeout(d) => Error::Timeout(d),
