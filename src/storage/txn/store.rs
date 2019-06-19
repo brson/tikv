@@ -174,7 +174,7 @@ impl Clone for FixtureStore {
                 let owned_k = k.clone();
                 let owned_v = match v {
                     Ok(v) => Ok(v.clone()),
-                    Err(e) => Err(e.maybe_clone().unwrap()),
+                    Err(e) => Err(e.lossy_clone()),
                 };
                 (owned_k, owned_v)
             })
@@ -198,7 +198,7 @@ impl Store for FixtureStore {
         match r {
             None => Ok(None),
             Some(Ok(v)) => Ok(Some(v.clone())),
-            Some(Err(e)) => Err(e.maybe_clone().unwrap()),
+            Some(Err(e)) => Err(e.lossy_clone()),
         }
     }
 
@@ -240,12 +240,12 @@ impl Store for FixtureStore {
                 let owned_v = if key_only {
                     match v {
                         Ok(_v) => Ok(vec![]),
-                        Err(e) => Err(e.maybe_clone().unwrap()),
+                        Err(e) => Err(e.lossy_clone()),
                     }
                 } else {
                     match v {
                         Ok(v) => Ok(v.clone()),
-                        Err(e) => Err(e.maybe_clone().unwrap()),
+                        Err(e) => Err(e.lossy_clone()),
                     }
                 };
                 (owned_k, owned_v)

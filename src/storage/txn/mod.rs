@@ -63,31 +63,31 @@ quick_error! {
 }
 
 impl Error {
-    pub fn maybe_clone(&self) -> Option<Error> {
+    pub fn lossy_clone(&self) -> Error {
         match *self {
-            Error::Engine(ref e) => Some(Error::Engine(e.lossy_clone())),
-            Error::Codec(ref e) => Some(Error::Codec(e.lossy_clone())),
-            Error::Mvcc(ref e) => Some(Error::Mvcc(e.lossy_clone())),
+            Error::Engine(ref e) => Error::Engine(e.lossy_clone()),
+            Error::Codec(ref e) => Error::Codec(e.lossy_clone()),
+            Error::Mvcc(ref e) => Error::Mvcc(e.lossy_clone()),
             Error::InvalidTxnTso {
                 start_ts,
                 commit_ts,
-            } => Some(Error::InvalidTxnTso {
+            } => Error::InvalidTxnTso {
                 start_ts,
                 commit_ts,
-            }),
+            },
             Error::InvalidReqRange {
                 ref start,
                 ref end,
                 ref lower_bound,
                 ref upper_bound,
-            } => Some(Error::InvalidReqRange {
+            } => Error::InvalidReqRange {
                 start: start.clone(),
                 end: end.clone(),
                 lower_bound: lower_bound.clone(),
                 upper_bound: upper_bound.clone(),
-            }),
-            Error::Io(ref e) => Some(Error::Io(clone_io_error(e))),
-            Error::ProtoBuf(ref e) => Some(Error::ProtoBuf(clone_protobuf_error(e))),
+            },
+            Error::Io(ref e) => Error::Io(clone_io_error(e)),
+            Error::ProtoBuf(ref e) => Error::ProtoBuf(clone_protobuf_error(e)),
         }
     }
 }
