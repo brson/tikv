@@ -67,7 +67,7 @@ impl Error {
         match *self {
             Error::Engine(ref e) => Some(Error::Engine(e.lossy_clone())),
             Error::Codec(ref e) => Some(Error::Codec(e.lossy_clone())),
-            Error::Mvcc(ref e) => e.maybe_clone().map(Error::Mvcc),
+            Error::Mvcc(ref e) => Some(Error::Mvcc(e.lossy_clone())),
             Error::InvalidTxnTso {
                 start_ts,
                 commit_ts,

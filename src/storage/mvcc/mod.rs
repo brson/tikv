@@ -91,88 +91,88 @@ quick_error! {
 }
 
 impl Error {
-    pub fn maybe_clone(&self) -> Option<Error> {
+    pub fn lossy_clone(&self) -> Error {
         match *self {
-            Error::Engine(ref e) => Some(Error::Engine(e.lossy_clone())),
-            Error::Codec(ref e) => Some(Error::Codec(e.lossy_clone())),
+            Error::Engine(ref e) => Error::Engine(e.lossy_clone()),
+            Error::Codec(ref e) => Error::Codec(e.lossy_clone()),
             Error::KeyIsLocked {
                 ref key,
                 ref primary,
                 ts,
                 ttl,
                 txn_size,
-            } => Some(Error::KeyIsLocked {
+            } => Error::KeyIsLocked {
                 key: key.clone(),
                 primary: primary.clone(),
                 ts,
                 ttl,
                 txn_size,
-            }),
-            Error::BadFormatLock => Some(Error::BadFormatLock),
-            Error::BadFormatWrite => Some(Error::BadFormatWrite),
+            },
+            Error::BadFormatLock => Error::BadFormatLock,
+            Error::BadFormatWrite => Error::BadFormatWrite,
             Error::TxnLockNotFound {
                 start_ts,
                 commit_ts,
                 ref key,
-            } => Some(Error::TxnLockNotFound {
+            } => Error::TxnLockNotFound {
                 start_ts,
                 commit_ts,
                 key: key.to_owned(),
-            }),
+            },
             Error::LockTypeNotMatch {
                 start_ts,
                 ref key,
                 pessimistic,
-            } => Some(Error::LockTypeNotMatch {
+            } => Error::LockTypeNotMatch {
                 start_ts,
                 key: key.to_owned(),
                 pessimistic,
-            }),
+            },
             Error::WriteConflict {
                 start_ts,
                 conflict_start_ts,
                 conflict_commit_ts,
                 ref key,
                 ref primary,
-            } => Some(Error::WriteConflict {
+            } => Error::WriteConflict {
                 start_ts,
                 conflict_start_ts,
                 conflict_commit_ts,
                 key: key.to_owned(),
                 primary: primary.to_owned(),
-            }),
+            },
             Error::Deadlock {
                 start_ts,
                 lock_ts,
                 ref lock_key,
                 deadlock_key_hash,
-            } => Some(Error::Deadlock {
+            } => Error::Deadlock {
                 start_ts,
                 lock_ts,
                 lock_key: lock_key.to_owned(),
                 deadlock_key_hash,
-            }),
-            Error::AlreadyExist { ref key } => Some(Error::AlreadyExist { key: key.clone() }),
-            Error::DefaultNotFound { ref key, ref write } => Some(Error::DefaultNotFound {
+            },
+            Error::AlreadyExist { ref key } => Error::AlreadyExist { key: key.clone() },
+            Error::DefaultNotFound { ref key, ref write } => Error::DefaultNotFound {
                 key: key.to_owned(),
                 write: write.clone(),
-            }),
-            Error::KeyVersion => Some(Error::KeyVersion),
-            Error::Committed { commit_ts } => Some(Error::Committed { commit_ts }),
+            },
+            Error::KeyVersion => Error::KeyVersion,
+            Error::Committed { commit_ts } => Error::Committed { commit_ts },
             Error::PessimisticLockRollbacked { start_ts, ref key } => {
-                Some(Error::PessimisticLockRollbacked {
+                Error::PessimisticLockRollbacked {
                     start_ts,
                     key: key.to_owned(),
-                })
+                }
             }
             Error::PessimisticLockNotFound { start_ts, ref key } => {
-                Some(Error::PessimisticLockNotFound {
+                Error::PessimisticLockNotFound {
                     start_ts,
                     key: key.to_owned(),
-                })
+                }
             }
-            Error::StaleRequest => Some(Error::StaleRequest),
-            Error::Io(ref e) => Some(Error::Io(clone_io_error(e))),
+            Error::StaleRequest => Error::StaleRequest,
+            Error::Io(ref e) => Error::Io(clone_io_error(e)),
         }
     }
 }
