@@ -160,9 +160,29 @@ impl<S: Snapshot> SnapshotStore<S> {
     }
 }
 
+quick_error! {
+    #[derive(Debug)]
+    pub enum FixtureStoreError {
+    }
+}
+
+pub type FixtureStoreResult<T> = std::result::Result<T, FixtureStoreError>;
+
+impl FixtureStoreError {
+    pub fn lossy_clone(&self) -> FixtureStoreError {
+        panic!()
+    }
+}
+
+impl From<FixtureStoreError> for Error {
+    fn from(e: FixtureStoreError) -> Error {
+        panic!()
+    }
+}
+
 /// A Store that reads on fixtures.
 pub struct FixtureStore {
-    data: std::collections::BTreeMap<Key, Result<Vec<u8>>>,
+    data: std::collections::BTreeMap<Key, FixtureStoreResult<Vec<u8>>>,
 }
 
 impl Clone for FixtureStore {
@@ -184,7 +204,7 @@ impl Clone for FixtureStore {
 }
 
 impl FixtureStore {
-    pub fn new(data: std::collections::BTreeMap<Key, Result<Vec<u8>>>) -> Self {
+    pub fn new(data: std::collections::BTreeMap<Key, FixtureStoreResult<Vec<u8>>>) -> Self {
         FixtureStore { data }
     }
 }
@@ -198,7 +218,7 @@ impl Store for FixtureStore {
         match r {
             None => Ok(None),
             Some(Ok(v)) => Ok(Some(v.clone())),
-            Some(Err(e)) => Err(e.lossy_clone()),
+            Some(Err(e)) => Err(e.lossy_clone().into()),
         }
     }
 
@@ -265,7 +285,7 @@ impl Store for FixtureStore {
 
 /// A Scanner that scans on fixtures.
 pub struct FixtureStoreScanner {
-    data: std::vec::IntoIter<(Key, Result<Vec<u8>>)>,
+    data: std::vec::IntoIter<(Key, FixtureStoreResult<Vec<u8>>)>,
 }
 
 impl Scanner for FixtureStoreScanner {
@@ -275,7 +295,7 @@ impl Scanner for FixtureStoreScanner {
         match value {
             None => Ok(None),
             Some((k, Ok(v))) => Ok(Some((k, v))),
-            Some((_k, Err(e))) => Err(e),
+            Some((_k, Err(e))) => Err(e.into()),
         }
     }
 
