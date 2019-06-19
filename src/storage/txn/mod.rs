@@ -66,7 +66,7 @@ impl Error {
     pub fn maybe_clone(&self) -> Option<Error> {
         match *self {
             Error::Engine(ref e) => e.maybe_clone().map(Error::Engine),
-            Error::Codec(ref e) => e.maybe_clone().map(Error::Codec),
+            Error::Codec(ref e) => Some(Error::Codec(e.clone())),
             Error::Mvcc(ref e) => e.maybe_clone().map(Error::Mvcc),
             Error::InvalidTxnTso {
                 start_ts,

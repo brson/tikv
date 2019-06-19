@@ -3,6 +3,7 @@
 pub mod bytes;
 pub mod number;
 
+use crate::clone_io_error;
 use std::io::{self, ErrorKind};
 
 pub type BytesSlice<'a> = &'a [u8];
@@ -32,15 +33,18 @@ quick_error! {
     }
 }
 
-impl Error {
-    pub fn maybe_clone(&self) -> Option<Error> {
+impl Clone for Error {
+    fn clone(&self) -> Error {
         match *self {
-            Error::KeyLength => Some(Error::KeyLength),
-            Error::KeyPadding => Some(Error::KeyPadding),
-            Error::KeyNotFound => Some(Error::KeyNotFound),
-            Error::Io(_) => None,
+            Error::KeyLength => Error::KeyLength,
+            Error::KeyPadding => Error::KeyPadding,
+            Error::KeyNotFound => Error::KeyNotFound,
+            Error::Io(ref e) => Error::Io(clone_io_error(e)),
         }
     }
+}
+
+impl Error {
     pub fn unexpected_eof() -> Error {
         Error::Io(io::Error::new(ErrorKind::UnexpectedEof, "eof"))
     }
