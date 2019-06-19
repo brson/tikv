@@ -33,6 +33,7 @@ extern crate test;
 use std::collections::hash_map::Entry;
 use std::collections::vec_deque::{Iter, VecDeque};
 use std::fs::File;
+use std::io;
 use std::ops::{Deref, DerefMut};
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -565,6 +566,22 @@ pub unsafe fn erase_lifetime_mut<'a, T: ?Sized>(v: &mut T) -> &'a mut T {
 
 pub unsafe fn erase_lifetime<'a, T: ?Sized>(v: &T) -> &'a T {
     &*(v as *const T)
+}
+
+pub fn clone_io_error(e: &io::Error) -> io::Error {
+    // io::Error must either have a code or an inner error
+    if let Some(code) = e.raw_os_error() {
+        return io::Error::from_raw_os_error(code);
+    } else if let Some(inner) = e.get_ref() {
+        // We lose the concrete inner error and substitute it with the
+        // stringified version
+        let msg = format!("{}", inner);
+        let kind = e.kind();
+        return io::Error::new(kind, msg);
+    } else {
+        error!("impossible io::Error");
+        return io::Error::new(e.kind(), "Impossible I/O error");
+    }
 }
 
 #[cfg(test)]
