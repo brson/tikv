@@ -675,14 +675,14 @@ impl From<engine::Error> for Error {
     }
 }
 
-impl Error {
-    pub fn maybe_clone(&self) -> Option<Error> {
+impl Clone for Error {
+    fn clone(&self) -> Error {
         match *self {
-            Error::Request(ref e) => Some(Error::Request(e.clone())),
-            Error::Timeout(d) => Some(Error::Timeout(d)),
-            Error::EmptyRequest => Some(Error::EmptyRequest),
-            Error::Other(ref e) => Some(Error::OtherString(format!("{}", e))),
-            Error::OtherString(ref e) => Some(Error::OtherString(e.clone())),
+            Error::Request(ref e) => Error::Request(e.clone()),
+            Error::Timeout(d) => Error::Timeout(d),
+            Error::EmptyRequest => Error::EmptyRequest,
+            Error::Other(ref e) => Error::OtherString(format!("{}", e)),
+            Error::OtherString(ref e) => Error::OtherString(e.clone()),
         }
     }
 }

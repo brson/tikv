@@ -65,7 +65,7 @@ quick_error! {
 impl Error {
     pub fn maybe_clone(&self) -> Option<Error> {
         match *self {
-            Error::Engine(ref e) => e.maybe_clone().map(Error::Engine),
+            Error::Engine(ref e) => Some(Error::Engine(e.clone())),
             Error::Codec(ref e) => Some(Error::Codec(e.clone())),
             Error::Mvcc(ref e) => e.maybe_clone().map(Error::Mvcc),
             Error::InvalidTxnTso {
