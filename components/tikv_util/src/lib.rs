@@ -569,7 +569,7 @@ pub unsafe fn erase_lifetime<'a, T: ?Sized>(v: &T) -> &'a T {
     &*(v as *const T)
 }
 
-pub fn clone_io_error(e: &io::Error) -> io::Error {
+pub fn lossy_clone_io_error(e: &io::Error) -> io::Error {
     // io::Error must either have a code or an inner error
     if let Some(code) = e.raw_os_error() {
         return io::Error::from_raw_os_error(code);
@@ -587,7 +587,7 @@ pub fn clone_io_error(e: &io::Error) -> io::Error {
 
 pub fn clone_protobuf_error(e: &ProtobufError) -> ProtobufError {
     match e {
-        ProtobufError::IoError(ref e) => ProtobufError::IoError(clone_io_error(e)),
+        ProtobufError::IoError(ref e) => ProtobufError::IoError(lossy_clone_io_error(e)),
         ProtobufError::WireError(ref e) => ProtobufError::WireError(clone_wire_error(e)),
         ProtobufError::Utf8(ref e) => ProtobufError::Utf8(e.clone()),
         ProtobufError::MessageNotInitialized { message } => ProtobufError::MessageNotInitialized { message },

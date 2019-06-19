@@ -3,7 +3,7 @@
 pub mod bytes;
 pub mod number;
 
-use crate::clone_io_error;
+use crate::lossy_clone_io_error;
 use std::io::{self, ErrorKind};
 
 pub type BytesSlice<'a> = &'a [u8];
@@ -39,7 +39,7 @@ impl Error {
             Error::KeyLength => Error::KeyLength,
             Error::KeyPadding => Error::KeyPadding,
             Error::KeyNotFound => Error::KeyNotFound,
-            Error::Io(ref e) => Error::Io(clone_io_error(e)),
+            Error::Io(ref e) => Error::Io(lossy_clone_io_error(e)),
         }
     }
 }

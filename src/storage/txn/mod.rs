@@ -12,7 +12,7 @@ pub use self::process::{execute_callback, ProcessResult, RESOLVE_LOCK_BATCH_SIZE
 pub use self::scheduler::{Msg, Scheduler};
 pub use self::store::{FixtureStore, FixtureStoreScanner};
 pub use self::store::{Scanner, SnapshotStore, Store};
-use tikv_util::{clone_io_error, clone_protobuf_error, escape};
+use tikv_util::{lossy_clone_io_error, clone_protobuf_error, escape};
 
 quick_error! {
     #[derive(Debug)]
@@ -86,7 +86,7 @@ impl Error {
                 lower_bound: lower_bound.clone(),
                 upper_bound: upper_bound.clone(),
             },
-            Error::Io(ref e) => Error::Io(clone_io_error(e)),
+            Error::Io(ref e) => Error::Io(lossy_clone_io_error(e)),
             Error::ProtoBuf(ref e) => Error::ProtoBuf(clone_protobuf_error(e)),
         }
     }
