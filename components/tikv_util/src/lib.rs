@@ -42,6 +42,7 @@ use std::time::Duration;
 use std::{env, slice, thread, u64};
 
 use protobuf::Message;
+use protobuf::{ProtobufError, error::WireError};
 use rand;
 use rand::rngs::ThreadRng;
 
@@ -581,6 +582,29 @@ pub fn clone_io_error(e: &io::Error) -> io::Error {
     } else {
         error!("impossible io::Error");
         return io::Error::new(e.kind(), "Impossible I/O error");
+    }
+}
+
+pub fn clone_protobuf_error(e: &ProtobufError) -> ProtobufError {
+    match e {
+        ProtobufError::IoError(ref e) => ProtobufError::IoError(clone_io_error(e)),
+        ProtobufError::WireError(ref e) => ProtobufError::WireError(clone_wire_error(e)),
+        ProtobufError::Utf8(ref e) => ProtobufError::Utf8(e.clone()),
+        ProtobufError::MessageNotInitialized { message } => ProtobufError::MessageNotInitialized { message },
+    }
+}
+
+fn clone_wire_error(e: &WireError) -> WireError {
+    match e {
+        WireError::UnexpectedEof => WireError::UnexpectedEof,
+        WireError::UnexpectedWireType(v) => WireError::UnexpectedWireType(*v),
+        WireError::IncorrectTag(v) => WireError::IncorrectTag(*v),
+        WireError::IncompleteMap => WireError::IncompleteMap,
+        WireError::IncorrectVarint => WireError::IncorrectVarint,
+        WireError::Utf8Error => WireError::Utf8Error,
+        WireError::InvalidEnumValue(v) => WireError::InvalidEnumValue(*v),
+        WireError::OverRecursionLimit => WireError::OverRecursionLimit,
+        WireError::Other => WireError::Other,
     }
 }
 
