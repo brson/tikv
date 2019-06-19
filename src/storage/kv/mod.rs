@@ -660,6 +660,12 @@ quick_error! {
             description(err.description())
             display("unknown error {:?}", err)
         }
+        // This is a hack to support cloning of the Other variant. It would be
+        // preferable not to have the Other variant at all, but it is used quite
+        // a lot and would take some time to untangle.
+        OtherString(e: String) {
+            description(e)
+        }
     }
 }
 
@@ -675,7 +681,8 @@ impl Error {
             Error::Request(ref e) => Some(Error::Request(e.clone())),
             Error::Timeout(d) => Some(Error::Timeout(d)),
             Error::EmptyRequest => Some(Error::EmptyRequest),
-            Error::Other(_) => None,
+            Error::Other(ref e) => Some(Error::OtherString(format!("{}", e))),
+            Error::OtherString(ref e) => Some(Error::OtherString(e.clone())),
         }
     }
 }
