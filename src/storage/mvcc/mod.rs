@@ -13,6 +13,7 @@ pub use self::txn::{MvccTxn, MAX_TXN_WRITE_SIZE};
 pub use self::write::{Write, WriteType};
 
 use std::io;
+use tikv_util::clone_io_error;
 use tikv_util::escape;
 use tikv_util::metrics::CRITICAL_ERROR;
 use tikv_util::{panic_when_unexpected_key_or_data, set_panic_mark};
@@ -171,7 +172,7 @@ impl Error {
                 })
             }
             Error::StaleRequest => Some(Error::StaleRequest),
-            Error::Io(_) => None,
+            Error::Io(ref e) => Some(Error::Io(clone_io_error(e))),
         }
     }
 }
