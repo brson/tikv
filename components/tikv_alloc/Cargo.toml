@@ -13,6 +13,10 @@ jemalloc = ["jemallocator", "jemalloc-sys", "jemalloc-ctl"]
 # certain profile functions will return nothing.
 mem-profiling = ["jemallocator/profiling"]
 
+[lib]
+bench = false
+doctest = false
+
 [dependencies]
 libc = "0.2"
 log = "0.3"

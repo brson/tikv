@@ -6,6 +6,9 @@ edition = "2018"
 
 [lib]
 path = "mod.rs"
+test = false
+bench = false
+doctest = false
 
 [dependencies]
 byteorder = "1"

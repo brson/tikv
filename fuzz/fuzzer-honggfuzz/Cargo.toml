@@ -3,6 +3,11 @@ name = "fuzzer-honggfuzz"
 version = "0.0.1"
 publish = false
 
+[lib]
+test = false
+bench = false
+doctest = false
+
 [dependencies]
 fuzz-targets = {path = "../targets"}
 honggfuzz = "0.5"

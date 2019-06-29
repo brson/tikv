@@ -4,6 +4,10 @@ version = "0.0.1"
 edition = "2018"
 publish = false
 
+[lib]
+bench = false
+doctest = false
+
 [dependencies]
 slog = "2.3"
 slog-term = "2.4"

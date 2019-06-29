@@ -26,16 +26,22 @@ name = "tikv"
 
 [[bin]]
 name = "tikv-server"
+test = false
+bench = false
 
 [[bin]]
 name = "tikv-ctl"
+bench = false
 
 [[bin]]
 name = "tikv-importer"
+test = false
+bench = false
 
 [[test]]
 name = "failpoints"
 path = "tests/failpoints/mod.rs"
+bench = false
 
 [[test]]
 name = "integrations"

@@ -5,6 +5,11 @@ edition = "2018"
 publish = false
 description = "TiKV Coprocessor data types"
 
+[lib]
+test = false
+bench = false
+doctest = false
+
 [dependencies]
 tipb = { git = "https://github.com/pingcap/tipb.git" }
 bitflags = "1.0"

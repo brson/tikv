@@ -3,6 +3,11 @@ name = "fuzzer-libfuzzer"
 version = "0.0.1"
 publish = false
 
+[lib]
+test = false
+bench = false
+doctest = false
+
 [dependencies]
 fuzz-targets = {path = "../targets"}
 libfuzzer-sys = {git = "https://github.com/rust-fuzz/libfuzzer-sys.git"}

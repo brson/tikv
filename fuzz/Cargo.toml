@@ -6,6 +6,8 @@ publish = false
 [[bin]]
 name = "fuzz"
 path = "cli.rs"
+test = false
+bench = false
 
 [dependencies]
 cargo_metadata = "0.6"

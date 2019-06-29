@@ -4,6 +4,10 @@ version = "0.0.1"
 edition = "2018"
 publish = false
 
+[lib]
+bench = false
+doctest = false
+
 [features]
 portable = ["engine_rocksdb/portable"]
 sse = ["engine_rocksdb/sse"]

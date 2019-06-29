@@ -4,6 +4,10 @@ version = "0.0.1"
 edition = "2018"
 publish = false
 
+[lib]
+bench = false
+doctest = false
+
 [dependencies]
 tikv_util = { path = "../tikv_util" }
 tikv = { path = "../../", default-features = false }
