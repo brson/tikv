@@ -868,9 +868,7 @@ mod tests {
             let col_expr = col_expr(0, tp);
             let mut exp = scalar_func_expr(sig, &[col_expr]);
             if let Some(flag) = flag {
-                exp.mut_field_type()
-                    .as_mut_accessor()
-                    .set_flag(flag);
+                exp.mut_field_type().as_mut_accessor().set_flag(flag);
             }
             let e = Expression::build(&ctx, exp).unwrap();
             let res = e.eval_int(&mut ctx, &col).unwrap();
@@ -1726,10 +1724,7 @@ mod tests {
         for (flag, cols, exp) in cases {
             let mut col_expr = col_expr(0, FieldTypeTp::LongLong);
             if let Some(flag) = flag {
-                col_expr
-                    .mut_field_type()
-                    .as_mut_accessor()
-                    .set_flag(flag);
+                col_expr.mut_field_type().as_mut_accessor().set_flag(flag);
             }
             let ex = scalar_func_expr(ScalarFuncSig::CastIntAsJson, &[col_expr]);
             let e = Expression::build(&ctx, ex).unwrap();
