@@ -210,7 +210,7 @@ impl DetectTable {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, PartialEq)]
 pub enum DetectType {
     Detect,
     CleanUpWaitFor,
