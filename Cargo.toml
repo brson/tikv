@@ -196,6 +196,7 @@ members = [
   "components/tipb_helper",
   "components/log_wrappers",
   "components/tikv_util",
+  "components/engine",
 ]
 
 [profile.dev]
