@@ -137,6 +137,7 @@ tipb = { git = "https://github.com/pingcap/tipb.git" }
 # TODO: use master branch after the next version is released.
 kvproto = { git = "https://github.com/pingcap/kvproto.git", branch = "release-3.0" }
 log_wrappers = { path = "components/log_wrappers" }
+engine_traits = { path = "components/engine_traits" }
 engine = { path = "components/engine" }
 tikv_util = { path = "components/tikv_util" }
 farmhash = "1.1.5"
@@ -196,6 +197,7 @@ members = [
   "components/tipb_helper",
   "components/log_wrappers",
   "components/tikv_util",
+  "components/engine_traits",
   "components/engine",
 ]
 

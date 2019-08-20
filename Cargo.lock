@@ -572,6 +572,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "engine_traits"
+version = "0.0.1"
+
+[[package]]
 name = "enum-primitive-derive"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2367,6 +2371,7 @@ dependencies = [
  "crossbeam 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "derive_more 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "engine 0.0.1",
+ "engine_traits 0.0.1",
  "fail 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "farmhash 1.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "flate2 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
