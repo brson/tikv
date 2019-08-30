@@ -5,10 +5,10 @@
 //! stores. They are mixed for now, will be separated in the future.
 
 pub mod apply;
-mod batch;
+use raftstore2::store::fsm::batch;
 use raftstore2::store::fsm::metrics;
 mod peer;
-mod router;
+use raftstore2::store::fsm::router;
 pub mod store;
 
 pub use self::apply::{

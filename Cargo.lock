@@ -2030,6 +2030,7 @@ name = "raftstore"
 version = "0.1.0"
 dependencies = [
  "crossbeam 0.5.0",
+ "derive_more",
  "engine",
  "hex",
  "kvproto",
@@ -2039,6 +2040,8 @@ dependencies = [
  "protobuf 2.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "quick-error",
  "raft 0.6.0-alpha (registry+https://github.com/rust-lang/crates.io-index)",
+ "slog",
+ "slog-global",
  "tikv_util",
 ]
 
