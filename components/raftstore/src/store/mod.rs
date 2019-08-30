@@ -1,3 +1,4 @@
+pub mod local_metrics;
 pub mod metrics;
 pub mod snap;
 

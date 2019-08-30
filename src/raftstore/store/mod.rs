@@ -9,7 +9,7 @@ pub mod transport;
 pub mod util;
 
 mod bootstrap;
-mod local_metrics;
+use raftstore2::store::local_metrics;
 use raftstore2::store::metrics;
 mod peer;
 mod peer_storage;
