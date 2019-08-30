@@ -1962,6 +1962,9 @@ replace = "raft-proto 0.6.0-alpha (git+https://github.com/pingcap/raft-rs)"
 [[package]]
 name = "raftstore"
 version = "0.1.0"
+dependencies = [
+ "quick-error 1.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "rand"
