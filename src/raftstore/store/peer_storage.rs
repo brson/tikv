@@ -34,10 +34,8 @@ use super::worker::RegionTask;
 use super::{SnapEntry, SnapKey, SnapManager, SnapshotStatistics};
 use crate::config;
 
-// When we create a region peer, we should initialize its log term/index > 0,
-// so that we can force the follower peer to sync the snapshot first.
-pub const RAFT_INIT_LOG_TERM: u64 = 5;
-pub const RAFT_INIT_LOG_INDEX: u64 = 5;
+pub use raftstore2::store::peer_storage::RAFT_INIT_LOG_TERM;
+pub use raftstore2::store::peer_storage::RAFT_INIT_LOG_INDEX;
 const MAX_SNAP_TRY_CNT: usize = 5;
 const RAFT_LOG_MULTI_GET_CNT: u64 = 8;
 
