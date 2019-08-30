@@ -5,4 +5,15 @@ edition = "2018"
 publish = false
 
 [dependencies]
+crossbeam = "0.5"
+hex = "0.3"
+kvproto = { git = "https://github.com/pingcap/kvproto.git" }
+protobuf = "2.8"
 quick-error = "1.2.2"
+raft = "0.6.0-alpha"
+
+engine = { path = "../engine" }
+# TODO: Eliminate this dependency to make pd_client and raftstore build in
+# parallel
+pd_client = { path = "../pd_client" }
+tikv_util = { path = "../tikv_util" }

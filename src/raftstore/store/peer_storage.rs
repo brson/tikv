@@ -25,7 +25,7 @@ use raft::{self, Error as RaftError, RaftState, Ready, Storage, StorageError};
 use crate::raftstore::store::fsm::GenSnapTask;
 use crate::raftstore::store::util::conf_state_from_region;
 use crate::raftstore::store::ProposalContext;
-use crate::raftstore::{Error, Result};
+use crate::raftstore::Result;
 use tikv_util::worker::Scheduler;
 
 use super::keys::{self, enc_end_key, enc_start_key};
@@ -241,12 +241,6 @@ where
     E: Into<Box<dyn error::Error + Send + Sync>>,
 {
     raft::Error::Store(StorageError::Other(error.into()))
-}
-
-impl From<Error> for RaftError {
-    fn from(err: Error) -> RaftError {
-        storage_error(err)
-    }
 }
 
 pub struct ApplySnapResult {
