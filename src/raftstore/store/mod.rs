@@ -10,7 +10,7 @@ pub mod util;
 
 mod bootstrap;
 mod local_metrics;
-mod metrics;
+use raftstore2::store::metrics;
 mod peer;
 mod peer_storage;
 mod region_snapshot;
