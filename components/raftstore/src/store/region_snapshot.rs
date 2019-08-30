@@ -8,9 +8,9 @@ use engine::{
 use kvproto::metapb::Region;
 use std::sync::Arc;
 
-use crate::raftstore::store::keys::DATA_PREFIX_KEY;
-use crate::raftstore::store::{keys, util};
-use crate::raftstore::Result;
+use crate::store::keys::DATA_PREFIX_KEY;
+use crate::store::{keys, util};
+use crate::Result;
 use tikv_util::keybuilder::KeyBuilder;
 use tikv_util::metrics::CRITICAL_ERROR;
 use tikv_util::{panic_when_unexpected_key_or_data, set_panic_mark};
