@@ -6,7 +6,7 @@
 
 pub mod apply;
 mod batch;
-mod metrics;
+use raftstore2::store::fsm::metrics;
 mod peer;
 mod router;
 pub mod store;
