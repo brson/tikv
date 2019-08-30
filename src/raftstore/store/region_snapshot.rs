@@ -9,7 +9,7 @@ use kvproto::metapb::Region;
 use std::sync::Arc;
 
 use crate::raftstore::store::keys::DATA_PREFIX_KEY;
-use crate::raftstore::store::{keys, util, PeerStorage};
+use crate::raftstore::store::{keys, util};
 use crate::raftstore::Result;
 use tikv_util::keybuilder::KeyBuilder;
 use tikv_util::metrics::CRITICAL_ERROR;
@@ -25,10 +25,6 @@ pub struct RegionSnapshot {
 }
 
 impl RegionSnapshot {
-    pub fn new(ps: &PeerStorage) -> RegionSnapshot {
-        RegionSnapshot::from_snapshot(ps.raw_snapshot().into_sync(), ps.region().clone())
-    }
-
     pub fn from_raw(db: Arc<DB>, region: Region) -> RegionSnapshot {
         RegionSnapshot::from_snapshot(Snapshot::new(db).into_sync(), region)
     }
