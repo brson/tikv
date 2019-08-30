@@ -3,6 +3,8 @@
 #[macro_use] #[cfg(test)]
 extern crate derive_more;
 #[macro_use]
+extern crate fail;
+#[macro_use]
 extern crate lazy_static;
 #[macro_use]
 extern crate prometheus;

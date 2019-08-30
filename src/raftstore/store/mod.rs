@@ -13,7 +13,7 @@ use raftstore2::store::local_metrics;
 use raftstore2::store::metrics;
 mod peer;
 mod peer_storage;
-mod region_snapshot;
+use raftstore2::store::region_snapshot;
 mod snap;
 mod worker;
 
