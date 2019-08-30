@@ -1,6 +1,8 @@
 #[macro_use]
 extern crate lazy_static;
 #[macro_use]
+extern crate prometheus;
+#[macro_use]
 extern crate quick_error;
 
 pub mod coprocessor;
