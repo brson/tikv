@@ -11,6 +11,7 @@ use protobuf::ProtobufError;
 use kvproto::{errorpb, metapb};
 use pd_client;
 use raft;
+use raft::{Error as RaftError, StorageError};
 use tikv_util::codec;
 
 use super::coprocessor::Error as CopError;
@@ -221,3 +222,10 @@ impl<T> From<TrySendError<T>> for Error {
         }
     }
 }
+
+impl From<Error> for RaftError {
+    fn from(err: Error) -> RaftError {
+        raft::Error::Store(StorageError::Other(err.into()))
+    }
+}
+

@@ -1963,7 +1963,15 @@ replace = "raft-proto 0.6.0-alpha (git+https://github.com/pingcap/raft-rs)"
 name = "raftstore"
 version = "0.1.0"
 dependencies = [
+ "crossbeam 0.5.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "engine 0.0.1",
+ "hex 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "kvproto 0.0.2 (git+https://github.com/pingcap/kvproto.git)",
+ "pd_client 0.1.0",
+ "protobuf 2.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "quick-error 1.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "raft 0.6.0-alpha (registry+https://github.com/rust-lang/crates.io-index)",
+ "tikv_util 0.1.0",
 ]
 
 [[package]]
