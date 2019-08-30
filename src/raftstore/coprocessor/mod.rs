@@ -8,7 +8,7 @@ use raft::StateRole;
 
 pub mod config;
 pub mod dispatcher;
-mod error;
+use raftstore2::coprocessor::error;
 mod metrics;
 pub use storage_types::properties;
 pub mod region_info_accessor;
@@ -17,7 +17,7 @@ pub mod split_observer;
 
 pub use self::config::Config;
 pub use self::dispatcher::{CoprocessorHost, Registry};
-pub use self::error::{Error, Result};
+pub use raftstore2::coprocessor::{Error, Result};
 pub use self::region_info_accessor::{
     RegionCollector, RegionInfo, RegionInfoAccessor, SeekRegionCallback,
 };
