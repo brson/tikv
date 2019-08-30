@@ -20,3 +20,5 @@ extern crate tikv_util;
 pub mod coprocessor;
 pub mod errors;
 pub mod store;
+
+pub use errors::{Error, Result};
