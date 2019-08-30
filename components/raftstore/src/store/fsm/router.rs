@@ -470,8 +470,8 @@ impl<N: Fsm, C: Fsm, Ns: Clone, Cs: Clone> Clone for Router<N, C, Ns, Cs> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::raftstore::store::fsm::batch::tests::Message;
-    use crate::raftstore::store::fsm::batch::{self, tests::*};
+    use crate::store::fsm::batch::tests::Message;
+    use crate::store::fsm::batch::{self, tests::*};
     use crossbeam::channel::{RecvTimeoutError, SendError, TryRecvError, TrySendError};
     use std::sync::atomic::AtomicUsize;
     use std::sync::Arc;
