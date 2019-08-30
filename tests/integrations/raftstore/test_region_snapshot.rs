@@ -51,6 +51,10 @@ fn new_peer_storage(engines: Engines, r: &Region) -> PeerStorage {
     PeerStorage::new(engines, r, sched, 0, "".to_owned()).unwrap()
 }
 
+fn new_region_snapshot(ps: &PeerStorage) -> RegionSnapshot {
+    RegionSnapshot::from_snapshot(ps.raw_snapshot().into_sync(), ps.region().clone())
+}
+
 fn load_default_dataset(engines: Engines) -> (PeerStorage, DataSet) {
     let mut r = Region::default();
     r.mut_peers().push(Peer::default());
@@ -130,7 +134,7 @@ fn test_peekable() {
     let key3 = b"key3";
     engines.kv.put_msg(&data_key(key3), &r).expect("");
 
-    let snap = RegionSnapshot::new(&store);
+    let snap = new_region_snapshot(&store);
     let v3 = snap.get_msg(key3).expect("");
     assert_eq!(v3, Some(r));
 
@@ -147,7 +151,7 @@ fn test_seek_and_seek_prev() {
     let path = Builder::new().prefix("test-raftstore").tempdir().unwrap();
     let engines = new_temp_engine(&path);
     let (store, _) = load_default_dataset(engines.clone());
-    let snap = RegionSnapshot::new(&store);
+    let snap = new_region_snapshot(&store);
 
     let check_seek_result = |snap: &RegionSnapshot,
     lower_bound: Option<&[u8]>,
@@ -230,7 +234,7 @@ fn test_seek_and_seek_prev() {
     let path = Builder::new().prefix("test-raftstore").tempdir().unwrap();
     let engines = new_temp_engine(&path);
     let (store, _) = load_multiple_levels_dataset(engines.clone());
-    let snap = RegionSnapshot::new(&store);
+    let snap = new_region_snapshot(&store);
 
     seek_table = vec![
         (b"a01", false, None, None),
@@ -258,7 +262,7 @@ fn test_iterate() {
     let engines = new_temp_engine(&path);
     let (store, base_data) = load_default_dataset(engines.clone());
 
-    let snap = RegionSnapshot::new(&store);
+    let snap = new_region_snapshot(&store);
     let mut data = vec![];
     snap.scan(b"a2", &[0xFF, 0xFF], false, |key, value| {
         data.push((key.to_vec(), value.to_vec()));
@@ -293,7 +297,7 @@ fn test_iterate() {
     let mut region = Region::default();
     region.mut_peers().push(Peer::default());
     let store = new_peer_storage(engines.clone(), &region);
-    let snap = RegionSnapshot::new(&store);
+    let snap = new_region_snapshot(&store);
     data.clear();
     snap.scan(b"", &[0xFF, 0xFF], false, |key, value| {
         data.push((key.to_vec(), value.to_vec()));
@@ -319,7 +323,7 @@ fn test_iterate() {
 
     // test iterator with upper bound
     let store = new_peer_storage(engines, &region);
-    let snap = RegionSnapshot::new(&store);
+    let snap = new_region_snapshot(&store);
     let mut iter = snap.iter(IterOption::new(
         None,
         Some(KeyBuilder::from_slice(b"a5", DATA_PREFIX_KEY.len(), 0)),
@@ -342,7 +346,7 @@ fn test_reverse_iterate() {
     let engines = new_temp_engine(&path);
     let (store, test_data) = load_default_dataset(engines.clone());
 
-    let snap = RegionSnapshot::new(&store);
+    let snap = new_region_snapshot(&store);
     let mut statistics = CFStatistics::default();
     let it = snap.iter(IterOption::default());
     let mut iter = Cursor::new(it, ScanMode::Mixed);
@@ -394,7 +398,7 @@ fn test_reverse_iterate() {
     let mut region = Region::default();
     region.mut_peers().push(Peer::default());
     let store = new_peer_storage(engines, &region);
-    let snap = RegionSnapshot::new(&store);
+    let snap = new_region_snapshot(&store);
     let it = snap.iter(IterOption::default());
     let mut iter = Cursor::new(it, ScanMode::Mixed);
     assert!(!iter
@@ -444,7 +448,7 @@ fn test_reverse_iterate_with_lower_bound() {
     let engines = new_temp_engine(&path);
     let (store, test_data) = load_default_dataset(engines);
 
-    let snap = RegionSnapshot::new(&store);
+    let snap = new_region_snapshot(&store);
     let mut iter_opt = IterOption::default();
     iter_opt.set_lower_bound(b"a3", 1);
     let mut iter = snap.iter(iter_opt);
