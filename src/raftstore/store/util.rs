@@ -12,7 +12,7 @@ use raft::eraftpb::{self, ConfChangeType, ConfState, MessageType};
 use raft::INVALID_INDEX;
 use time::{Duration, Timespec};
 
-use super::peer_storage;
+use super::peer_storage::RAFT_INIT_LOG_TERM;
 use crate::raftstore::{Error, Result};
 use tikv_util::time::monotonic_raw_now;
 use tikv_util::Either;
@@ -95,7 +95,7 @@ pub fn check_key_in_region(key: &[u8], region: &metapb::Region) -> Result<()> {
 pub fn is_first_vote_msg(msg: &eraftpb::Message) -> bool {
     match msg.get_msg_type() {
         MessageType::MsgRequestVote | MessageType::MsgRequestPreVote => {
-            msg.get_term() == peer_storage::RAFT_INIT_LOG_TERM + 1
+            msg.get_term() == RAFT_INIT_LOG_TERM + 1
         }
         _ => false,
     }
@@ -618,7 +618,7 @@ mod tests {
     use raft::eraftpb::{ConfChangeType, Message, MessageType};
     use time::Duration as TimeDuration;
 
-    use crate::raftstore::store::peer_storage;
+    use crate::raftstore::store::peer_storage::RAFT_INIT_LOG_TERM;
     use tikv_util::time::{monotonic_now, monotonic_raw_now};
 
     use super::*;
@@ -821,27 +821,27 @@ mod tests {
         let tbl = vec![
             (
                 MessageType::MsgRequestVote,
-                peer_storage::RAFT_INIT_LOG_TERM + 1,
+                RAFT_INIT_LOG_TERM + 1,
                 true,
             ),
             (
                 MessageType::MsgRequestPreVote,
-                peer_storage::RAFT_INIT_LOG_TERM + 1,
+                RAFT_INIT_LOG_TERM + 1,
                 true,
             ),
             (
                 MessageType::MsgRequestVote,
-                peer_storage::RAFT_INIT_LOG_TERM,
+                RAFT_INIT_LOG_TERM,
                 false,
             ),
             (
                 MessageType::MsgRequestPreVote,
-                peer_storage::RAFT_INIT_LOG_TERM,
+                RAFT_INIT_LOG_TERM,
                 false,
             ),
             (
                 MessageType::MsgHup,
-                peer_storage::RAFT_INIT_LOG_TERM + 1,
+                RAFT_INIT_LOG_TERM + 1,
                 false,
             ),
         ];
