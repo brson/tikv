@@ -2569,6 +2569,7 @@ name = "storage_types"
 version = "0.1.0"
 dependencies = [
  "byteorder 1.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "hex 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "keys 0.1.0",
  "quick-error 1.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "tikv_util 0.1.0",
