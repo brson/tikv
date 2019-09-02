@@ -122,6 +122,7 @@ pd_client = { path = "components/pd_client" }
 keys = { path = "components/keys" }
 sst_importer = { path = "components/sst_importer" }
 raftstore2 = { path = "components/raftstore", package = "raftstore" }
+storage_types = { path = "components/storage_types" }
 
 [dependencies.murmur3]
 git = "https://github.com/pingcap/murmur3.git"
@@ -190,6 +191,7 @@ members = [
   "components/keys",
   "components/sst_importer",
   "components/raftstore",
+  "components/storage_types",
   "cmd",
 ]
 default-members = ["cmd"]
