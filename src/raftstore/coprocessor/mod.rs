@@ -6,7 +6,7 @@ use kvproto::pdpb::CheckPolicy;
 use kvproto::raft_cmdpb::{AdminRequest, AdminResponse, Request, Response};
 use raft::StateRole;
 
-pub mod config;
+pub use raftstore2::coprocessor::config;
 pub mod dispatcher;
 use raftstore2::coprocessor::error;
 use raftstore2::coprocessor::metrics;
