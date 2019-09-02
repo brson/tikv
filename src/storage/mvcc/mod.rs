@@ -13,7 +13,7 @@ pub use self::reader::EntryScanner;
 pub use self::reader::MvccReader;
 pub use self::reader::{Scanner, ScannerBuilder};
 pub use self::txn::{MvccTxn, MAX_TXN_WRITE_SIZE};
-pub use self::write::{Write, WriteType};
+pub use self::write::{Write, WriteType, Error as WriteError};
 
 use std::error;
 use std::io;
@@ -176,6 +176,16 @@ impl From<LockError> for Error {
             LockError::Io(e) => Error::Io(e),
             LockError::Codec(e) => Error::Codec(e),
             LockError::BadFormatLock => Error::BadFormatLock,
+        }
+    }
+}
+
+impl From<WriteError> for Error {
+    fn from(err: WriteError) -> Error {
+        match err {
+            WriteError::Io(e) => Error::Io(e),
+            WriteError::Codec(e) => Error::Codec(e),
+            WriteError::BadFormatWrite => Error::BadFormatWrite,
         }
     }
 }
