@@ -11,6 +11,8 @@ extern crate prometheus;
 #[macro_use]
 extern crate quick_error;
 #[macro_use]
+extern crate serde_derive;
+#[macro_use]
 extern crate slog_global;
 #[cfg(test)]
 extern crate test;
