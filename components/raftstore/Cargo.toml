@@ -25,9 +25,14 @@ keys = { path = "../keys" }
 # TODO: Eliminate this dependency to make pd_client and raftstore build in
 # parallel
 pd_client = { path = "../pd_client" }
+storage_types = { path = "../storage_types" }
 tikv_util = { path = "../tikv_util" }
 
 [dependencies.prometheus]
 git = "https://github.com/pingcap/rust-prometheus.git"
 rev = "7dd3d42f0c21384950afe6a46ed85352acf71625"
 features = ["nightly", "push", "process"]
+
+[dev-dependencies]
+rand = "0.6.5"
+tempfile = "3.0"
