@@ -15,6 +15,7 @@ mod peer;
 mod peer_storage;
 use raftstore2::store::region_snapshot;
 mod snap;
+mod snap_manager;
 mod worker;
 
 pub use self::bootstrap::{
@@ -38,10 +39,11 @@ pub use self::peer_storage::{
 };
 pub use self::region_snapshot::{RegionIterator, RegionSnapshot};
 pub use self::snap::{
-    check_abort, copy_snapshot, ApplyOptions, Error as SnapError, SnapEntry, SnapKey, SnapManager,
-    SnapManagerBuilder, Snapshot, SnapshotDeleter, SnapshotStatistics,
+    check_abort, copy_snapshot, ApplyOptions, Error as SnapError, SnapKey,
+    Snapshot, SnapshotDeleter, SnapshotStatistics,
 };
 pub use self::snap::snap_io::{apply_sst_cf_file, build_sst_cf_file};
+pub use self::snap_manager::{SnapEntry, SnapManager, SnapManagerBuilder};
 pub use self::transport::{CasualRouter, ProposalRouter, StoreRouter, Transport};
 pub use self::worker::PdTask;
 pub use self::worker::{KeyEntry, LocalReader, RegionTask};
