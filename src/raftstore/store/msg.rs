@@ -1,5 +1,6 @@
 // Copyright 2016 TiKV Project Authors. Licensed under Apache-2.0.
 
+use std::any::Any;
 use std::fmt;
 use std::time::Instant;
 
@@ -12,7 +13,6 @@ use kvproto::raft_serverpb::RaftMessage;
 use raft::SnapshotStatus;
 
 use crate::raftstore::store::fsm::apply::TaskRes as ApplyTaskRes;
-use crate::raftstore::store::fsm::PeerFsm;
 use crate::raftstore::store::util::KeysInfoFormatter;
 use crate::raftstore::store::SnapKey;
 use crate::storage::kv::CompactedEvent;
@@ -146,7 +146,7 @@ pub enum CasualMessage {
 
     /// A test only message, it is useful when we want to access
     /// peer's internal state.
-    Test(Box<dyn FnOnce(&mut PeerFsm) + Send + 'static>),
+    Test(Box<dyn FnOnce(&mut dyn Any) + Send + 'static>),
 }
 
 impl fmt::Debug for CasualMessage {
