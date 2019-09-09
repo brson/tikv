@@ -1,5 +1,6 @@
 // Copyright 2016 TiKV Project Authors. Licensed under Apache-2.0.
 
+use std::any::Any;
 use std::path::Path;
 use std::sync::{self, mpsc, Arc, RwLock};
 use std::time::*;
@@ -1002,7 +1003,8 @@ impl<T: Simulator> Cluster<T> {
         router
             .send(
                 region_id,
-                PeerMsg::CasualMessage(CasualMessage::Test(Box::new(move |peer: &mut PeerFsm| {
+                PeerMsg::CasualMessage(CasualMessage::Test(Box::new(move |peer: &mut dyn Any| {
+                    let peer: &mut PeerFsm = peer.downcast_mut().expect("any is PeerFsm");
                     let idx = peer.peer.raft_group.get_store().committed_index();
                     peer.peer.raft_group.request_snapshot(idx).unwrap();
                     debug!("{} request snapshot at {}", idx, peer.peer.tag);
