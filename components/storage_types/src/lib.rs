@@ -5,6 +5,7 @@ extern crate slog;
 #[macro_use]
 extern crate slog_global;
 
+pub mod compacted_event;
 pub mod mvcc;
 pub mod properties;
 
