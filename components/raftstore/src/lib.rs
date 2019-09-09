@@ -1,5 +1,7 @@
 #![feature(test)]
 
+#[macro_use]
+extern crate bitflags;
 #[macro_use] #[cfg(test)]
 extern crate derive_more;
 #[macro_use]
