@@ -12,17 +12,17 @@ use kvproto::raft_cmdpb::RaftCmdRequest;
 use kvproto::raft_serverpb::RaftMessage;
 use raft::SnapshotStatus;
 
-use crate::raftstore::store::fsm::apply::TaskRes as ApplyTaskRes;
-use crate::raftstore::store::util::KeysInfoFormatter;
-use crate::raftstore::store::SnapKey;
-use crate::storage::kv::CompactedEvent;
+use crate::store::fsm::apply_types::TaskRes as ApplyTaskRes;
+use crate::store::util::KeysInfoFormatter;
+use crate::store::snap::SnapKey;
+use storage_types::compacted_event::CompactedEvent;
 use tikv_util::escape;
 
-pub use raftstore2::store::msg_callback::ReadResponse;
-pub use raftstore2::store::msg_callback::WriteResponse;
-pub use raftstore2::store::msg_callback::ReadCallback;
-pub use raftstore2::store::msg_callback::WriteCallback;
-pub use raftstore2::store::msg_callback::Callback;
+pub use crate::store::msg_callback::ReadResponse;
+pub use crate::store::msg_callback::WriteResponse;
+pub use crate::store::msg_callback::ReadCallback;
+pub use crate::store::msg_callback::WriteCallback;
+pub use crate::store::msg_callback::Callback;
 
 bitflags! {
     pub struct PeerTicks: u8 {
