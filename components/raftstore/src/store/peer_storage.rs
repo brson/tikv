@@ -2,3 +2,10 @@
 // so that we can force the follower peer to sync the snapshot first.
 pub const RAFT_INIT_LOG_TERM: u64 = 5;
 pub const RAFT_INIT_LOG_INDEX: u64 = 5;
+
+pub const JOB_STATUS_PENDING: usize = 0;
+pub const JOB_STATUS_RUNNING: usize = 1;
+pub const JOB_STATUS_CANCELLING: usize = 2;
+pub const JOB_STATUS_CANCELLED: usize = 3;
+pub const JOB_STATUS_FINISHED: usize = 4;
+pub const JOB_STATUS_FAILED: usize = 5;
