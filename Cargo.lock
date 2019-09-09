@@ -2029,6 +2029,7 @@ replace = "raft-proto 0.6.0-alpha (git+https://github.com/pingcap/raft-rs)"
 name = "raftstore"
 version = "0.1.0"
 dependencies = [
+ "bitflags",
  "crossbeam 0.5.0",
  "derive_more",
  "engine",

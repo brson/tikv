@@ -1,5 +1,6 @@
 pub mod fsm;
 pub use keys;
+pub mod msg;
 pub mod msg_callback;
 pub mod util;
 
