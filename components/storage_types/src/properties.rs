@@ -7,7 +7,7 @@ use std::io::Read;
 use std::ops::{Deref, DerefMut};
 use std::u64;
 
-use storage_types::mvcc::write::{Write, WriteType};
+use crate::mvcc::write::{Write, WriteType};
 use keys::Key;
 use engine::rocks::{
     CFHandle, DBEntryType, Range, TablePropertiesCollector, TablePropertiesCollectorFactory,
@@ -727,8 +727,8 @@ mod tests {
     use tempfile::Builder;
     use test::Bencher;
 
-    use crate::coprocessor::properties::MvccPropertiesCollectorFactory;
-    use storage_types::mvcc::write::{Write, WriteType};
+    use super::MvccPropertiesCollectorFactory;
+    use crate::mvcc::write::{Write, WriteType};
     use keys::Key;
     use engine::rocks;
     use engine::rocks::util::CFOptions;
