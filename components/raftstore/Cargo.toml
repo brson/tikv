@@ -6,6 +6,7 @@ publish = false
 
 [dependencies]
 bitflags = "1.0.1"
+crc = "1.8"
 crossbeam = "0.5"
 derive_more = "0.15.0"
 fail = "0.3"
@@ -19,6 +20,7 @@ serde = "1.0"
 serde_derive = "1.0"
 slog = { version = "2.3", features = ["max_level_trace", "release_max_level_debug"] }
 slog-global = { version = "0.1", git = "https://github.com/breeswish/slog-global.git", rev = "91904ade" }
+tempfile = "3.0"
 time = "0.1"
 
 engine = { path = "../engine" }
@@ -35,4 +37,3 @@ default-features = false
 
 [dev-dependencies]
 rand = "0.6.5"
-tempfile = "3.0"

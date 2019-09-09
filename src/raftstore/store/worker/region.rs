@@ -667,7 +667,7 @@ mod tests {
     use std::time::Duration;
 
     use crate::raftstore::store::peer_storage::JOB_STATUS_PENDING;
-    use crate::raftstore::store::snap::tests::get_test_db_for_regions;
+    use crate::raftstore::store::snap::test_helpers::get_test_db_for_regions;
     use crate::raftstore::store::worker::RegionRunner;
     use crate::raftstore::store::{keys, SnapKey, SnapManager};
     use engine::rocks;

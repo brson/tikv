@@ -14,7 +14,7 @@ use raftstore2::store::metrics;
 mod peer;
 mod peer_storage;
 use raftstore2::store::region_snapshot;
-mod snap;
+use raftstore2::store::snap;
 mod snap_manager;
 mod worker;
 
