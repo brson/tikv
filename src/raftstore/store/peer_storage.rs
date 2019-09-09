@@ -39,10 +39,8 @@ pub use raftstore2::store::peer_storage::RAFT_INIT_LOG_INDEX;
 const MAX_SNAP_TRY_CNT: usize = 5;
 const RAFT_LOG_MULTI_GET_CNT: u64 = 8;
 
-/// The initial region epoch version.
-pub const INIT_EPOCH_VER: u64 = 1;
-/// The initial region epoch conf_version.
-pub const INIT_EPOCH_CONF_VER: u64 = 1;
+pub use raftstore2::store::peer_storage::INIT_EPOCH_VER;
+pub use raftstore2::store::peer_storage::INIT_EPOCH_CONF_VER;
 
 // One extra slot for VecDeque internal usage.
 const MAX_CACHE_CAPACITY: usize = 1024 - 1;
