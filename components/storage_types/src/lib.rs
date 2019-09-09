@@ -1,7 +1,12 @@
 #[macro_use]
 extern crate quick_error;
+#[macro_use(slog_debug)]
+extern crate slog;
+#[macro_use]
+extern crate slog_global;
 
 pub mod mvcc;
+pub mod properties;
 
 use keys::{Key, Value};
 

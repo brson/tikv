@@ -7,7 +7,7 @@ use std::io::Read;
 use std::ops::{Deref, DerefMut};
 use std::u64;
 
-use storage_types::mvcc::write::{Write, WriteType};
+use crate::mvcc::write::{Write, WriteType};
 use keys::Key;
 use engine::rocks::{
     CFHandle, DBEntryType, Range, TablePropertiesCollector, TablePropertiesCollectorFactory,
