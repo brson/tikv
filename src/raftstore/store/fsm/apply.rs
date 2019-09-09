@@ -18,13 +18,13 @@ use engine::Engines;
 use engine::{util as engine_util, Mutable, Peekable};
 use engine::{ALL_CFS, CF_DEFAULT, CF_LOCK, CF_RAFT, CF_WRITE};
 use kvproto::import_sstpb::SstMeta;
-use kvproto::metapb::{Peer as PeerMeta, Region};
+use kvproto::metapb::Region;
 use kvproto::raft_cmdpb::{
-    AdminCmdType, AdminRequest, AdminResponse, ChangePeerRequest, CmdType, CommitMergeRequest,
+    AdminCmdType, AdminRequest, AdminResponse, ChangePeerRequest, CmdType,
     RaftCmdRequest, RaftCmdResponse, Request, Response,
 };
 use kvproto::raft_serverpb::{
-    MergeState, PeerState, RaftApplyState, RaftTruncatedState, RegionLocalState,
+    MergeState, PeerState, RaftApplyState, RegionLocalState,
 };
 use raft::eraftpb::{ConfChange, ConfChangeType, Entry, EntryType, Snapshot as RaftSnapshot};
 use uuid::Builder as UuidBuilder;
@@ -136,70 +136,9 @@ impl PendingCmdQueue {
     }
 }
 
-#[derive(Default, Debug)]
-pub struct ChangePeer {
-    pub conf_change: ConfChange,
-    pub peer: PeerMeta,
-    pub region: Region,
-}
-
-#[derive(Debug)]
-pub struct Range {
-    pub cf: String,
-    pub start_key: Vec<u8>,
-    pub end_key: Vec<u8>,
-}
-
-impl Range {
-    fn new(cf: String, start_key: Vec<u8>, end_key: Vec<u8>) -> Range {
-        Range {
-            cf,
-            start_key,
-            end_key,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub enum ExecResult {
-    ChangePeer(ChangePeer),
-    CompactLog {
-        state: RaftTruncatedState,
-        first_index: u64,
-    },
-    SplitRegion {
-        regions: Vec<Region>,
-        derived: Region,
-    },
-    PrepareMerge {
-        region: Region,
-        state: MergeState,
-    },
-    CatchUpLogs(CatchUpLogs),
-    CommitMerge {
-        region: Region,
-        source: Region,
-    },
-    RollbackMerge {
-        region: Region,
-        commit: u64,
-    },
-    ComputeHash {
-        region: Region,
-        index: u64,
-        snap: Snapshot,
-    },
-    VerifyHash {
-        index: u64,
-        hash: Vec<u8>,
-    },
-    DeleteRange {
-        ranges: Vec<Range>,
-    },
-    IngestSst {
-        ssts: Vec<SstMeta>,
-    },
-}
+pub use raftstore2::store::fsm::apply_types::ChangePeer;
+pub use raftstore2::store::fsm::apply_types::Range;
+pub use raftstore2::store::fsm::apply_types::ExecResult;
 
 /// The possible returned value when applying logs.
 pub enum ApplyResult {
@@ -2192,22 +2131,7 @@ pub struct Destroy {
     region_id: u64,
 }
 
-/// A message that asks the delegate to apply to the given logs and then reply to
-/// target mailbox.
-#[derive(Default, Debug)]
-pub struct CatchUpLogs {
-    /// The target region to be notified when given logs are applied.
-    pub target_region_id: u64,
-    /// Merge request that contains logs to be applied.
-    pub merge: CommitMergeRequest,
-    /// A flag indicate that all source region's logs are applied.
-    ///
-    /// This is still necessary although we have a mailbox field already.
-    /// Mailbox is used to notify target region, and trigger a round of polling.
-    /// But due to the FIFO natural of channel, we need a flag to check if it's
-    /// ready when polling.
-    pub logs_up_to_date: Arc<AtomicU64>,
-}
+pub use raftstore2::store::fsm::apply_types::CatchUpLogs;
 
 pub struct GenSnapTask {
     region_id: u64,
@@ -2312,37 +2236,9 @@ impl Debug for Msg {
     }
 }
 
-#[derive(Default, Clone, Debug, PartialEq)]
-pub struct ApplyMetrics {
-    /// an inaccurate difference in region size since last reset.
-    pub size_diff_hint: i64,
-    /// delete keys' count since last reset.
-    pub delete_keys_hint: u64,
-
-    pub written_bytes: u64,
-    pub written_keys: u64,
-    pub lock_cf_written_bytes: u64,
-}
-
-#[derive(Debug)]
-pub struct ApplyRes {
-    pub region_id: u64,
-    pub apply_state: RaftApplyState,
-    pub applied_index_term: u64,
-    pub exec_res: VecDeque<ExecResult>,
-    pub metrics: ApplyMetrics,
-}
-
-#[derive(Debug)]
-pub enum TaskRes {
-    Apply(ApplyRes),
-    Destroy {
-        // ID of region that has been destroyed.
-        region_id: u64,
-        // ID of peer that has been destroyed.
-        peer_id: u64,
-    },
-}
+pub use raftstore2::store::fsm::apply_types::ApplyMetrics;
+pub use raftstore2::store::fsm::apply_types::ApplyRes;
+pub use raftstore2::store::fsm::apply_types::TaskRes;
 
 pub struct ApplyFsm {
     delegate: ApplyDelegate,
