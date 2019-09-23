@@ -1,3 +1,4 @@
+pub mod cmd_resp;
 pub mod fsm;
 pub use keys;
 pub mod msg;
