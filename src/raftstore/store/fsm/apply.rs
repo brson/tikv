@@ -6,7 +6,6 @@ use std::fmt::{self, Debug, Formatter};
 use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 #[cfg(test)]
 use std::sync::mpsc::Sender;
-use std::sync::mpsc::SyncSender;
 use std::sync::Arc;
 use std::{cmp, usize};
 
@@ -26,7 +25,7 @@ use kvproto::raft_cmdpb::{
 use kvproto::raft_serverpb::{
     MergeState, PeerState, RaftApplyState, RegionLocalState,
 };
-use raft::eraftpb::{ConfChange, ConfChangeType, Entry, EntryType, Snapshot as RaftSnapshot};
+use raft::eraftpb::{ConfChange, ConfChangeType, Entry, EntryType};
 use uuid::Builder as UuidBuilder;
 
 use crate::import::SSTImporter;
@@ -2132,57 +2131,7 @@ pub struct Destroy {
 }
 
 pub use raftstore2::store::fsm::apply_types::CatchUpLogs;
-
-pub struct GenSnapTask {
-    region_id: u64,
-    commit_index: u64,
-    snap_notifier: SyncSender<RaftSnapshot>,
-}
-
-impl GenSnapTask {
-    pub fn new(
-        region_id: u64,
-        commit_index: u64,
-        snap_notifier: SyncSender<RaftSnapshot>,
-    ) -> GenSnapTask {
-        GenSnapTask {
-            region_id,
-            commit_index,
-            snap_notifier,
-        }
-    }
-
-    pub fn commit_index(&self) -> u64 {
-        self.commit_index
-    }
-
-    pub fn generate_and_schedule_snapshot(
-        self,
-        engines: &Engines,
-        region_sched: &Scheduler<RegionTask>,
-    ) -> Result<()> {
-        let snapshot = RegionTask::Gen {
-            region_id: self.region_id,
-            notifier: self.snap_notifier,
-            // This snapshot may be held for a long time, which may cause too many
-            // open files in rocksdb.
-            // TODO: figure out another way to do raft snapshot with short life rocksdb snapshots.
-            raft_snap: Snapshot::new(engines.raft.clone()),
-            kv_snap: Snapshot::new(engines.kv.clone()),
-        };
-        box_try!(region_sched.schedule(snapshot));
-        Ok(())
-    }
-}
-
-impl Debug for GenSnapTask {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("GenSnapTask")
-            .field("region_id", &self.region_id)
-            .field("commit_index", &self.commit_index)
-            .finish()
-    }
-}
+pub use raftstore2::store::fsm::gen_snap_task::GenSnapTask;
 
 pub enum Msg {
     Apply {
