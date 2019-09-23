@@ -8,10 +8,12 @@ use std::mem;
 
 use crate::raftstore::store::CasualRouter;
 
+use raft::StateRole;
+
 use super::{SizeCheckObserver, KeysCheckObserver, HalfCheckObserver,
             TableCheckObserver, ObserverContext, SplitCheckerHost,
             AdminObserver, QueryObserver, RoleObserver, RegionChangeObserver,
-            RegionChangeEvent, StateRole, SplitCheckObserver, Config, Result};
+            RegionChangeEvent, SplitCheckObserver, Config, Result};
 
 struct Entry<T> {
     priority: u32,
@@ -266,9 +268,10 @@ impl CoprocessorHost {
 
 #[cfg(test)]
 mod tests {
+    use raft::StateRole;
     use super::super::{ObserverContext, AdminObserver, QueryObserver,
                        RoleObserver, RegionChangeObserver, RegionChangeEvent,
-                       StateRole, Result, CoprocessorHost, Coprocessor};
+                       Result, CoprocessorHost, Coprocessor};
     use std::sync::atomic::*;
     use std::sync::*;
 
