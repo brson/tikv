@@ -1,7 +1,7 @@
 // Copyright 2016 TiKV Project Authors. Licensed under Apache-2.0.
 
-use crate::raftstore::store::{CasualMessage, RaftCommand, StoreMsg};
-use crate::raftstore::{DiscardReason, Error, Result};
+use crate::store::msg::{CasualMessage, RaftCommand, StoreMsg};
+use crate::errors::{DiscardReason, Error, Result};
 use crossbeam::TrySendError;
 use kvproto::raft_serverpb::RaftMessage;
 use std::sync::mpsc;
