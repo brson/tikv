@@ -93,7 +93,6 @@ serde = "1.0"
 serde_json = "1.0"
 serde_derive = "1.0"
 zipf = "5.0.1"
-bitflags = "1.0.1"
 fail = "0.3"
 uuid = { version = "0.7", features = [ "serde", "v4" ] }
 grpcio = { version = "0.5.0-alpha.3", features = [ "openssl-vendored" ] }

@@ -2933,7 +2933,6 @@ version = "4.0.0-alpha"
 dependencies = [
  "arrow",
  "backtrace",
- "bitflags",
  "byteorder",
  "chrono",
  "crc",
