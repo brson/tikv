@@ -896,59 +896,30 @@ impl Drop for Snap {
 pub use raftstore2::store::snap::{Error, Result};
 
 #[cfg(test)]
-pub mod tests {
-    use std::fs::{self, OpenOptions};
-    use std::io::{self, Read, Seek, SeekFrom, Write};
+pub mod test_helpers {
     use std::path::Path;
-    use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
     use std::sync::Arc;
 
     use engine::rocks;
     use engine::rocks::util::CFOptions;
     use engine::rocks::{DBOptions, Env, DB};
     use engine::{Engines, Iterable, Mutable, Peekable, Snapshot as DbSnapshot};
-    use engine::{ALL_CFS, CF_DEFAULT, CF_LOCK, CF_RAFT, CF_WRITE};
+    use engine::{ALL_CFS, CF_RAFT};
     use kvproto::metapb::{Peer, Region};
     use kvproto::raft_serverpb::{
-        RaftApplyState, RaftSnapshotData, RegionLocalState, SnapshotMeta,
+        RaftApplyState, RegionLocalState,
     };
-    use protobuf::Message;
-    use std::path::PathBuf;
-    use tempfile::{Builder, TempDir};
+    use tempfile::{TempDir};
 
-    use super::{
-        ApplyOptions, Snap, SnapKey, Snapshot,
-        SnapshotDeleter, SnapshotStatistics,
-    };
     use crate::raftstore::store::snap::{
-        META_FILE_SUFFIX, SNAPSHOT_CFS, SNAP_GEN_PREFIX,
+        SNAPSHOT_CFS,
     };
 
-    use crate::raftstore::store::peer_storage::JOB_STATUS_RUNNING;
-    use crate::raftstore::store::{keys, INIT_EPOCH_CONF_VER, INIT_EPOCH_VER};
+    use crate::raftstore::store::peer_storage::{INIT_EPOCH_CONF_VER, INIT_EPOCH_VER};
     use crate::raftstore::Result;
 
     const TEST_STORE_ID: u64 = 1;
     const TEST_KEY: &[u8] = b"akey";
-    const TEST_WRITE_BATCH_SIZE: usize = 10 * 1024 * 1024;
-    const TEST_META_FILE_BUFFER_SIZE: usize = 1000;
-    const BYTE_SIZE: usize = 1;
-
-    #[derive(Clone)]
-    struct DummyDeleter;
-
-    impl SnapshotDeleter for DummyDeleter {
-        fn delete_snapshot(&self, _: &SnapKey, snap: &dyn Snapshot, _: bool) -> bool {
-            snap.delete(); 
-           true
-        }
-    }
-
-    type DBBuilder = fn(
-        p: &Path,
-        db_opt: Option<DBOptions>,
-        cf_opts: Option<Vec<CFOptions<'_>>>,
-    ) -> Result<Arc<DB>>;
 
     pub fn open_test_empty_db(
         path: &Path,
@@ -1075,6 +1046,60 @@ pub mod tests {
         db_opt.set_env(env);
         db_opt
     }
+}
+
+#[cfg(test)]
+pub mod tests {
+    use std::fs::{self, OpenOptions};
+    use std::io::{self, Read, Seek, SeekFrom, Write};
+    use std::path::Path;
+    use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
+    use std::sync::Arc;
+
+    use engine::rocks;
+    use engine::rocks::util::CFOptions;
+    use engine::rocks::{DBOptions, DB};
+    use engine::{Snapshot as DbSnapshot};
+    use engine::{CF_DEFAULT, CF_LOCK, CF_RAFT, CF_WRITE};
+    use kvproto::raft_serverpb::{
+        RaftSnapshotData, SnapshotMeta,
+    };
+    use protobuf::Message;
+    use std::path::PathBuf;
+    use tempfile::{Builder, TempDir};
+
+    use super::{
+        ApplyOptions, Snap, SnapKey, Snapshot,
+        SnapshotDeleter, SnapshotStatistics,
+    };
+    use crate::raftstore::store::snap::{
+        META_FILE_SUFFIX, SNAP_GEN_PREFIX,
+    };
+
+    use crate::raftstore::store::peer_storage::JOB_STATUS_RUNNING;
+    use crate::raftstore::Result;
+
+    use super::test_helpers::*;
+
+    const TEST_WRITE_BATCH_SIZE: usize = 10 * 1024 * 1024;
+    const TEST_META_FILE_BUFFER_SIZE: usize = 1000;
+    const BYTE_SIZE: usize = 1;
+
+    #[derive(Clone)]
+    struct DummyDeleter;
+
+    impl SnapshotDeleter for DummyDeleter {
+        fn delete_snapshot(&self, _: &SnapKey, snap: &dyn Snapshot, _: bool) -> bool {
+            snap.delete(); 
+           true
+        }
+    }
+
+    type DBBuilder = fn(
+        p: &Path,
+        db_opt: Option<DBOptions>,
+        cf_opts: Option<Vec<CFOptions<'_>>>,
+    ) -> Result<Arc<DB>>;
 
     #[test]
     fn test_gen_snapshot_meta() {
