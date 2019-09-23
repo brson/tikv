@@ -9,6 +9,7 @@ mod pd;
 mod raftlog_gc;
 mod read;
 mod region;
+mod region_task;
 mod split_check;
 
 pub use self::cleanup::{Runner as CleanupRunner, Task as CleanupTask};
