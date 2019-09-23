@@ -425,7 +425,7 @@ pub mod tests {
         SnapshotDeleter, SnapshotStatistics,
     };
 
-    use super::super::snap::tests::*;
+    use super::super::snap::test_helpers::*;
 
     #[test]
     fn test_snap_mgr_create_dir() {
