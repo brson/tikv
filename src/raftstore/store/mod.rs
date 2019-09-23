@@ -5,7 +5,7 @@ pub mod config;
 pub mod fsm;
 pub use keys;
 pub use raftstore2::store::msg;
-pub mod transport;
+pub use raftstore2::store::transport;
 pub use raftstore2::store::util;
 
 mod bootstrap;

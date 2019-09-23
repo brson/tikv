@@ -2,6 +2,7 @@ pub mod fsm;
 pub use keys;
 pub mod msg;
 pub mod msg_callback;
+pub mod transport;
 pub mod util;
 
 pub mod local_metrics;
