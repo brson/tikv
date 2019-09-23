@@ -1,13 +1,12 @@
 // Copyright 2016 TiKV Project Authors. Licensed under Apache-2.0.
 
-use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::fmt::{self, Display, Formatter};
 use std::mem;
 use std::sync::Arc;
 
 use engine::rocks::DBIterator;
-use engine::{CfName, CF_WRITE, LARGE_CFS};
+use engine::{CfName, LARGE_CFS};
 use engine::{IterOption, Iterable, DB};
 use kvproto::metapb::Region;
 use kvproto::metapb::RegionEpoch;
@@ -22,49 +21,7 @@ use tikv_util::worker::Runnable;
 
 use super::metrics::*;
 
-#[derive(PartialEq, Eq)]
-pub struct KeyEntry {
-    key: Vec<u8>,
-    pos: usize,
-    value_size: usize,
-    cf: CfName,
-}
-
-impl KeyEntry {
-    pub fn new(key: Vec<u8>, pos: usize, value_size: usize, cf: CfName) -> KeyEntry {
-        KeyEntry {
-            key,
-            pos,
-            value_size,
-            cf,
-        }
-    }
-
-    pub fn key(&self) -> &[u8] {
-        self.key.as_ref()
-    }
-
-    pub fn is_commit_version(&self) -> bool {
-        self.cf == CF_WRITE
-    }
-
-    pub fn entry_size(&self) -> usize {
-        self.value_size + self.key.len()
-    }
-}
-
-impl PartialOrd for KeyEntry {
-    fn partial_cmp(&self, rhs: &KeyEntry) -> Option<Ordering> {
-        // BinaryHeap is max heap, so we have to reverse order to get a min heap.
-        Some(self.key.cmp(&rhs.key).reverse())
-    }
-}
-
-impl Ord for KeyEntry {
-    fn cmp(&self, rhs: &KeyEntry) -> Ordering {
-        self.partial_cmp(rhs).unwrap()
-    }
-}
+pub use raftstore2::coprocessor::model::KeyEntry;
 
 struct MergedIterator<'a> {
     iters: Vec<(CfName, DBIterator<&'a DB>)>,
@@ -104,7 +61,7 @@ impl<'a> MergedIterator<'a> {
     fn next(&mut self) -> Option<KeyEntry> {
         let pos = match self.heap.peek() {
             None => return None,
-            Some(e) => e.pos,
+            Some(e) => e.pos(),
         };
         let (cf, iter) = &mut self.iters[pos];
         if iter.next() {
