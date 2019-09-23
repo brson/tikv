@@ -9,5 +9,6 @@ pub mod metrics;
 pub mod peer_storage;
 pub mod region_snapshot;
 pub mod snap;
+pub mod worker;
 
 pub use self::snap::{Error as SnapError};
