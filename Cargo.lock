@@ -2030,6 +2030,7 @@ name = "raftstore"
 version = "0.1.0"
 dependencies = [
  "bitflags",
+ "crc",
  "crossbeam 0.5.0",
  "derive_more",
  "engine",
