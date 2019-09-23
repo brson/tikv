@@ -149,7 +149,7 @@ mod tests {
     use std::sync::Arc;
 
     use super::*;
-    use crate::raftstore::store::snap::test_helpers::*;
+    use crate::store::snap::test_helpers::*;
     use engine::CF_DEFAULT;
     use tempfile::Builder;
 
