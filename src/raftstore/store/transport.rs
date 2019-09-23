@@ -1,6 +1,6 @@
 // Copyright 2016 TiKV Project Authors. Licensed under Apache-2.0.
 
-use crate::raftstore::store::{CasualMessage, PeerMsg, RaftCommand, RaftRouter, StoreMsg};
+use crate::raftstore::store::{CasualMessage, RaftCommand, StoreMsg};
 use crate::raftstore::{DiscardReason, Error, Result};
 use crossbeam::TrySendError;
 use kvproto::raft_serverpb::RaftMessage;
@@ -30,37 +30,6 @@ pub trait ProposalRouter {
 /// Messages are not guaranteed to be delivered by this trait.
 pub trait StoreRouter {
     fn send(&self, msg: StoreMsg) -> Result<()>;
-}
-
-impl CasualRouter for RaftRouter {
-    #[inline]
-    fn send(&self, region_id: u64, msg: CasualMessage) -> Result<()> {
-        match RaftRouter::send(self, region_id, PeerMsg::CasualMessage(msg)) {
-            Ok(()) => Ok(()),
-            Err(TrySendError::Full(_)) => Err(Error::Transport(DiscardReason::Full)),
-            Err(TrySendError::Disconnected(_)) => Err(Error::RegionNotFound(region_id)),
-        }
-    }
-}
-
-impl ProposalRouter for RaftRouter {
-    #[inline]
-    fn send(&self, cmd: RaftCommand) -> std::result::Result<(), TrySendError<RaftCommand>> {
-        self.send_raft_command(cmd)
-    }
-}
-
-impl StoreRouter for RaftRouter {
-    #[inline]
-    fn send(&self, msg: StoreMsg) -> Result<()> {
-        match self.send_control(msg) {
-            Ok(()) => Ok(()),
-            Err(TrySendError::Full(_)) => Err(Error::Transport(DiscardReason::Full)),
-            Err(TrySendError::Disconnected(_)) => {
-                Err(Error::Transport(DiscardReason::Disconnected))
-            }
-        }
-    }
 }
 
 impl CasualRouter for mpsc::SyncSender<(u64, CasualMessage)> {
