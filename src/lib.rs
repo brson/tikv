@@ -25,8 +25,6 @@
 #![feature(const_fn)]
 #![feature(mem_take)]
 
-#[macro_use]
-extern crate bitflags;
 #[macro_use(fail_point)]
 extern crate fail;
 #[macro_use]
