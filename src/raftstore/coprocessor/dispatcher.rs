@@ -8,7 +8,10 @@ use std::mem;
 
 use crate::raftstore::store::CasualRouter;
 
-use super::*;
+use super::{SizeCheckObserver, KeysCheckObserver, HalfCheckObserver,
+            TableCheckObserver, ObserverContext, SplitCheckerHost,
+            AdminObserver, QueryObserver, RoleObserver, RegionChangeObserver,
+            RegionChangeEvent, StateRole, SplitCheckObserver, Config, Result};
 
 struct Entry<T> {
     priority: u32,
@@ -263,7 +266,9 @@ impl CoprocessorHost {
 
 #[cfg(test)]
 mod tests {
-    use crate::raftstore::coprocessor::*;
+    use super::super::{ObserverContext, AdminObserver, QueryObserver,
+                       RoleObserver, RegionChangeObserver, RegionChangeEvent,
+                       StateRole, Result, CoprocessorHost, Coprocessor};
     use std::sync::atomic::*;
     use std::sync::*;
 
