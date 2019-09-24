@@ -1,10 +1,11 @@
 // Copyright 2016 TiKV Project Authors. Licensed under Apache-2.0.
 
-use super::{AdminObserver, Coprocessor, ObserverContext, Result as CopResult};
+use super::model::{AdminObserver, Coprocessor, ObserverContext};
+use super::error::{Result as CopResult};
 use tidb_query::codec::table;
 use tikv_util::codec::bytes::{self, encode_bytes};
 
-use crate::raftstore::store::util;
+use crate::store::util;
 use kvproto::metapb::Region;
 use kvproto::raft_cmdpb::{AdminCmdType, AdminRequest, SplitRequest};
 use std::result::Result as StdResult;
@@ -163,8 +164,8 @@ impl AdminObserver for SplitObserver {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::raftstore::coprocessor::AdminObserver;
-    use crate::raftstore::coprocessor::ObserverContext;
+    use crate::coprocessor::model::AdminObserver;
+    use crate::coprocessor::model::ObserverContext;
     use byteorder::{BigEndian, WriteBytesExt};
     use kvproto::metapb::Region;
     use kvproto::raft_cmdpb::{AdminCmdType, AdminRequest, SplitRequest};

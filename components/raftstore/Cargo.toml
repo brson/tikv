@@ -6,6 +6,7 @@ publish = false
 
 [dependencies]
 bitflags = "1.0.1"
+byteorder = "1.2"
 crc = "1.8"
 crossbeam = "0.5"
 derive_more = "0.15.0"
@@ -25,6 +26,7 @@ time = "0.1"
 
 engine = { path = "../engine" }
 keys = { path = "../keys" }
+log_wrappers = { path = "../log_wrappers" }
 # TODO: Eliminate this dependency to make pd_client and raftstore build in
 # parallel
 pd_client = { path = "../pd_client" }

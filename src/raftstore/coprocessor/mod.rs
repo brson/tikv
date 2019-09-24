@@ -6,7 +6,7 @@ use raftstore2::coprocessor::metrics;
 pub use storage_types::properties;
 pub mod region_info_accessor;
 pub use raftstore2::coprocessor::split_check;
-pub mod split_observer;
+pub use raftstore2::coprocessor::split_observer;
 
 pub use self::config::Config;
 pub use self::dispatcher::{CoprocessorHost, Registry};
