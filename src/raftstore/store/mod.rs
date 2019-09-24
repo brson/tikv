@@ -9,6 +9,7 @@ pub use raftstore2::store::transport;
 pub use raftstore2::store::util;
 
 mod bootstrap;
+mod do_snap;
 use raftstore2::store::local_metrics;
 use raftstore2::store::metrics;
 mod peer;
@@ -23,6 +24,7 @@ pub use self::bootstrap::{
     prepare_bootstrap_cluster,
 };
 pub use self::config::Config;
+pub use self::do_snap::do_snapshot;
 pub use self::fsm::{new_compaction_listener, DestroyPeerJob, RaftRouter, StoreInfo};
 pub use self::msg::{
     Callback, CasualMessage, PeerMsg, PeerTicks, RaftCommand, ReadCallback, ReadResponse,
@@ -32,7 +34,7 @@ pub use self::peer::{
     Peer, PeerStat, ProposalContext, ReadExecutor, RequestInspector, RequestPolicy,
 };
 pub use self::peer_storage::{
-    clear_meta, do_snapshot, init_apply_state, init_raft_state, maybe_upgrade_from_2_to_3,
+    clear_meta, init_apply_state, init_raft_state, maybe_upgrade_from_2_to_3,
     write_initial_apply_state, write_initial_raft_state, write_peer_state, CacheQueryStats,
     PeerStorage, SnapState, INIT_EPOCH_CONF_VER, INIT_EPOCH_VER, RAFT_INIT_LOG_INDEX,
     RAFT_INIT_LOG_TERM,
