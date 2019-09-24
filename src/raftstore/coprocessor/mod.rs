@@ -1,7 +1,7 @@
 // Copyright 2016 TiKV Project Authors. Licensed under Apache-2.0.
 
 pub use raftstore2::coprocessor::config;
-pub mod dispatcher;
+pub use raftstore2::coprocessor::dispatcher;
 use raftstore2::coprocessor::metrics;
 pub use storage_types::properties;
 pub mod region_info_accessor;

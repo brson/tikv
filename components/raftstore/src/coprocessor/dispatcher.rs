@@ -6,14 +6,17 @@ use kvproto::pdpb::CheckPolicy;
 use kvproto::raft_cmdpb::{RaftCmdRequest, RaftCmdResponse};
 use std::mem;
 
-use crate::raftstore::store::CasualRouter;
+use crate::store::transport::CasualRouter;
 
 use raft::StateRole;
 
-use super::{SizeCheckObserver, KeysCheckObserver, HalfCheckObserver,
-            TableCheckObserver, ObserverContext, SplitCheckerHost,
-            AdminObserver, QueryObserver, RoleObserver, RegionChangeObserver,
-            RegionChangeEvent, SplitCheckObserver, Config, Result};
+use super::split_check::{SizeCheckObserver, KeysCheckObserver, HalfCheckObserver,
+                         TableCheckObserver};
+use super::model::{ObserverContext, SplitCheckerHost,
+                   AdminObserver, QueryObserver, RoleObserver, RegionChangeObserver,
+                   RegionChangeEvent, SplitCheckObserver};
+use super::error::Result;
+use super::config::Config;
 
 struct Entry<T> {
     priority: u32,
@@ -269,9 +272,11 @@ impl CoprocessorHost {
 #[cfg(test)]
 mod tests {
     use raft::StateRole;
-    use super::super::{ObserverContext, AdminObserver, QueryObserver,
-                       RoleObserver, RegionChangeObserver, RegionChangeEvent,
-                       Result, CoprocessorHost, Coprocessor};
+    use super::super::model::{ObserverContext, AdminObserver, QueryObserver,
+                              RoleObserver, RegionChangeObserver, RegionChangeEvent,
+                              Coprocessor};
+    use super::super::error::Result;
+    use super::CoprocessorHost;
     use std::sync::atomic::*;
     use std::sync::*;
 

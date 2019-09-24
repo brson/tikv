@@ -1,4 +1,5 @@
 pub mod config;
+pub mod dispatcher;
 pub mod error;
 pub mod metrics;
 pub mod model;
