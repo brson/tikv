@@ -14,4 +14,4 @@ pub use self::size::{
 };
 pub use self::table::TableCheckObserver;
 
-pub use raftstore2::coprocessor::model::SplitCheckerHost as Host;
+pub use crate::coprocessor::model::SplitCheckerHost as Host;

@@ -29,6 +29,8 @@ keys = { path = "../keys" }
 # parallel
 pd_client = { path = "../pd_client" }
 storage_types = { path = "../storage_types" }
+# TODO: Eliminate this dependency
+tidb_query = { path = "../tidb_query" }
 tikv_util = { path = "../tikv_util" }
 
 [dependencies.prometheus]

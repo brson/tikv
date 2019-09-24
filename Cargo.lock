@@ -2051,6 +2051,7 @@ dependencies = [
  "slog-global",
  "storage_types",
  "tempfile",
+ "tidb_query",
  "tikv_util",
  "time",
 ]

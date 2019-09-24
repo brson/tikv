@@ -10,12 +10,12 @@ use kvproto::pdpb::CheckPolicy;
 use tidb_query::codec::table as table_codec;
 use tikv_util::keybuilder::KeyBuilder;
 
-use crate::raftstore::store::keys;
-use crate::storage::types::Key;
+use keys::{self, Key};
 
-use super::super::{
-    Coprocessor, KeyEntry, ObserverContext, Result, SplitCheckObserver, SplitChecker,
+use super::super::model::{
+    Coprocessor, KeyEntry, ObserverContext, SplitCheckObserver, SplitChecker,
 };
+use super::super::error::Result;
 use super::Host;
 
 #[derive(Default)]
