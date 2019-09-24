@@ -1623,7 +1623,7 @@ pub fn maybe_upgrade_from_2_to_3(
 
 #[cfg(test)]
 mod tests {
-    use crate::raftstore::store::fsm::apply::compact_raft_log;
+    use raftstore2::store::compact::compact_raft_log;
     use crate::raftstore::store::worker::RegionRunner;
     use crate::raftstore::store::worker::RegionTask;
     use crate::raftstore::store::{bootstrap_store, initial_region, prepare_bootstrap_cluster};
