@@ -2,9 +2,8 @@
 
 pub use raftstore2::coprocessor::config;
 pub use raftstore2::coprocessor::dispatcher;
-use raftstore2::coprocessor::metrics;
 pub use raftstore2::coprocessor::properties;
-pub mod region_info_accessor;
+pub use raftstore2::coprocessor::region_info_accessor;
 pub use raftstore2::coprocessor::split_check;
 pub use raftstore2::coprocessor::split_observer;
 
