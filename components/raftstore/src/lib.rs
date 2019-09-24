@@ -1,4 +1,5 @@
 #![feature(test)]
+#![feature(mem_take)]
 
 #[macro_use]
 extern crate bitflags;
