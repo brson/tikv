@@ -2,11 +2,10 @@
 
 pub use raftstore2::coprocessor::config;
 pub mod dispatcher;
-use raftstore2::coprocessor::error;
 use raftstore2::coprocessor::metrics;
 pub use storage_types::properties;
 pub mod region_info_accessor;
-pub mod split_check;
+pub use raftstore2::coprocessor::split_check;
 pub mod split_observer;
 
 pub use self::config::Config;

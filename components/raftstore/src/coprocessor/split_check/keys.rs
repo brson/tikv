@@ -1,6 +1,8 @@
 // Copyright 2018 TiKV Project Authors. Licensed under Apache-2.0.
 
-use crate::raftstore::store::{keys, CasualMessage, CasualRouter};
+use keys;
+use crate::store::msg::{CasualMessage};
+use crate::store::transport::{CasualRouter};
 use engine::rocks::DB;
 use engine::rocks::{self, Range};
 use engine::util;
@@ -11,8 +13,8 @@ use std::sync::Mutex;
 
 use super::super::error::Result;
 use super::super::metrics::*;
-use super::super::properties::{get_range_entries_and_versions, RangeProperties};
-use super::super::{Coprocessor, KeyEntry, ObserverContext, SplitCheckObserver, SplitChecker};
+use storage_types::properties::{get_range_entries_and_versions, RangeProperties};
+use super::super::model::{Coprocessor, KeyEntry, ObserverContext, SplitCheckObserver, SplitChecker};
 use super::Host;
 
 pub struct Checker {

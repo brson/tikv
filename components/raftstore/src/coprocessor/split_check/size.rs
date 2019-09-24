@@ -12,12 +12,14 @@ use engine::{CF_DEFAULT, CF_WRITE};
 use kvproto::metapb::Region;
 use kvproto::pdpb::CheckPolicy;
 
-use crate::raftstore::store::{keys, CasualMessage, CasualRouter};
+use keys;
+use crate::store::msg::{CasualMessage};
+use crate::store::transport::{CasualRouter};
 
 use super::super::error::Result;
 use super::super::metrics::*;
-use super::super::properties::RangeProperties;
-use super::super::{Coprocessor, KeyEntry, ObserverContext, SplitCheckObserver, SplitChecker};
+use storage_types::properties::RangeProperties;
+use super::super::model::{Coprocessor, KeyEntry, ObserverContext, SplitCheckObserver, SplitChecker};
 use super::Host;
 
 pub struct Checker {
