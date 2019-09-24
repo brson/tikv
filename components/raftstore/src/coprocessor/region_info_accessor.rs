@@ -7,12 +7,13 @@ use std::sync::{mpsc, Arc, Mutex};
 use std::time::Duration;
 
 use super::metrics::*;
-use super::{
-    Coprocessor, CoprocessorHost, ObserverContext, RegionChangeEvent, RegionChangeObserver,
+use super::model::{
+    Coprocessor, ObserverContext, RegionChangeEvent, RegionChangeObserver,
     RoleObserver,
 };
-use crate::raftstore::store::keys::{data_end_key, data_key};
-use crate::storage::kv::{RegionInfoProvider, RipResult};
+use super::dispatcher::CoprocessorHost;
+use keys::{data_end_key, data_key};
+use storage_types::region_info::{RegionInfoProvider, RipResult};
 use kvproto::metapb::Region;
 use raft::StateRole;
 use tikv_util::collections::HashMap;
