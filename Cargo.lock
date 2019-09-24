@@ -2030,6 +2030,7 @@ name = "raftstore"
 version = "0.1.0"
 dependencies = [
  "bitflags",
+ "byteorder",
  "crc",
  "crossbeam 0.5.0",
  "derive_more",
@@ -2039,6 +2040,7 @@ dependencies = [
  "keys",
  "kvproto",
  "lazy_static",
+ "log_wrappers",
  "pd_client",
  "prometheus",
  "protobuf 2.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
