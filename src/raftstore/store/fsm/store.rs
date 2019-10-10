@@ -461,7 +461,7 @@ pub struct RaftPoller<T: 'static, C: 'static> {
 }
 
 impl<T: Transport, C: PdClient> RaftPoller<T, C> {
-    fn handle_raft_ready(&mut self, peers: &mut [Box<PeerFsm>]) {
+    fn handle_raft_ready(&mut self, peers: &mut [Box<PeerFsm<Rocks, Rocks>>]) {
         // Only enable the fail point when the store id is equal to 3, which is
         // the id of slow store in tests.
         fail_point!("on_raft_ready", self.poll_ctx.store_id() == 3, |_| {});
@@ -562,7 +562,7 @@ impl<T: Transport, C: PdClient> RaftPoller<T, C> {
     }
 }
 
-impl<T: Transport, C: PdClient> PollHandler<PeerFsm, StoreFsm> for RaftPoller<T, C> {
+impl<T: Transport, C: PdClient> PollHandler<PeerFsm<Rocks, Rocks>, StoreFsm> for RaftPoller<T, C> {
     fn begin(&mut self, batch_size: usize) {
         self.previous_metrics = self.poll_ctx.raft_metrics.clone();
         self.poll_ctx.pending_count = 0;
@@ -598,7 +598,7 @@ impl<T: Transport, C: PdClient> PollHandler<PeerFsm, StoreFsm> for RaftPoller<T,
         expected_msg_count
     }
 
-    fn handle_normal(&mut self, peer: &mut PeerFsm) -> Option<usize> {
+    fn handle_normal(&mut self, peer: &mut PeerFsm<Rocks, Rocks>) -> Option<usize> {
         let mut expected_msg_count = None;
         if peer.have_pending_merge_apply_result() {
             expected_msg_count = Some(peer.receiver.len());
@@ -649,7 +649,7 @@ impl<T: Transport, C: PdClient> PollHandler<PeerFsm, StoreFsm> for RaftPoller<T,
         expected_msg_count
     }
 
-    fn end(&mut self, peers: &mut [Box<PeerFsm>]) {
+    fn end(&mut self, peers: &mut [Box<PeerFsm<Rocks, Rocks>>]) {
         if self.poll_ctx.has_ready {
             self.handle_raft_ready(peers);
         }
@@ -703,7 +703,7 @@ impl<T, C> RaftPollerBuilder<T, C> {
     /// Initialize this store. It scans the db engine, loads all regions
     /// and their peers from it, and schedules snapshot worker if necessary.
     /// WARN: This store should not be used before initialized.
-    fn init(&mut self) -> Result<Vec<(LooseBoundedSender<PeerMsg>, Box<PeerFsm>)>> {
+    fn init(&mut self) -> Result<Vec<(LooseBoundedSender<PeerMsg>, Box<PeerFsm<Rocks, Rocks>>)>> {
         // Scan region meta to get saved regions.
         let start_key = keys::REGION_META_MIN_KEY;
         let end_key = keys::REGION_META_MAX_KEY;
@@ -1008,7 +1008,7 @@ impl RaftBatchSystem {
     fn start_system<T: Transport + 'static, C: PdClient + 'static>(
         &mut self,
         mut workers: Workers,
-        region_peers: Vec<(LooseBoundedSender<PeerMsg>, Box<PeerFsm>)>,
+        region_peers: Vec<(LooseBoundedSender<PeerMsg>, Box<PeerFsm<Rocks, Rocks>>)>,
         builder: RaftPollerBuilder<T, C>,
     ) -> Result<()> {
         builder.snap_mgr.init()?;

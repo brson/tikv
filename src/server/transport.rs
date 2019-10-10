@@ -5,7 +5,6 @@ use kvproto::raft_cmdpb::RaftCmdRequest;
 use kvproto::raft_serverpb::RaftMessage;
 use raft::eraftpb::MessageType;
 use std::sync::{Arc, RwLock};
-use std::marker::PhantomData;
 
 use super::metrics::*;
 use super::resolve::StoreAddrResolver;
@@ -21,10 +20,9 @@ use raft::SnapshotStatus;
 use tikv_util::collections::HashSet;
 use tikv_util::worker::Scheduler;
 use tikv_util::HandyRwLock;
-use engine_traits::KvEngine;
 
 /// Routes messages to the raftstore.
-pub trait RaftStoreRouter<K: KvEngine, R: KvEngine>: Send + Clone {
+pub trait RaftStoreRouter: Send + Clone {
     /// Sends RaftMessage to local store.
     fn send_raft_msg(&self, msg: RaftMessage) -> RaftStoreResult<()>;
 
@@ -70,7 +68,7 @@ pub trait RaftStoreRouter<K: KvEngine, R: KvEngine>: Send + Clone {
 #[derive(Clone)]
 pub struct RaftStoreBlackHole;
 
-impl<K: KvEngine, R: KvEngine> RaftStoreRouter<K, R> for RaftStoreBlackHole {
+impl RaftStoreRouter for RaftStoreBlackHole {
     /// Sends RaftMessage to local store.
     fn send_raft_msg(&self, _: RaftMessage) -> RaftStoreResult<()> {
         Ok(())
@@ -95,15 +93,15 @@ impl<K: KvEngine, R: KvEngine> RaftStoreRouter<K, R> for RaftStoreBlackHole {
 
 /// A router that routes messages to the raftstore
 #[derive(Clone)]
-pub struct ServerRaftStoreRouter<K: KvEngine, R: KvEngine> {
-    router: RaftRouter<K, R>,
-    local_reader: LocalReader<RaftRouter<K, R>>,
+pub struct ServerRaftStoreRouter {
+    router: RaftRouter,
+    local_reader: LocalReader<RaftRouter>,
 }
 
-impl<K: KvEngine, R: KvEngine> ServerRaftStoreRouter<K, R> {
+impl ServerRaftStoreRouter {
     /// Creates a new router.
-    pub fn new(router: RaftRouter<K, R>, local_reader: LocalReader<RaftRouter<K, R>>) -> Self {
-        Self {
+    pub fn new(router: RaftRouter, local_reader: LocalReader<RaftRouter>) -> ServerRaftStoreRouter {
+        ServerRaftStoreRouter {
             router,
             local_reader,
         }
@@ -127,7 +125,7 @@ fn handle_error<T>(region_id: u64, e: TrySendError<T>) -> RaftStoreError {
     }
 }
 
-impl<K: KvEngine, R: KvEngine> RaftStoreRouter<K, R> for ServerRaftStoreRouter<K, R> {
+impl RaftStoreRouter for ServerRaftStoreRouter {
     fn send_raft_msg(&self, msg: RaftMessage) -> RaftStoreResult<()> {
         let region_id = msg.get_region_id();
         self.router
@@ -137,7 +135,7 @@ impl<K: KvEngine, R: KvEngine> RaftStoreRouter<K, R> for ServerRaftStoreRouter<K
 
     fn send_command(&self, req: RaftCmdRequest, cb: Callback) -> RaftStoreResult<()> {
         let cmd = RaftCommand::new(req, cb);
-        if LocalReader::<RaftRouter<K, R>>::acceptable(&cmd.request) {
+        if LocalReader::<RaftRouter>::acceptable(&cmd.request) {
             self.local_reader.execute_raft_command(cmd);
             Ok(())
         } else {
@@ -174,29 +172,25 @@ impl<K: KvEngine, R: KvEngine> RaftStoreRouter<K, R> for ServerRaftStoreRouter<K
     }
 }
 
-pub struct ServerTransport<T, S, K, R>
+pub struct ServerTransport<T, S>
 where
-    K: KvEngine,
-    R: KvEngine,
-    T: RaftStoreRouter<K, R> + 'static,
+    T: RaftStoreRouter + 'static,
     S: StoreAddrResolver + 'static,
 {
-    raft_client: Arc<RwLock<RaftClient<K, R, T>>>,
+    raft_client: Arc<RwLock<RaftClient<T>>>,
     snap_scheduler: Scheduler<SnapTask>,
     pub raft_router: T,
     resolving: Arc<RwLock<HashSet<u64>>>,
     resolver: S,
 }
 
-impl<T, S, K, R> Clone for ServerTransport<T, S, K, R>
+impl<T, S> Clone for ServerTransport<T, S>
 where
-    K: KvEngine,
-    R: KvEngine,
-    T: RaftStoreRouter<K, R> + 'static,
+    T: RaftStoreRouter + 'static,
     S: StoreAddrResolver + 'static,
 {
     fn clone(&self) -> Self {
-        Self {
+        ServerTransport {
             raft_client: Arc::clone(&self.raft_client),
             snap_scheduler: self.snap_scheduler.clone(),
             raft_router: self.raft_router.clone(),
@@ -206,14 +200,14 @@ where
     }
 }
 
-impl<T: RaftStoreRouter<K, R> + 'static, S: StoreAddrResolver + 'static, K: KvEngine + 'static, R: KvEngine + 'static> ServerTransport<T, S, K, R> {
+impl<T: RaftStoreRouter + 'static, S: StoreAddrResolver + 'static> ServerTransport<T, S> {
     pub fn new(
-        raft_client: Arc<RwLock<RaftClient<K, R, T>>>,
+        raft_client: Arc<RwLock<RaftClient<T>>>,
         snap_scheduler: Scheduler<SnapTask>,
         raft_router: T,
         resolver: S,
-    ) -> Self {
-        Self {
+    ) -> ServerTransport<T, S> {
+        ServerTransport {
             raft_client,
             snap_scheduler,
             raft_router,
@@ -349,7 +343,7 @@ impl<T: RaftStoreRouter<K, R> + 'static, S: StoreAddrResolver + 'static, K: KvEn
         }
     }
 
-    fn new_snapshot_reporter(&self, msg: &RaftMessage) -> SnapshotReporter<K, R, T> {
+    fn new_snapshot_reporter(&self, msg: &RaftMessage) -> SnapshotReporter<T> {
         let region_id = msg.get_region_id();
         let to_peer_id = msg.get_to_peer().get_id();
         let to_store_id = msg.get_to_peer().get_store_id();
@@ -389,11 +383,9 @@ impl<T: RaftStoreRouter<K, R> + 'static, S: StoreAddrResolver + 'static, K: KvEn
     }
 }
 
-impl<T, S, K, R> Transport for ServerTransport<T, S, K, R>
+impl<T, S> Transport for ServerTransport<T, S>
 where
-    K: KvEngine,
-    R: KvEngine,
-    T: RaftStoreRouter<K, R> + 'static,
+    T: RaftStoreRouter + 'static,
     S: StoreAddrResolver + 'static,
 {
     fn send(&mut self, msg: RaftMessage) -> RaftStoreResult<()> {
@@ -407,16 +399,14 @@ where
     }
 }
 
-struct SnapshotReporter<K: KvEngine, R: KvEngine, T: RaftStoreRouter<K, R> + 'static> {
+struct SnapshotReporter<T: RaftStoreRouter + 'static> {
     raft_router: T,
     region_id: u64,
     to_peer_id: u64,
     to_store_id: u64,
-    _phantom_k: PhantomData<K>,
-    _phantom_r: PhantomData<R>,
 }
 
-impl<K: KvEngine, R: KvEngine, T: RaftStoreRouter<K, R> + 'static> SnapshotReporter<K, R, T> {
+impl<T: RaftStoreRouter + 'static> SnapshotReporter<T> {
     pub fn report(&self, status: SnapshotStatus) {
         debug!(
             "send snapshot";

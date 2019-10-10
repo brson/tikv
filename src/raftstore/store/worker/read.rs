@@ -168,8 +168,8 @@ pub struct LocalReader<C: ProposalRouter> {
     tag: String,
 }
 
-impl<K: KvEngine, R: KvEngine> LocalReader<RaftRouter<K, R>> {
-    pub fn new(kv_engine: Arc<DB>, store_meta: Arc<Mutex<StoreMeta>>, router: RaftRouter<K, R>) -> Self {
+impl<K: KvEngine, R: KvEngine> LocalReader<RaftRouter> {
+    pub fn new(kv_engine: Arc<DB>, store_meta: Arc<Mutex<StoreMeta>>, router: RaftRouter) -> Self {
         Self {
             store_meta,
             kv_engine,

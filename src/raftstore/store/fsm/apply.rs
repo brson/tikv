@@ -11,6 +11,7 @@ use std::sync::Arc;
 use std::{cmp, usize};
 
 use crossbeam::channel::{TryRecvError, TrySendError};
+use engine_rocks::Rocks;
 use engine_traits::{KvEngines, KvEngine, WriteOptions, WriteBatch, Mutable};
 use engine::{ALL_CFS, CF_DEFAULT, CF_LOCK, CF_RAFT, CF_WRITE};
 use kvproto::import_sstpb::SstMeta;
@@ -250,13 +251,13 @@ impl ApplyCallback {
 }
 
 #[derive(Clone)]
-pub enum Notifier<K: KvEngine, R: KvEngine> {
-    Router(RaftRouter<K, R>),
+pub enum Notifier {
+    Router(RaftRouter),
     #[cfg(test)]
-    Sender(Sender<PeerMsg<K, R>>),
+    Sender(Sender<PeerMsg<Rocks, Rocks>>),
 }
 
-impl<K: KvEngine, R: KvEngine> Notifier<K, R> {
+impl Notifier {
     fn notify(&self, region_id: u64, msg: PeerMsg) {
         match *self {
             Notifier::Router(ref r) => {

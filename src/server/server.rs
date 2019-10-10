@@ -6,12 +6,12 @@ use std::str::FromStr;
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant};
 
-use engine_rocks::Rocks;
 use futures::{Future, Stream};
 use grpcio::{ChannelBuilder, EnvBuilder, Environment, Server as GrpcServer, ServerBuilder};
 use kvproto::tikvpb::*;
 use tokio_threadpool::{Builder as ThreadPoolBuilder, ThreadPool};
 use tokio_timer::timer::Handle;
+use engine_rocks::Rocks;
 
 use crate::coprocessor::Endpoint;
 use crate::raftstore::store::SnapManager;
@@ -39,7 +39,7 @@ pub const STATS_THREAD_PREFIX: &str = "transport-stats";
 ///
 /// It hosts various internal components, including gRPC, the raftstore router
 /// and a snapshot worker.
-pub struct Server<T: RaftStoreRouter<Rocks, Rocks> + 'static, S: StoreAddrResolver + 'static> {
+pub struct Server<T: RaftStoreRouter + 'static, S: StoreAddrResolver + 'static> {
     env: Arc<Environment>,
     /// A GrpcServer builder or a GrpcServer.
     ///
@@ -47,7 +47,7 @@ pub struct Server<T: RaftStoreRouter<Rocks, Rocks> + 'static, S: StoreAddrResolv
     builder_or_server: Option<Either<ServerBuilder, GrpcServer>>,
     local_addr: SocketAddr,
     // Transport.
-    trans: ServerTransport<T, S, Rocks, Rocks>,
+    trans: ServerTransport<T, S>,
     raft_router: T,
     // For sending/receiving snapshots.
     snap_mgr: SnapManager<Rocks, Rocks>,
@@ -59,7 +59,7 @@ pub struct Server<T: RaftStoreRouter<Rocks, Rocks> + 'static, S: StoreAddrResolv
     timer: Handle,
 }
 
-impl<T: RaftStoreRouter<Rocks, Rocks>, S: StoreAddrResolver + 'static> Server<T, S> {
+impl<T: RaftStoreRouter, S: StoreAddrResolver + 'static> Server<T, S> {
     #[allow(clippy::too_many_arguments)]
     pub fn new<E: Engine, L: LockMgr>(
         cfg: &Arc<Config>,
@@ -142,7 +142,7 @@ impl<T: RaftStoreRouter<Rocks, Rocks>, S: StoreAddrResolver + 'static> Server<T,
         Ok(svr)
     }
 
-    pub fn transport(&self) -> ServerTransport<T, S, Rocks, Rocks> {
+    pub fn transport(&self) -> ServerTransport<T, S> {
         self.trans.clone()
     }
 

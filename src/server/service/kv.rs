@@ -15,7 +15,6 @@ use crate::storage::lock_manager::LockMgr;
 use crate::storage::mvcc::{Error as MvccError, LockType, Write as MvccWrite, WriteType};
 use crate::storage::txn::Error as TxnError;
 use crate::storage::{self, Engine, Key, Mutation, Options, Storage, Value};
-use engine_rocks::Rocks;
 use futures::executor::{self, Notify, Spawn};
 use futures::{future, Async, Future, Sink, Stream};
 use grpcio::{
@@ -42,7 +41,7 @@ const GRPC_MSG_NOTIFY_SIZE: usize = 8;
 
 /// Service handles the RPC messages for the `Tikv` service.
 #[derive(Clone)]
-pub struct Service<T: RaftStoreRouter<Rocks, Rocks> + 'static, E: Engine, L: LockMgr> {
+pub struct Service<T: RaftStoreRouter + 'static, E: Engine, L: LockMgr> {
     // For handling KV requests.
     storage: Storage<E, L>,
     // For handling coprocessor requests.
@@ -55,7 +54,7 @@ pub struct Service<T: RaftStoreRouter<Rocks, Rocks> + 'static, E: Engine, L: Loc
     thread_load: Arc<ThreadLoad>,
 }
 
-impl<T: RaftStoreRouter<Rocks, Rocks> + 'static, E: Engine, L: LockMgr> Service<T, E, L> {
+impl<T: RaftStoreRouter + 'static, E: Engine, L: LockMgr> Service<T, E, L> {
     /// Constructs a new `Service` which provides the `Tikv` service.
     pub fn new(
         storage: Storage<E, L>,
@@ -85,7 +84,7 @@ impl<T: RaftStoreRouter<Rocks, Rocks> + 'static, E: Engine, L: LockMgr> Service<
     }
 }
 
-impl<T: RaftStoreRouter<Rocks, Rocks> + 'static, E: Engine, L: LockMgr> Tikv for Service<T, E, L> {
+impl<T: RaftStoreRouter + 'static, E: Engine, L: LockMgr> Tikv for Service<T, E, L> {
     fn kv_get(&mut self, ctx: RpcContext<'_>, req: GetRequest, sink: UnarySink<GetResponse>) {
         let timer = GRPC_MSG_HISTOGRAM_VEC.kv_get.start_coarse_timer();
         let future = future_get(&self.storage, req)

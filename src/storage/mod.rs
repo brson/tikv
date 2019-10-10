@@ -22,7 +22,6 @@ use std::io::Error as IoError;
 use std::sync::{atomic, Arc};
 use std::{cmp, error, u64};
 
-use engine_rocks::Rocks;
 use engine::rocks::DB;
 use engine::{IterOption, DATA_KEY_PREFIX_LEN};
 use futures::{future, Future};
@@ -635,7 +634,7 @@ pub struct TestStorageBuilder<E: Engine> {
     engine: E,
     config: Config,
     local_storage: Option<Arc<DB>>,
-    raft_store_router: Option<ServerRaftStoreRouter<Rocks, Rocks>>,
+    raft_store_router: Option<ServerRaftStoreRouter>,
 }
 
 impl TestStorageBuilder<RocksEngine> {
@@ -679,7 +678,7 @@ impl<E: Engine> TestStorageBuilder<E> {
     /// Set raft store router for GCWorker.
     ///
     /// By default, `None` will be used.
-    pub fn raft_store_router(mut self, raft_store_router: ServerRaftStoreRouter<Rocks, Rocks>) -> Self {
+    pub fn raft_store_router(mut self, raft_store_router: ServerRaftStoreRouter) -> Self {
         self.raft_store_router = Some(raft_store_router);
         self
     }
@@ -733,7 +732,7 @@ pub struct Storage<E: Engine, L: LockMgr> {
     read_pool_high: FuturePool,
 
     /// Used to handle requests related to GC.
-    gc_worker: GCWorker<E, Rocks, Rocks>,
+    gc_worker: GCWorker<E>,
 
     /// How many strong references. Thread pool and workers will be stopped
     /// once there are no more references.
@@ -798,7 +797,7 @@ impl<E: Engine, L: LockMgr> Storage<E, L> {
         config: &Config,
         mut read_pool: Vec<FuturePool>,
         local_storage: Option<Arc<DB>>,
-        raft_store_router: Option<ServerRaftStoreRouter<Rocks, Rocks>>,
+        raft_store_router: Option<ServerRaftStoreRouter>,
         lock_mgr: Option<L>,
     ) -> Result<Self> {
         let pessimistic_txn_enabled = lock_mgr.is_some();

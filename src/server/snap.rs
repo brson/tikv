@@ -5,6 +5,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
+use engine_rocks::Rocks;
 use futures::{future, Async, Future, Poll, Stream};
 use futures_cpupool::{Builder as CpuPoolBuilder, CpuPool};
 use grpcio::{
@@ -19,7 +20,6 @@ use crate::raftstore::store::{SnapEntry, SnapKey, SnapManager, Snapshot};
 use tikv_util::security::SecurityManager;
 use tikv_util::worker::Runnable;
 use tikv_util::DeferContext;
-use engine_traits::KvEngine;
 
 use super::metrics::*;
 use super::transport::RaftStoreRouter;
@@ -101,9 +101,9 @@ struct SendStat {
 /// Send the snapshot to specified address.
 ///
 /// It will first send the normal raft snapshot message and then send the snapshot file.
-fn send_snap<K: KvEngine + 'static, R: KvEngine + 'static>(
+fn send_snap(
     env: Arc<Environment>,
-    mgr: SnapManager<K, R>,
+    mgr: SnapManager<Rocks, Rocks>,
     security_mgr: Arc<SecurityManager>,
     cfg: &Config,
     addr: &str,
@@ -182,7 +182,7 @@ struct RecvSnapContext {
 }
 
 impl RecvSnapContext {
-    fn new<K: KvEngine, R: KvEngine>(head_chunk: Option<SnapshotChunk>, snap_mgr: &SnapManager<K, R>) -> Result<Self> {
+    fn new(head_chunk: Option<SnapshotChunk>, snap_mgr: &SnapManager<Rocks, Rocks>) -> Result<Self> {
         // head_chunk is None means the stream is empty.
         let mut head = head_chunk.ok_or_else(|| Error::Other("empty gRPC stream".into()))?;
         if !head.has_message() {
@@ -218,7 +218,7 @@ impl RecvSnapContext {
         })
     }
 
-    fn finish<K: KvEngine, RR: KvEngine, R: RaftStoreRouter<K, RR>>(self, raft_router: R) -> Result<()> {
+    fn finish<R: RaftStoreRouter>(self, raft_router: R) -> Result<()> {
         let key = self.key;
         if let Some(mut file) = self.file {
             info!("saving snapshot file"; "snap_key" => %key, "file" => file.path());
@@ -235,10 +235,10 @@ impl RecvSnapContext {
     }
 }
 
-fn recv_snap<R: RaftStoreRouter<K, RR> + 'static, K: KvEngine + 'static, RR: KvEngine + 'static>(
+fn recv_snap<R: RaftStoreRouter + 'static>(
     stream: RequestStream<SnapshotChunk>,
     sink: ClientStreamingSink<Done>,
-    snap_mgr: SnapManager<K, RR>,
+    snap_mgr: SnapManager<Rocks, Rocks>,
     raft_router: R,
 ) -> impl Future<Item = (), Error = Error> {
     let stream = stream.map_err(Error::from);
@@ -291,9 +291,9 @@ fn recv_snap<R: RaftStoreRouter<K, RR> + 'static, K: KvEngine + 'static, RR: KvE
     .map_err(Error::from)
 }
 
-pub struct Runner<R: RaftStoreRouter<K, RR> + 'static, K: KvEngine, RR: KvEngine> {
+pub struct Runner<R: RaftStoreRouter + 'static> {
     env: Arc<Environment>,
-    snap_mgr: SnapManager<K, RR>,
+    snap_mgr: SnapManager<Rocks, Rocks>,
     pool: CpuPool,
     raft_router: R,
     security_mgr: Arc<SecurityManager>,
@@ -302,15 +302,15 @@ pub struct Runner<R: RaftStoreRouter<K, RR> + 'static, K: KvEngine, RR: KvEngine
     recving_count: Arc<AtomicUsize>,
 }
 
-impl<R: RaftStoreRouter<K, RR> + 'static, K: KvEngine, RR: KvEngine> Runner<R, K, RR> {
+impl<R: RaftStoreRouter + 'static> Runner<R> {
     pub fn new(
         env: Arc<Environment>,
-        snap_mgr: SnapManager<K, RR>,
+        snap_mgr: SnapManager<Rocks, Rocks>,
         r: R,
         security_mgr: Arc<SecurityManager>,
         cfg: Arc<Config>,
-    ) -> Self {
-        Self {
+    ) -> Runner<R> {
+        Runner {
             env,
             snap_mgr,
             pool: CpuPoolBuilder::new()
@@ -326,7 +326,7 @@ impl<R: RaftStoreRouter<K, RR> + 'static, K: KvEngine, RR: KvEngine> Runner<R, K
     }
 }
 
-impl<R: RaftStoreRouter<K, RR> + 'static, K: KvEngine + 'static, RR: KvEngine + 'static> Runnable<Task> for Runner<R, K, RR> {
+impl<R: RaftStoreRouter + 'static> Runnable<Task> for Runner<R> {
     fn run(&mut self, task: Task) {
         match task {
             Task::Recv { stream, sink } => {

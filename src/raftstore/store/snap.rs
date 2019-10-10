@@ -983,7 +983,7 @@ struct SnapManagerCore {
     snap_size: Arc<AtomicU64>,
 }
 
-fn notify_stats<K: KvEngine, R: KvEngine>(ch: Option<&RaftRouter<K, R>>) {
+fn notify_stats<K: KvEngine, R: KvEngine>(ch: Option<&RaftRouter>) {
     if let Some(ch) = ch {
         if let Err(e) = ch.send_control(StoreMsg::SnapshotStats) {
             error!(
@@ -999,13 +999,13 @@ fn notify_stats<K: KvEngine, R: KvEngine>(ch: Option<&RaftRouter<K, R>>) {
 pub struct SnapManager<K: KvEngine, R: KvEngine> {
     // directory to store snapfile.
     core: Arc<RwLock<SnapManagerCore>>,
-    router: Option<RaftRouter<K, R>>,
+    router: Option<RaftRouter>,
     limiter: Option<Arc<IOLimiter>>,
     max_total_size: u64,
 }
 
 impl<K: KvEngine + 'static, R: KvEngine + 'static> SnapManager<K, R> {
-    pub fn new<T: Into<String>>(path: T, router: Option<RaftRouter<K, R>>) -> Self {
+    pub fn new<T: Into<String>>(path: T, router: Option<RaftRouter>) -> Self {
         SnapManagerBuilder::default().build(path, router)
     }
 
@@ -1324,7 +1324,7 @@ impl SnapManagerBuilder {
         self.max_total_size = bytes;
         self
     }
-    pub fn build<T: Into<String>, K: KvEngine, R: KvEngine>(&self, path: T, router: Option<RaftRouter<K, R>>) -> SnapManager<K, R> {
+    pub fn build<T: Into<String>, K: KvEngine, R: KvEngine>(&self, path: T, router: Option<RaftRouter>) -> SnapManager<K, R> {
         let limiter = if self.max_write_bytes_per_sec > 0 {
             Some(Arc::new(IOLimiter::new(self.max_write_bytes_per_sec)))
         } else {

@@ -286,7 +286,7 @@ impl StatsMonitor {
 pub struct Runner<T: PdClient, K: KvEngine, R: KvEngine> {
     store_id: u64,
     pd_client: Arc<T>,
-    router: RaftRouter<K, R>,
+    router: RaftRouter,
     db: Arc<DB>,
     region_peers: HashMap<u64, PeerStat>,
     store_stat: StoreStat,
@@ -307,7 +307,7 @@ impl<T: PdClient, K: KvEngine + 'static, R: KvEngine + 'static> Runner<T, K, R> 
     pub fn new(
         store_id: u64,
         pd_client: Arc<T>,
-        router: RaftRouter<K, R>,
+        router: RaftRouter,
         db: Arc<DB>,
         scheduler: Scheduler<Task>,
         store_heartbeat_interval: u64,
@@ -957,7 +957,7 @@ fn new_merge_request(merge: pdpb::Merge) -> AdminRequest {
 }
 
 fn send_admin_request<K: KvEngine, R: KvEngine>(
-    router: &RaftRouter<K, R>,
+    router: &RaftRouter,
     region_id: u64,
     epoch: metapb::RegionEpoch,
     peer: metapb::Peer,
@@ -982,7 +982,7 @@ fn send_admin_request<K: KvEngine, R: KvEngine>(
 }
 
 /// Sends merge fail message to gc merge source.
-fn send_merge_fail<K: KvEngine, R: KvEngine>(router: &RaftRouter<K, R>, source_region_id: u64, target: metapb::Peer) {
+fn send_merge_fail<K: KvEngine, R: KvEngine>(router: &RaftRouter, source_region_id: u64, target: metapb::Peer) {
     let target_id = target.get_id();
     if let Err(e) = router.send(
         source_region_id,
@@ -1000,7 +1000,7 @@ fn send_merge_fail<K: KvEngine, R: KvEngine>(router: &RaftRouter<K, R>, source_r
 
 /// Sends a raft message to destroy the specified stale Peer
 fn send_destroy_peer_message<K: KvEngine, R: KvEngine>(
-    router: &RaftRouter<K, R>,
+    router: &RaftRouter,
     local_region: metapb::Region,
     peer: metapb::Peer,
     pd_region: metapb::Region,

@@ -13,13 +13,11 @@ use kvproto::raft_cmdpb::{
     AdminCmdType, AdminRequest, RaftCmdRequest, RaftRequestHeader, RegionDetailResponse,
     StatusCmdType, StatusRequest,
 };
-use std::marker::PhantomData;
 
 use crate::raftstore::store::msg::Callback;
 use crate::server::debug::{Debugger, Error};
 use crate::server::transport::RaftStoreRouter;
 use tikv_util::metrics;
-use engine_traits::KvEngine;
 
 use tikv_alloc;
 
@@ -45,23 +43,21 @@ fn error_to_grpc_error(tag: &'static str, e: Error) -> GrpcError {
 
 /// Service handles the RPC messages for the `Debug` service.
 #[derive(Clone)]
-pub struct Service<K: KvEngine, R: KvEngine, T: RaftStoreRouter<K, R>> {
+pub struct Service<T: RaftStoreRouter> {
     pool: CpuPool,
     debugger: Debugger,
     raft_router: T,
-    _phantom_k: PhantomData<K>,
-    _phantom_r: PhantomData<R>,
 }
 
-impl<K: KvEngine, R: KvEngine, T: RaftStoreRouter<K, R>> Service<K, R, T> {
+impl<T: RaftStoreRouter> Service<T> {
     /// Constructs a new `Service` with `Engines` and a `RaftStoreRouter`.
-    pub fn new(engines: Engines, raft_router: T) -> Self {
+    pub fn new(engines: Engines, raft_router: T) -> Service<T> {
         let pool = Builder::new()
             .name_prefix(thd_name!("debugger"))
             .pool_size(1)
             .create();
         let debugger = Debugger::new(engines);
-        Self {
+        Service {
             pool,
             debugger,
             raft_router,
@@ -86,7 +82,7 @@ impl<K: KvEngine, R: KvEngine, T: RaftStoreRouter<K, R>> Service<K, R, T> {
     }
 }
 
-impl<K: KvEngine, R: KvEngine, T: RaftStoreRouter<K, R> + 'static> debugpb::Debug for Service<K, R, T> {
+impl<T: RaftStoreRouter + 'static> debugpb::Debug for Service<T> {
     fn get(&mut self, ctx: RpcContext<'_>, mut req: GetRequest, sink: UnarySink<GetResponse>) {
         const TAG: &str = "debug_get";
 
@@ -457,7 +453,7 @@ impl<K: KvEngine, R: KvEngine, T: RaftStoreRouter<K, R> + 'static> debugpb::Debu
     }
 }
 
-fn region_detail<K: KvEngine, R: KvEngine, T: RaftStoreRouter<K, R>>(
+fn region_detail<T: RaftStoreRouter>(
     raft_router: T,
     region_id: u64,
     store_id: u64,
@@ -495,7 +491,7 @@ fn region_detail<K: KvEngine, R: KvEngine, T: RaftStoreRouter<K, R>>(
         })
 }
 
-fn consistency_check<K: KvEngine, R: KvEngine, T: RaftStoreRouter<K, R>>(
+fn consistency_check<T: RaftStoreRouter>(
     raft_router: T,
     mut detail: RegionDetailResponse,
 ) -> impl Future<Item = (), Error = Error> {
