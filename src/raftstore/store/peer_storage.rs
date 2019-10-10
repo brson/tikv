@@ -1336,8 +1336,8 @@ pub fn clear_meta<K: KvEngine, R: KvEngine>(
     Ok(())
 }
 
-pub fn do_snapshot<K: KvEngine, R: KvEngine>(
-    mgr: SnapManager<K, R>,
+pub fn do_snapshot(
+    mgr: SnapManager,
     raft_snap: DbSnapshot,
     kv_snap: DbSnapshot,
     region_id: u64,

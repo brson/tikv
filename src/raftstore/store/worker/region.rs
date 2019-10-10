@@ -203,16 +203,16 @@ impl PendingDeleteRanges {
 }
 
 #[derive(Clone)]
-struct SnapContext<K: KvEngine, R: KvEngine> {
+struct SnapContext {
     engines: Engines,
     batch_size: usize,
-    mgr: SnapManager<K, R>,
+    mgr: SnapManager,
     use_delete_range: bool,
     clean_stale_peer_delay: Duration,
     pending_delete_ranges: PendingDeleteRanges,
 }
 
-impl<K: KvEngine, R: KvEngine> SnapContext<K, R> {
+impl SnapContext {
     /// Generates the snapshot of the Region.
     fn generate_snap(
         &self,
@@ -245,8 +245,8 @@ impl<K: KvEngine, R: KvEngine> SnapContext<K, R> {
     fn handle_gen(
         &self,
         region_id: u64,
-        raft_snap: R::Snap,
-        kv_snap: K::Snap,
+        raft_snap: Snapshot,
+        kv_snap: Snapshot,
         notifier: SyncSender<RaftSnapshot>,
     ) {
         SNAP_COUNTER_VEC
@@ -520,7 +520,7 @@ impl<K: KvEngine, R: KvEngine> SnapContext<K, R> {
 
 pub struct Runner<K: KvEngine, R: KvEngine> {
     pool: ThreadPool<DefaultContext>,
-    ctx: SnapContext<K, R>,
+    ctx: SnapContext,
 
     // we may delay some apply tasks if level 0 files to write stall threshold,
     // pending_applies records all delayed apply task, and will check again later
@@ -530,7 +530,7 @@ pub struct Runner<K: KvEngine, R: KvEngine> {
 impl<K: KvEngine, R: KvEngine> Runner<K, R> {
     pub fn new(
         engines: Engines,
-        mgr: SnapManager<K, R>,
+        mgr: SnapManager,
         batch_size: usize,
         use_delete_range: bool,
         clean_stale_peer_delay: Duration,

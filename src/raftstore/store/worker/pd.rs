@@ -283,7 +283,7 @@ impl StatsMonitor {
     }
 }
 
-pub struct Runner<T: PdClient, K: KvEngine, R: KvEngine> {
+pub struct Runner<T> {
     store_id: u64,
     pd_client: Arc<T>,
     router: RaftRouter,
@@ -301,7 +301,7 @@ pub struct Runner<T: PdClient, K: KvEngine, R: KvEngine> {
     stats_monitor: StatsMonitor,
 }
 
-impl<T: PdClient, K: KvEngine + 'static, R: KvEngine + 'static> Runner<T, K, R> {
+impl<T: PdClient> Runner<T> {
     const INTERVAL_DIVISOR: u32 = 2;
 
     pub fn new(
@@ -777,7 +777,7 @@ impl<T: PdClient, K: KvEngine + 'static, R: KvEngine + 'static> Runner<T, K, R> 
     }
 }
 
-impl<T: PdClient, K: KvEngine +'static, R: KvEngine + 'static> Runnable<Task> for Runner<T, K, R> {
+impl<T: PdClient> Runnable<Task> for Runner<T> {
     fn run(&mut self, task: Task, handle: &Handle) {
         debug!("executing task"; "task" => %task);
 

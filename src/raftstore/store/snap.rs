@@ -996,7 +996,7 @@ fn notify_stats<K: KvEngine, R: KvEngine>(ch: Option<&RaftRouter>) {
 
 /// `SnapManagerCore` trace all current processing snapshots.
 #[derive(Clone)]
-pub struct SnapManager<K: KvEngine, R: KvEngine> {
+pub struct SnapManager {
     // directory to store snapfile.
     core: Arc<RwLock<SnapManagerCore>>,
     router: Option<RaftRouter>,
@@ -1004,7 +1004,7 @@ pub struct SnapManager<K: KvEngine, R: KvEngine> {
     max_total_size: u64,
 }
 
-impl<K: KvEngine + 'static, R: KvEngine + 'static> SnapManager<K, R> {
+impl SnapManager {
     pub fn new<T: Into<String>>(path: T, router: Option<RaftRouter>) -> Self {
         SnapManagerBuilder::default().build(path, router)
     }
@@ -1283,7 +1283,7 @@ impl<K: KvEngine + 'static, R: KvEngine + 'static> SnapManager<K, R> {
     }
 }
 
-impl<K: KvEngine, R: KvEngine> SnapshotDeleter for SnapManager<K, R> {
+impl SnapshotDeleter for SnapManager {
     fn delete_snapshot(&self, key: &SnapKey, snap: &dyn Snapshot, check_entry: bool) -> bool {
         let core = self.core.rl();
         if check_entry {
@@ -1324,7 +1324,7 @@ impl SnapManagerBuilder {
         self.max_total_size = bytes;
         self
     }
-    pub fn build<T: Into<String>, K: KvEngine, R: KvEngine>(&self, path: T, router: Option<RaftRouter>) -> SnapManager<K, R> {
+    pub fn build<T: Into<String>>(&self, path: T, router: Option<RaftRouter>) -> SnapManager {
         let limiter = if self.max_write_bytes_per_sec > 0 {
             Some(Arc::new(IOLimiter::new(self.max_write_bytes_per_sec)))
         } else {
