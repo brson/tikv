@@ -63,6 +63,7 @@ use tikv_util::time::{duration_to_sec, SlowTimer};
 use tikv_util::timer::SteadyTimer;
 use tikv_util::worker::{FutureScheduler, FutureWorker, Scheduler, Worker};
 use tikv_util::{is_zero_duration, sys as sys_util, Either, RingQueue};
+use engine_rocks::Rocks;
 
 type Key = Vec<u8>;
 
@@ -135,7 +136,7 @@ impl StoreMeta {
     }
 }
 
-pub type RaftRouter = BatchRouter<PeerFsm, StoreFsm>;
+pub type RaftRouter = BatchRouter<PeerFsm<Rocks, Rocks>, StoreFsm>;
 
 impl RaftRouter {
     pub fn send_raft_message(
@@ -191,19 +192,19 @@ pub struct PollContext<T, C: 'static> {
     pub cfg: Arc<Config>,
     pub store: metapb::Store,
     pub pd_scheduler: FutureScheduler<PdTask>,
-    pub consistency_check_scheduler: Scheduler<ConsistencyCheckTask>,
+    pub consistency_check_scheduler: Scheduler<ConsistencyCheckTask<Rocks>>,
     pub split_check_scheduler: Scheduler<SplitCheckTask>,
     // handle Compact, CleanupSST task
     pub cleanup_scheduler: Scheduler<CleanupTask>,
     pub raftlog_gc_scheduler: Scheduler<RaftlogGcTask>,
-    pub region_scheduler: Scheduler<RegionTask>,
+    pub region_scheduler: Scheduler<RegionTask<Rocks, Rocks>>,
     pub apply_router: ApplyRouter,
     pub router: RaftRouter,
     pub importer: Arc<SSTImporter>,
     pub store_meta: Arc<Mutex<StoreMeta>>,
     pub future_poller: ThreadPoolSender,
     pub raft_metrics: RaftMetrics,
-    pub snap_mgr: SnapManager,
+    pub snap_mgr: SnapManager<Rocks, Rocks>,
     pub applying_snap_count: Arc<AtomicUsize>,
     pub coprocessor_host: Arc<CoprocessorHost>,
     pub timer: SteadyTimer,
@@ -679,17 +680,17 @@ pub struct RaftPollerBuilder<T, C> {
     pub cfg: Arc<Config>,
     pub store: metapb::Store,
     pd_scheduler: FutureScheduler<PdTask>,
-    consistency_check_scheduler: Scheduler<ConsistencyCheckTask>,
+    consistency_check_scheduler: Scheduler<ConsistencyCheckTask<Rocks>>,
     split_check_scheduler: Scheduler<SplitCheckTask>,
     cleanup_scheduler: Scheduler<CleanupTask>,
     raftlog_gc_scheduler: Scheduler<RaftlogGcTask>,
-    pub region_scheduler: Scheduler<RegionTask>,
+    pub region_scheduler: Scheduler<RegionTask<Rocks, Rocks>>,
     apply_router: ApplyRouter,
     pub router: RaftRouter,
     pub importer: Arc<SSTImporter>,
     store_meta: Arc<Mutex<StoreMeta>>,
     future_poller: ThreadPoolSender,
-    snap_mgr: SnapManager,
+    snap_mgr: SnapManager<Rocks, Rocks>,
     pub coprocessor_host: Arc<CoprocessorHost>,
     trans: T,
     pd_client: Arc<C>,
@@ -919,18 +920,18 @@ where
 
 struct Workers {
     pd_worker: FutureWorker<PdTask>,
-    consistency_check_worker: Worker<ConsistencyCheckTask>,
+    consistency_check_worker: Worker<ConsistencyCheckTask<Rocks>>,
     split_check_worker: Worker<SplitCheckTask>,
     // handle Compact, CleanupSST task
     cleanup_worker: Worker<CleanupTask>,
     raftlog_gc_worker: Worker<RaftlogGcTask>,
-    region_worker: Worker<RegionTask>,
+    region_worker: Worker<RegionTask<Rocks, Rocks>>,
     coprocessor_host: Arc<CoprocessorHost>,
     future_poller: ThreadPool,
 }
 
 pub struct RaftBatchSystem {
-    system: BatchSystem<PeerFsm, StoreFsm>,
+    system: BatchSystem<PeerFsm<Rocks, Rocks>, StoreFsm>,
     apply_router: ApplyRouter,
     apply_system: ApplyBatchSystem,
     router: RaftRouter,
@@ -949,7 +950,7 @@ impl RaftBatchSystem {
         engines: Engines,
         trans: T,
         pd_client: Arc<C>,
-        mgr: SnapManager,
+        mgr: SnapManager<Rocks, Rocks>,
         pd_worker: FutureWorker<PdTask>,
         store_meta: Arc<Mutex<StoreMeta>>,
         mut coprocessor_host: CoprocessorHost,

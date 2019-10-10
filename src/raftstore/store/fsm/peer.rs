@@ -260,11 +260,11 @@ impl<K: KvEngine, R: KvEngine> Fsm for PeerFsm<K, R> {
 
 pub struct PeerFsmDelegate<'a, T: 'static, C: 'static, K: KvEngine, R: KvEngine> {
     fsm: &'a mut PeerFsm<K, R>,
-    ctx: &'a mut PollContext<T, C, K, R>,
+    ctx: &'a mut PollContext<T, C>,
 }
 
 impl<'a, T: Transport, C: PdClient, K: KvEngine + 'static, R: KvEngine + 'static> PeerFsmDelegate<'a, T, C, K, R> {
-    pub fn new(fsm: &'a mut PeerFsm<K, R>, ctx: &'a mut PollContext<T, C, K, R>) -> Self {
+    pub fn new(fsm: &'a mut PeerFsm<K, R>, ctx: &'a mut PollContext<T, C>) -> Self {
         Self { fsm, ctx }
     }
 
