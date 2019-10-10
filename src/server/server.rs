@@ -6,6 +6,7 @@ use std::str::FromStr;
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant};
 
+use engine_rocks::Rocks;
 use futures::{Future, Stream};
 use grpcio::{ChannelBuilder, EnvBuilder, Environment, Server as GrpcServer, ServerBuilder};
 use kvproto::tikvpb::*;
@@ -20,7 +21,6 @@ use tikv_util::security::SecurityManager;
 use tikv_util::timer::GLOBAL_TIMER_HANDLE;
 use tikv_util::worker::Worker;
 use tikv_util::Either;
-use engine_traits::KvEngine;
 
 use super::load_statistics::*;
 use super::raft_client::RaftClient;
@@ -39,7 +39,7 @@ pub const STATS_THREAD_PREFIX: &str = "transport-stats";
 ///
 /// It hosts various internal components, including gRPC, the raftstore router
 /// and a snapshot worker.
-pub struct Server<T: RaftStoreRouter<K, R> + 'static, S: StoreAddrResolver + 'static, K: KvEngine, R: KvEngine> {
+pub struct Server<T: RaftStoreRouter<Rocks, Rocks> + 'static, S: StoreAddrResolver + 'static> {
     env: Arc<Environment>,
     /// A GrpcServer builder or a GrpcServer.
     ///
@@ -47,10 +47,10 @@ pub struct Server<T: RaftStoreRouter<K, R> + 'static, S: StoreAddrResolver + 'st
     builder_or_server: Option<Either<ServerBuilder, GrpcServer>>,
     local_addr: SocketAddr,
     // Transport.
-    trans: ServerTransport<T, S, K, R>,
+    trans: ServerTransport<T, S, Rocks, Rocks>,
     raft_router: T,
     // For sending/receiving snapshots.
-    snap_mgr: SnapManager<K, R>,
+    snap_mgr: SnapManager<Rocks, Rocks>,
     snap_worker: Worker<SnapTask>,
 
     // Currently load statistics is done in the thread.
@@ -59,16 +59,16 @@ pub struct Server<T: RaftStoreRouter<K, R> + 'static, S: StoreAddrResolver + 'st
     timer: Handle,
 }
 
-impl<T: RaftStoreRouter<K, R>, S: StoreAddrResolver + 'static, K: KvEngine, R: KvEngine> Server<T, S, K, R> {
+impl<T: RaftStoreRouter<Rocks, Rocks>, S: StoreAddrResolver + 'static> Server<T, S> {
     #[allow(clippy::too_many_arguments)]
     pub fn new<E: Engine, L: LockMgr>(
         cfg: &Arc<Config>,
         security_mgr: &Arc<SecurityManager>,
-        storage: Storage<E, L, K, R>,
+        storage: Storage<E, L>,
         cop: Endpoint<E>,
         raft_router: T,
         resolver: S,
-        snap_mgr: SnapManager<K, R>,
+        snap_mgr: SnapManager<Rocks, Rocks>,
     ) -> Result<Self> {
         // A helper thread (or pool) for transport layer.
         let stats_pool = ThreadPoolBuilder::new()
@@ -126,7 +126,7 @@ impl<T: RaftStoreRouter<K, R>, S: StoreAddrResolver + 'static, K: KvEngine, R: K
             resolver,
         );
 
-        let svr = Self {
+        let svr = Server {
             env: Arc::clone(&env),
             builder_or_server: Some(builder),
             local_addr: addr,
@@ -142,7 +142,7 @@ impl<T: RaftStoreRouter<K, R>, S: StoreAddrResolver + 'static, K: KvEngine, R: K
         Ok(svr)
     }
 
-    pub fn transport(&self) -> ServerTransport<T, S, K, R> {
+    pub fn transport(&self) -> ServerTransport<T, S, Rocks, Rocks> {
         self.trans.clone()
     }
 
@@ -278,7 +278,7 @@ mod tests {
         significant_msg_sender: Sender<SignificantMsg>,
     }
 
-    impl RaftStoreRouter<Rocks, Rocks> for TestRaftStoreRouter {
+    impl RaftStoreRouter for TestRaftStoreRouter {
         fn send_raft_msg(&self, _: RaftMessage) -> RaftStoreResult<()> {
             self.tx.send(1).unwrap();
             Ok(())
@@ -294,7 +294,7 @@ mod tests {
             Ok(())
         }
 
-        fn casual_send(&self, _: u64, _: CasualMessage<K, R>) -> RaftStoreResult<()> {
+        fn casual_send(&self, _: u64, _: CasualMessage) -> RaftStoreResult<()> {
             self.tx.send(1).unwrap();
             Ok(())
         }

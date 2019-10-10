@@ -9,9 +9,7 @@ pub trait Snapshot: 'static + Peekable + Send + Sync + Debug {
     fn cf_names(&self) -> Vec<&str>;
 }
 
-pub trait WriteBatch<E: KvEngine>: Mutable {
-    fn with_capacity(engine: &E, cap: usize) -> Self;
-
+pub trait WriteBatch: Mutable {
     fn data_size(&self) -> usize;
     fn count(&self) -> usize;
     fn is_empty(&self) -> bool;
@@ -28,7 +26,7 @@ pub struct IngestExternalFileOptions {
 
 pub trait KvEngine: Peekable + Mutable + Iterable + Send + Sync + Clone + Debug {
     type Snap: Snapshot;
-    type Batch: WriteBatch<Self>;
+    type Batch: WriteBatch;
 
     fn write_opt(&self, opts: &WriteOptions, wb: &Self::Batch) -> Result<()>;
     fn write(&self, wb: &Self::Batch) -> Result<()> {

@@ -41,7 +41,7 @@ pub fn create_raft_storage<S, K, R>(
     local_storage: Option<Arc<DB>>,
     raft_store_router: Option<ServerRaftStoreRouter<K, R>>,
     lock_mgr: Option<LockManager>,
-) -> Result<Storage<RaftKv<K, R, S>, LockManager, K, R>>
+) -> Result<Storage<RaftKv<K, R, S>, LockManager>>
 where
     K: KvEngine + 'static,
     R: KvEngine + 'static,

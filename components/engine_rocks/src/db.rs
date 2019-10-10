@@ -7,7 +7,7 @@ use std::sync::Arc;
 
 use engine_traits::{
     Error, IterOptions, Iterable, KvEngine, Mutable, Peekable, ReadOptions, Result, WriteOptions,
-    WriteBatch, IngestExternalFileOptions,
+    IngestExternalFileOptions,
 };
 use rocksdb::{
     set_external_sst_file_global_seq_no, DBIterator, Writable, DB,
@@ -96,7 +96,7 @@ impl KvEngine for Rocks {
     }
 
     fn write_batch_with_cap(&self, cap: usize) -> Self::Batch {
-        Self::Batch::with_capacity(self, cap)
+        Self::Batch::with_capacity(Arc::clone(&self.0), cap)
     }
 
     fn write_batch(&self) -> Self::Batch {
