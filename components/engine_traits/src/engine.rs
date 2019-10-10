@@ -24,7 +24,7 @@ pub struct IngestExternalFileOptions {
     pub move_files: bool,
 }
 
-pub trait KvEngine: Peekable + Mutable + Iterable + Send + Sync + Clone + Debug {
+pub trait KvEngine: Peekable + Mutable + Iterable + Send + Sync + Clone + Debug + 'static {
     type Snap: Snapshot;
     type Batch: WriteBatch;
 
