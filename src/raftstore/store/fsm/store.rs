@@ -124,7 +124,7 @@ impl StoreMeta {
         &mut self,
         host: &CoprocessorHost,
         region: Region,
-        peer: &mut crate::raftstore::store::Peer,
+        peer: &mut crate::raftstore::store::Peer<Rocks, Rocks>,
     ) {
         let prev = self.regions.insert(region.get_id(), region.clone());
         if prev.map_or(true, |r| r.get_id() != region.get_id()) {
@@ -224,7 +224,7 @@ pub struct PollContext<T, C: 'static> {
     pub current_time: Option<Timespec>,
 }
 
-impl<T, C> HandleRaftReadyContext for PollContext<T, C> {
+impl<T, C> HandleRaftReadyContext<Rocks, Rocks> for PollContext<T, C> {
     #[inline]
     fn kv_wb(&self) -> &WriteBatch {
         &self.kv_wb
@@ -863,7 +863,7 @@ impl<T, C> RaftPollerBuilder<T, C> {
     }
 }
 
-impl<T, C> HandlerBuilder<PeerFsm, StoreFsm> for RaftPollerBuilder<T, C>
+impl<T, C> HandlerBuilder<PeerFsm<Rocks, Rocks>, StoreFsm> for RaftPollerBuilder<T, C>
 where
     T: Transport + 'static,
     C: PdClient + 'static,

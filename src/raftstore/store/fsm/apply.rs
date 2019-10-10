@@ -276,7 +276,7 @@ struct ApplyContext<K: KvEngine, R: KvEngine> {
     importer: Arc<SSTImporter>,
     region_scheduler: Scheduler<RegionTask<K, R>>,
     router: ApplyRouter,
-    notifier: Notifier<K, R>,
+    notifier: Notifier,
     engines: KvEngines<K, R>,
     cbs: MustConsumeVec<ApplyCallback>,
     apply_res: Vec<ApplyRes<K>>,
@@ -305,7 +305,7 @@ impl<K: KvEngine, R: KvEngine> ApplyContext<K, R> {
         region_scheduler: Scheduler<RegionTask<K, R>>,
         engines: KvEngines<K, R>,
         router: BatchRouter<ApplyFsm, ControlFsm>,
-        notifier: Notifier<K, R>,
+        notifier: Notifier,
         cfg: &Config,
     ) -> Self {
         Self {
@@ -2774,14 +2774,14 @@ pub struct Builder<K: KvEngine, R: KvEngine> {
     importer: Arc<SSTImporter>,
     region_scheduler: Scheduler<RegionTask<K, R>>,
     engines: KvEngines<K, R>,
-    sender: Notifier<K, R>,
+    sender: Notifier,
     router: ApplyRouter,
 }
 
 impl<K: KvEngine, R: KvEngine> Builder<K, R> {
     pub fn new<T, C>(
-        builder: &RaftPollerBuilder<T, C, K, R>,
-        sender: Notifier<K, R>,
+        builder: &RaftPollerBuilder<T, C>,
+        sender: Notifier,
         router: ApplyRouter,
     ) -> Self {
         Self {
