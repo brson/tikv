@@ -6,7 +6,7 @@ use kvproto::pdpb::CheckPolicy;
 use kvproto::raft_cmdpb::{RaftCmdRequest, RaftCmdResponse};
 use std::mem;
 
-use engine_traits::KvEngine;
+use engine_rocks::Rocks;
 use crate::raftstore::store::CasualRouter;
 
 use super::*;
@@ -120,7 +120,7 @@ pub struct CoprocessorHost {
 }
 
 impl CoprocessorHost {
-    pub fn new<C: CasualRouter<K, R> + Clone + Send + 'static, K: KvEngine, R: KvEngine>(cfg: Config, ch: C) -> Self {
+    pub fn new<C: CasualRouter<Rocks, Rocks> + Clone + Send + 'static>(cfg: Config, ch: C) -> Self {
         let mut registry = Registry::default();
         let split_size_check_observer = SizeCheckObserver::new(
             cfg.region_max_size.0,
