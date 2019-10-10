@@ -337,7 +337,7 @@ impl<K: KvEngine, R: KvEngine> ApplyContext<K, R> {
     /// After all delegates are handled, `write_to_db` method should be called.
     pub fn prepare_for(&mut self, delegate: &ApplyDelegate) {
         if self.kv_wb.is_none() {
-            self.kv_wb = Some(K::Batch::with_capacity(&self.engines.kv, DEFAULT_APPLY_WB_SIZE));
+            self.kv_wb = Some(K::write_batch_with_cap(&self.engines.kv, DEFAULT_APPLY_WB_SIZE));
             self.kv_wb_last_bytes = 0;
             self.kv_wb_last_keys = 0;
         }
@@ -385,7 +385,7 @@ impl<K: KvEngine, R: KvEngine> ApplyContext<K, R> {
             let data_size = self.kv_wb().data_size();
             if data_size > APPLY_WB_SHRINK_SIZE {
                 // Control the memory usage for the WriteBatch.
-                self.kv_wb = Some(K::Batch::with_capacity(&self.engines.kv, DEFAULT_APPLY_WB_SIZE));
+                self.kv_wb = Some(K::write_batch_with_cap(&self.engines.kv, DEFAULT_APPLY_WB_SIZE));
             } else {
                 // Clear data, reuse the WriteBatch, this can reduce memory allocations and deallocations.
                 self.kv_wb().clear();
@@ -2591,7 +2591,7 @@ impl ApplyFsm {
                 apply_ctx.timer = Some(SlowTimer::new());
             }
             if apply_ctx.kv_wb.is_none() {
-                apply_ctx.kv_wb = Some(K::Batch::with_capacity(&apply_ctx.engines.kv, DEFAULT_APPLY_WB_SIZE));
+                apply_ctx.kv_wb = Some(K::write_batch_with_cap(&apply_ctx.engines.kv, DEFAULT_APPLY_WB_SIZE));
             }
             self.delegate
                 .write_apply_state(&apply_ctx.engines, apply_ctx.kv_wb());
