@@ -94,7 +94,7 @@ pub struct PeerFsm<K: KvEngine, R: KvEngine> {
     stopped: bool,
     has_ready: bool,
     mailbox: Option<BasicMailbox<Self>>,
-    pub receiver: Receiver<PeerMsg<K, R>>,
+    pub receiver: Receiver<PeerMsg>,
 }
 
 impl<K: KvEngine, R: KvEngine> Drop for PeerFsm<K, R> {
@@ -127,7 +127,7 @@ impl<K: KvEngine, R: KvEngine> PeerFsm<K, R> {
         sched: Scheduler<RegionTask<K, R>>,
         engines: KvEngines<K, R>,
         region: &metapb::Region,
-    ) -> Result<(LooseBoundedSender<PeerMsg<K, R>>, Box<Self>)> {
+    ) -> Result<(LooseBoundedSender<PeerMsg>, Box<Self>)> {
         let meta_peer = match util::find_peer(region, store_id) {
             None => {
                 return Err(box_err!(
@@ -170,7 +170,7 @@ impl<K: KvEngine, R: KvEngine> PeerFsm<K, R> {
         engines: KvEngines<K, R>,
         region_id: u64,
         peer: metapb::Peer,
-    ) -> Result<(LooseBoundedSender<PeerMsg<K, R>>, Box<Self>)> {
+    ) -> Result<(LooseBoundedSender<PeerMsg>, Box<Self>)> {
         // We will remove tombstone key when apply snapshot
         info!(
             "replicate peer";
@@ -231,7 +231,7 @@ impl<K: KvEngine, R: KvEngine> PeerFsm<K, R> {
 }
 
 impl<K: KvEngine, R: KvEngine> Fsm for PeerFsm<K, R> {
-    type Message = PeerMsg<K, R>;
+    type Message = PeerMsg;
 
     #[inline]
     fn is_stopped(&self) -> bool {
@@ -268,7 +268,7 @@ impl<'a, T: Transport, C: PdClient, K: KvEngine + 'static, R: KvEngine + 'static
         Self { fsm, ctx }
     }
 
-    pub fn handle_msgs(&mut self, msgs: &mut Vec<PeerMsg<K, R>>) {
+    pub fn handle_msgs(&mut self, msgs: &mut Vec<PeerMsg>) {
         for m in msgs.drain(..) {
             match m {
                 PeerMsg::RaftMessage(msg) => {
@@ -310,7 +310,7 @@ impl<'a, T: Transport, C: PdClient, K: KvEngine + 'static, R: KvEngine + 'static
         }
     }
 
-    fn on_casual_msg(&mut self, msg: CasualMessage<K, R>) {
+    fn on_casual_msg(&mut self, msg: CasualMessage) {
         match msg {
             CasualMessage::SplitRegion {
                 region_epoch,

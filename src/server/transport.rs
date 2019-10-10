@@ -64,7 +64,7 @@ pub trait RaftStoreRouter<K: KvEngine, R: KvEngine>: Send + Clone {
         )
     }
 
-    fn casual_send(&self, region_id: u64, msg: CasualMessage<K, R>) -> RaftStoreResult<()>;
+    fn casual_send(&self, region_id: u64, msg: CasualMessage) -> RaftStoreResult<()>;
 }
 
 #[derive(Clone)]
@@ -88,7 +88,7 @@ impl<K: KvEngine, R: KvEngine> RaftStoreRouter<K, R> for RaftStoreBlackHole {
 
     fn broadcast_unreachable(&self, _: u64) {}
 
-    fn casual_send(&self, _: u64, _: CasualMessage<K, R>) -> RaftStoreResult<()> {
+    fn casual_send(&self, _: u64, _: CasualMessage) -> RaftStoreResult<()> {
         Ok(())
     }
 }
@@ -161,7 +161,7 @@ impl<K: KvEngine, R: KvEngine> RaftStoreRouter<K, R> for ServerRaftStoreRouter<K
         Ok(())
     }
 
-    fn casual_send(&self, region_id: u64, msg: CasualMessage<K, R>) -> RaftStoreResult<()> {
+    fn casual_send(&self, region_id: u64, msg: CasualMessage) -> RaftStoreResult<()> {
         self.router
             .send(region_id, PeerMsg::CasualMessage(msg))
             .map_err(|e| handle_error(region_id, e))

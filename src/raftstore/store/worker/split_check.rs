@@ -275,7 +275,7 @@ impl<K: KvEngine, R: KvEngine, S: CasualRouter<K, R>> Runnable<Task> for Runner<
     }
 }
 
-fn new_split_region<K: KvEngine, R: KvEngine>(region_epoch: RegionEpoch, split_keys: Vec<Vec<u8>>) -> CasualMessage<K, R> {
+fn new_split_region(region_epoch: RegionEpoch, split_keys: Vec<Vec<u8>>) -> CasualMessage {
     CasualMessage::SplitRegion {
         region_epoch,
         split_keys,

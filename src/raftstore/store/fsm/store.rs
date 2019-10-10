@@ -451,7 +451,7 @@ impl<'a, T: Transport, C: PdClient, K: KvEngine, R: KvEngine> StoreFsmDelegate<'
 pub struct RaftPoller<T: 'static, C: 'static, K: KvEngine, R: KvEngine> {
     tag: String,
     store_msg_buf: Vec<StoreMsg>,
-    peer_msg_buf: Vec<PeerMsg<K, R>>,
+    peer_msg_buf: Vec<PeerMsg>,
     previous_metrics: RaftMetrics,
     timer: SlowTimer,
     poll_ctx: PollContext<T, C, K, R>,
@@ -702,7 +702,7 @@ impl<T, C, K: KvEngine, R: KvEngine> RaftPollerBuilder<T, C, K, R> {
     /// Initialize this store. It scans the db engine, loads all regions
     /// and their peers from it, and schedules snapshot worker if necessary.
     /// WARN: This store should not be used before initialized.
-    fn init(&mut self) -> Result<Vec<(LooseBoundedSender<PeerMsg<K, R>>, Box<PeerFsm<K, R>>)>> {
+    fn init(&mut self) -> Result<Vec<(LooseBoundedSender<PeerMsg>, Box<PeerFsm<K, R>>)>> {
         // Scan region meta to get saved regions.
         let start_key = keys::REGION_META_MIN_KEY;
         let end_key = keys::REGION_META_MAX_KEY;
@@ -1006,7 +1006,7 @@ impl<K: KvEngine + 'static, R: KvEngine + 'static> RaftBatchSystem<K, R> {
     fn start_system<T: Transport + 'static, C: PdClient + 'static>(
         &mut self,
         mut workers: Workers<K, R>,
-        region_peers: Vec<(LooseBoundedSender<PeerMsg<K, R>>, Box<PeerFsm<K, R>>)>,
+        region_peers: Vec<(LooseBoundedSender<PeerMsg>, Box<PeerFsm<K, R>>)>,
         builder: RaftPollerBuilder<T, C, K, R>,
     ) -> Result<()> {
         builder.snap_mgr.init()?;

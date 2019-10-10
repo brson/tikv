@@ -17,7 +17,7 @@ use crate::raftstore::store::util::KeysInfoFormatter;
 use crate::raftstore::store::SnapKey;
 use crate::storage::kv::CompactedEvent;
 use tikv_util::escape;
-use engine_traits::KvEngine;
+use engine_rocks::Rocks;
 
 use super::RegionSnapshot;
 
@@ -165,7 +165,7 @@ pub enum SignificantMsg {
 /// Message that will be sent to a peer.
 ///
 /// These messages are not significant and can be dropped occasionally.
-pub enum CasualMessage<K: KvEngine, R: KvEngine> {
+pub enum CasualMessage {
     /// Split the target region into several partitions.
     SplitRegion {
         region_epoch: RegionEpoch,
@@ -217,7 +217,7 @@ pub enum CasualMessage<K: KvEngine, R: KvEngine> {
     Test(Box<dyn FnOnce(&mut dyn Any) + Send + 'static>),
 }
 
-impl<K: KvEngine, R: KvEngine> fmt::Debug for CasualMessage<K, R> {
+impl fmt::Debug for CasualMessage {
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::ComputeHashResult { index, ref hash } => write!(
@@ -282,7 +282,7 @@ impl RaftCommand {
 }
 
 /// Message that can be sent to a peer.
-pub enum PeerMsg<K: KvEngine, R: KvEngine> {
+pub enum PeerMsg {
     /// Raft message is the message sent between raft nodes in the same
     /// raft group. Messages need to be redirected to raftstore if target
     /// peer doesn't exist.
@@ -295,7 +295,7 @@ pub enum PeerMsg<K: KvEngine, R: KvEngine> {
     /// that the raft node will not work anymore.
     Tick(PeerTicks),
     /// Result of applying committed entries. The message can't be lost.
-    ApplyRes { res: ApplyTaskRes<K> },
+    ApplyRes { res: ApplyTaskRes<Rocks> },
     /// Message that can't be lost but rarely created. If they are lost, real bad
     /// things happen like some peers will be considered dead in the group.
     SignificantMsg(SignificantMsg),
@@ -304,12 +304,12 @@ pub enum PeerMsg<K: KvEngine, R: KvEngine> {
     /// A message only used to notify a peer.
     Noop,
     /// Message that is not important and can be dropped occasionally.
-    CasualMessage(CasualMessage<K, R>),
+    CasualMessage(CasualMessage),
     /// Ask region to report a heartbeat to PD.
     HeartbeatPd,
 }
 
-impl<K: KvEngine, R: KvEngine> fmt::Debug for PeerMsg<K, R> {
+impl fmt::Debug for PeerMsg {
     fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             PeerMsg::RaftMessage(_) => write!(fmt, "Raft Message"),
@@ -382,7 +382,7 @@ impl fmt::Debug for StoreMsg {
 
 // TODO: remove this enum and utilize the actual message instead.
 #[derive(Debug)]
-pub enum Msg<K: KvEngine, R: KvEngine> {
-    PeerMsg(PeerMsg<K, R>),
+pub enum Msg {
+    PeerMsg(PeerMsg),
     StoreMsg(StoreMsg),
 }

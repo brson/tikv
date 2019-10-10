@@ -257,7 +257,7 @@ pub enum Notifier<K: KvEngine, R: KvEngine> {
 }
 
 impl<K: KvEngine, R: KvEngine> Notifier<K, R> {
-    fn notify(&self, region_id: u64, msg: PeerMsg<K, R>) {
+    fn notify(&self, region_id: u64, msg: PeerMsg) {
         match *self {
             Notifier::Router(ref r) => {
                 r.force_send(region_id, msg).unwrap();
