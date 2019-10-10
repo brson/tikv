@@ -9,7 +9,7 @@ pub trait Snapshot: 'static + Peekable + Send + Sync + Debug {
     fn cf_names(&self) -> Vec<&str>;
 }
 
-pub trait WriteBatch: Mutable {
+pub trait WriteBatch: Mutable + Send {
     fn data_size(&self) -> usize;
     fn count(&self) -> usize;
     fn is_empty(&self) -> bool;
