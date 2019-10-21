@@ -22,6 +22,7 @@ pub use cf_handle::*;
 mod cf_options;
 pub use cf_options::*;
 mod import;
+mod miscext;
 
 #[cfg(test)]
 mod tests {

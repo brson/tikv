@@ -30,6 +30,8 @@ mod cf_options;
 pub use crate::cf_options::*;
 mod import;
 pub use import::*;
+mod miscext;
+pub use miscext::*;
 
 pub const DATA_KEY_PREFIX_LEN: usize = 1;
 
