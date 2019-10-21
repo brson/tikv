@@ -32,6 +32,8 @@ mod import;
 pub use import::*;
 mod miscext;
 pub use miscext::*;
+mod table_properties;
+pub use table_properties::*;
 
 pub const DATA_KEY_PREFIX_LEN: usize = 1;
 

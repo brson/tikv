@@ -23,6 +23,8 @@ mod cf_options;
 pub use cf_options::*;
 mod import;
 mod miscext;
+mod table_properties;
+pub use table_properties::*;
 
 #[cfg(test)]
 mod tests {

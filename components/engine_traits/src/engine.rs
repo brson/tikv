@@ -25,6 +25,7 @@ pub trait KvEngine:
     + Iterable
     + DBOptionsExt
     + CFHandleExt
+    + TablePropertiesExt
     + Import
     + Send
     + Sync
