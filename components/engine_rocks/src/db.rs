@@ -23,6 +23,10 @@ impl Rocks {
         Rocks(db)
     }
 
+    pub fn from_ref(db: &Arc<DB>) -> &Self {
+        unsafe { &*(db as *const Arc<DB> as *const Rocks) }
+    }
+
     pub fn as_inner(&self) -> &Arc<DB> {
         &self.0
     }
