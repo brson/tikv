@@ -10,8 +10,9 @@ use std::time::Duration;
 use futures::Future;
 use tokio_core::reactor::Handle;
 
-use engine::rocks::util::*;
 use engine::rocks::DB;
+use engine_traits::EngineMiscExt;
+use engine_rocks::Rocks;
 use fs2;
 use kvproto::metapb;
 use kvproto::pdpb;
@@ -511,8 +512,9 @@ impl<T: PdClient> Runner<T> {
         stats.set_capacity(capacity);
 
         // already include size of snapshot files
+        let rocks = Rocks::from_ref(&store_info.engine);
         let used_size =
-            stats.get_used_size() + get_engine_used_size(Arc::clone(&store_info.engine));
+            stats.get_used_size() + rocks.get_used_size();
         stats.set_used_size(used_size);
 
         let mut available = if capacity > used_size {
