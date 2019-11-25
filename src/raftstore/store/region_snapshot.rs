@@ -4,7 +4,7 @@ use engine::rocks::{TablePropertiesCollection, DB};
 use engine::{self, IterOption};
 use engine_rocks::{RocksDBVector, RocksEngineIterator, RocksSnapshot, RocksSyncSnapshot};
 use engine_traits::{
-    Peekable, ReadOptions, Result as EngineResult, SeekKey, Snapshot as SnapshotTrait,
+    Peekable, ReadOptions, Result as EngineResult, SeekKey, Snapshot,
 };
 use kvproto::metapb::Region;
 use std::sync::Arc;
