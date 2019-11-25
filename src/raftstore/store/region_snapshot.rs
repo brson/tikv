@@ -2,9 +2,9 @@
 
 use engine::rocks::{TablePropertiesCollection, DB};
 use engine::{self, IterOption};
-use engine_rocks::{RocksDBVector, RocksEngineIterator, RocksSnapshot, RocksSyncSnapshot};
+use engine_rocks::{RocksDBVector, RocksEngineIterator, RocksSnapshot, RocksSyncSnapshot, Compat};
 use engine_traits::{
-    Peekable, ReadOptions, Result as EngineResult, SeekKey, Snapshot,
+    Peekable, ReadOptions, Result as EngineResult, SeekKey, Snapshot, SyncSnapshot, KvEngine
 };
 use kvproto::metapb::Region;
 use std::sync::Arc;
@@ -14,6 +14,7 @@ use crate::raftstore::store::{keys, util, PeerStorage};
 use crate::raftstore::Result;
 use engine_traits::util::check_key_in_range;
 use engine_traits::{Error as EngineError, Iterable, Iterator};
+use engine_rocks::RocksEngine;
 use tikv_util::keybuilder::KeyBuilder;
 use tikv_util::metrics::CRITICAL_ERROR;
 use tikv_util::{panic_when_unexpected_key_or_data, set_panic_mark};
@@ -22,21 +23,22 @@ use tikv_util::{panic_when_unexpected_key_or_data, set_panic_mark};
 ///
 /// Only data within a region can be accessed.
 #[derive(Debug)]
-pub struct RegionSnapshot {
-    snap: RocksSyncSnapshot,
+pub struct RegionSnapshot<E: KvEngine> {
+    snap: <E::Snapshot as Snapshot>::SyncSnapshot,
     region: Arc<Region>,
 }
 
-impl RegionSnapshot {
-    pub fn new(ps: &PeerStorage) -> RegionSnapshot {
+impl<E> RegionSnapshot<E> where E: KvEngine {
+    pub fn new(ps: &PeerStorage) -> RegionSnapshot<RocksEngine> {
         RegionSnapshot::from_snapshot(ps.raw_snapshot().into_sync(), ps.region().clone())
     }
 
-    pub fn from_raw(db: Arc<DB>, region: Region) -> RegionSnapshot {
-        RegionSnapshot::from_snapshot(RocksSnapshot::new(db).into_sync(), region)
+    pub fn from_raw(db: Arc<DB>, region: Region) -> RegionSnapshot<RocksEngine> {
+        RegionSnapshot::from_snapshot(db.c().snapshot().into_sync(), region)
     }
 
-    pub fn from_snapshot(snap: RocksSyncSnapshot, region: Region) -> RegionSnapshot {
+    pub fn from_snapshot(snap: <E::Snapshot as Snapshot>::SyncSnapshot, region: Region) -> RegionSnapshot<E>
+    {
         RegionSnapshot {
             snap,
             region: Arc::new(region),
@@ -47,11 +49,11 @@ impl RegionSnapshot {
         &self.region
     }
 
-    pub fn iter(&self, iter_opt: IterOption) -> RegionIterator {
+    pub fn iter(&self, iter_opt: IterOption) -> RegionIterator<E> {
         RegionIterator::new(&self.snap, Arc::clone(&self.region), iter_opt)
     }
 
-    pub fn iter_cf(&self, cf: &str, iter_opt: IterOption) -> Result<RegionIterator> {
+    pub fn iter_cf(&self, cf: &str, iter_opt: IterOption) -> Result<RegionIterator<E>> {
         Ok(RegionIterator::new_cf(
             &self.snap,
             Arc::clone(&self.region),
@@ -90,7 +92,7 @@ impl RegionSnapshot {
         self.scan_impl(self.iter_cf(cf, iter_opt)?, start_key, f)
     }
 
-    fn scan_impl<F>(&self, mut it: RegionIterator, start_key: &[u8], mut f: F) -> Result<()>
+    fn scan_impl<F>(&self, mut it: RegionIterator<E>, start_key: &[u8], mut f: F) -> Result<()>
     where
         F: FnMut(&[u8], &[u8]) -> Result<bool>,
     {
@@ -129,7 +131,7 @@ impl RegionSnapshot {
     }
 }
 
-impl Clone for RegionSnapshot {
+impl<E> Clone for RegionSnapshot<E> where E: KvEngine {
     fn clone(&self) -> Self {
         RegionSnapshot {
             snap: self.snap.clone(),
@@ -138,8 +140,8 @@ impl Clone for RegionSnapshot {
     }
 }
 
-impl Peekable for RegionSnapshot {
-    type DBVector = RocksDBVector;
+impl<E> Peekable for RegionSnapshot<E> where E: KvEngine {
+    type DBVector = <E::Snapshot as Peekable>::DBVector;
 
     fn get_value_opt(
         &self,
@@ -219,8 +221,8 @@ impl Peekable for RegionSnapshot {
 /// `RegionIterator` wrap a rocksdb iterator and only allow it to
 /// iterate in the region. It behaves as if underlying
 /// db only contains one region.
-pub struct RegionIterator {
-    iter: RocksEngineIterator,
+pub struct RegionIterator<E: KvEngine> {
+    iter: <E::Snapshot as Iterable>::Iterator,
     valid: bool,
     region: Arc<Region>,
     start_key: Vec<u8>,
@@ -252,12 +254,12 @@ fn update_upper_bound(iter_opt: &mut IterOption, region: &Region) {
 }
 
 // we use engine::rocks's style iterator, doesn't need to impl std iterator.
-impl RegionIterator {
+impl<E> RegionIterator<E> where E: KvEngine {
     pub fn new(
-        snap: &RocksSyncSnapshot,
+        snap: &<E::Snapshot as Snapshot>::SyncSnapshot,
         region: Arc<Region>,
         mut iter_opt: IterOption,
-    ) -> RegionIterator {
+    ) -> RegionIterator<E> {
         update_lower_bound(&mut iter_opt, &region);
         update_upper_bound(&mut iter_opt, &region);
         let start_key = iter_opt.lower_bound().unwrap().to_vec();
@@ -275,11 +277,11 @@ impl RegionIterator {
     }
 
     pub fn new_cf(
-        snap: &RocksSyncSnapshot,
+        snap: &<E::Snapshot as Snapshot>::SyncSnapshot,
         region: Arc<Region>,
         mut iter_opt: IterOption,
         cf: &str,
-    ) -> RegionIterator {
+    ) -> RegionIterator<E> {
         update_lower_bound(&mut iter_opt, &region);
         update_upper_bound(&mut iter_opt, &region);
         let start_key = iter_opt.lower_bound().unwrap().to_vec();

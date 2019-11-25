@@ -21,6 +21,7 @@ use crate::raftstore::store::{
 };
 use crate::raftstore::Result;
 use engine::DB;
+use engine_rocks::RocksEngine;
 use tikv_util::collections::HashMap;
 use tikv_util::time::Instant;
 
@@ -83,9 +84,9 @@ impl ReadDelegate {
     fn handle_read(
         &self,
         req: &RaftCmdRequest,
-        executor: &mut ReadExecutor,
+        executor: &mut ReadExecutor<RocksEngine>,
         metrics: &mut ReadMetrics,
-    ) -> Option<ReadResponse> {
+    ) -> Option<ReadResponse<RocksEngine>> {
         if let Some(ref lease) = self.leader_lease {
             let term = lease.term();
             if term == self.term {
