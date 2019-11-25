@@ -16,6 +16,8 @@ use engine::rocks::{
 use engine::IterOptionsExt;
 use engine::{self, Engines, IterOption, Iterable, Mutable, Peekable};
 use engine::{CF_DEFAULT, CF_LOCK, CF_RAFT, CF_WRITE};
+use engine_traits::{TablePropertiesExt, TablePropertiesCollection};
+use engine_rocks::Compat;
 use kvproto::debugpb::{self, Db as DBType, Module};
 use kvproto::kvrpcpb::{MvccInfo, MvccLock, MvccValue, MvccWrite, Op};
 use kvproto::metapb::{Peer, Region};
@@ -1460,7 +1462,7 @@ fn divide_db(db: &Arc<DB>, parts: usize) -> crate::raftstore::Result<Vec<Vec<u8>
 fn divide_db_cf(db: &Arc<DB>, parts: usize, cf: &str) -> crate::raftstore::Result<Vec<Vec<u8>>> {
     let start = keys::data_key(b"");
     let end = keys::data_end_key(b"");
-    let collection = engine::util::get_range_properties_cf(db, cf, &start, &end)?;
+    let collection = db.c().get_range_properties_cf(db, cf, &start, &end)?;
 
     let mut keys = Vec::new();
     let mut found_keys_count = 0;
