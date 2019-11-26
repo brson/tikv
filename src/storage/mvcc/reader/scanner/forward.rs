@@ -88,6 +88,8 @@ impl<S: Snapshot> ForwardScanner<S> {
             // `has_lock` indicates whether `current_user_key` has a corresponding `lock`. If
             // there is one, it is what current lock cursor pointing to.
             let (current_user_key, has_write, has_lock) = {
+                let _ = self.default_cursor.as_ref().unwrap();
+
                 let w_key = if self.write_cursor.valid()? {
                     Some(self.write_cursor.key(&mut self.statistics.write))
                 } else {
