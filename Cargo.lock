@@ -92,11 +92,21 @@ checksum = "b671c8fb71b457dd4ae18c4ba1e59aa81793daacc361d82fcd410cef0d491875"
 
 [[package]]
 name = "backtrace"
-version = "0.3.37"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5180c5a20655b14a819b652fd2378fa5f1697b6c9ddad3e695c2f9cedf6df4e2"
+version = "0.3.40"
 dependencies = [
- "backtrace-sys",
+ "backtrace-sys 0.1.32",
+ "cfg-if",
+ "libc",
+ "rustc-demangle",
+]
+
+[[package]]
+name = "backtrace"
+version = "0.3.40"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "924c76597f0d9ca25d762c25a4d369d51267536465dc5064bdf0eb073ed477ea"
+dependencies = [
+ "backtrace-sys 0.1.32 (registry+https://github.com/rust-lang/crates.io-index)",
  "cfg-if",
  "libc",
  "rustc-demangle",
@@ -104,9 +114,17 @@ dependencies = [
 
 [[package]]
 name = "backtrace-sys"
-version = "0.1.31"
+version = "0.1.32"
+dependencies = [
+ "cc",
+ "libc",
+]
+
+[[package]]
+name = "backtrace-sys"
+version = "0.1.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "82a830b4ef2d1124a711c71d263c5abdc710ef8e907bd508c88be475cebc422b"
+checksum = "5d6575f128516de27e3ce99689419835fce9643a9b215a14d2b5b685be018491"
 dependencies = [
  "cc",
  "libc",
@@ -806,7 +824,7 @@ version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3ab49e9dcb602294bc42f9a7dfc9bc6e936fca4418ea300dbfb84fe16de0b7d9"
 dependencies = [
- "backtrace",
+ "backtrace 0.3.40 (registry+https://github.com/rust-lang/crates.io-index)",
  "version_check",
 ]
 
@@ -839,7 +857,7 @@ version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "795bd83d3abeb9220f257e597aa0080a508b27533824adf336529648f6abf7e2"
 dependencies = [
- "backtrace",
+ "backtrace 0.3.40 (registry+https://github.com/rust-lang/crates.io-index)",
  "failure_derive",
 ]
 
@@ -2041,7 +2059,7 @@ version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1051a5bbfa0c16d0c8cd86a2b2d71535c05bebb091bb7a7a445ccd3a1103b7bd"
 dependencies = [
- "backtrace",
+ "backtrace 0.3.40 (registry+https://github.com/rust-lang/crates.io-index)",
  "bytes",
  "inferno",
  "lazy_static",
@@ -3336,7 +3354,7 @@ name = "tikv"
 version = "4.0.0-alpha"
 dependencies = [
  "arrow",
- "backtrace",
+ "backtrace 0.3.40",
  "bitflags",
  "byteorder",
  "bytes",
@@ -3446,7 +3464,7 @@ dependencies = [
 name = "tikv_util"
 version = "0.1.0"
 dependencies = [
- "backtrace",
+ "backtrace 0.3.40 (registry+https://github.com/rust-lang/crates.io-index)",
  "byteorder",
  "chrono",
  "crc32fast",
