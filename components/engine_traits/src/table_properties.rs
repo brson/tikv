@@ -3,9 +3,12 @@
 use crate::CFHandleExt;
 use crate::errors::{Result, Error};
 use crate::range::Range;
+use std::ops::Deref;
+use std::iter::IntoIterator;
 
 pub trait TablePropertiesExt: CFHandleExt {
-    type TablePropertiesCollection: TablePropertiesCollection;
+    type TablePropertiesCollection: TablePropertiesCollection<Self::TablePropertiesCollectionView>;
+    type TablePropertiesCollectionView: TablePropertiesCollectionView;
 
     fn get_properties_of_tables_in_range(
         &self,
@@ -26,5 +29,25 @@ pub trait TablePropertiesExt: CFHandleExt {
     }
 }
 
-pub trait TablePropertiesCollection {
+pub trait TablePropertiesCollection<V>
+where Self: Deref<Target = V>
+{
 }
+
+pub trait TablePropertiesCollectionView
+{
+    type TableProperties: TableProperties;
+}
+
+pub trait TablePropertiesCollectionIter {
+}
+
+pub trait TablePropertiesCollectionItem {
+    type TableProperties: TableProperties;
+
+    fn key(&self) -> &str;
+    fn props(&self) -> &Self::TableProperties;
+}
+
+pub trait TableProperties { }
+
