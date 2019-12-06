@@ -204,10 +204,10 @@ pub enum ExecResult<E> where E: KvEngine {
 }
 
 /// The possible returned value when applying logs.
-pub enum ApplyResult {
+pub enum ApplyResult<E> where E: KvEngine {
     None,
     /// Additional result that needs to be sent back to raftstore.
-    Res(ExecResult<RocksEngine>),
+    Res(ExecResult<E>),
     /// It is unable to apply the `CommitMerge` until the source peer
     /// has applied to the required position and sets the atomic boolean
     /// to true.
@@ -771,7 +771,7 @@ impl ApplyDelegate {
         &mut self,
         apply_ctx: &mut ApplyContext,
         entry: &Entry,
-    ) -> ApplyResult {
+    ) -> ApplyResult<RocksEngine> {
         let index = entry.get_index();
         let term = entry.get_term();
         let data = entry.get_data();
@@ -808,7 +808,7 @@ impl ApplyDelegate {
         &mut self,
         apply_ctx: &mut ApplyContext,
         entry: &Entry,
-    ) -> ApplyResult {
+    ) -> ApplyResult<RocksEngine> {
         let index = entry.get_index();
         let term = entry.get_term();
         let conf_change: ConfChange = util::parse_data_at(entry.get_data(), index, &self.tag);
@@ -875,7 +875,7 @@ impl ApplyDelegate {
         index: u64,
         term: u64,
         cmd: RaftCmdRequest,
-    ) -> ApplyResult {
+    ) -> ApplyResult<RocksEngine> {
         if index == 0 {
             panic!(
                 "{} processing raft command needs a none zero index",
@@ -924,7 +924,7 @@ impl ApplyDelegate {
         index: u64,
         term: u64,
         req: RaftCmdRequest,
-    ) -> (RaftCmdResponse, ApplyResult) {
+    ) -> (RaftCmdResponse, ApplyResult<RocksEngine>) {
         // if pending remove, apply should be aborted already.
         assert!(!self.pending_remove);
 
@@ -1031,7 +1031,7 @@ impl ApplyDelegate {
         &mut self,
         ctx: &mut ApplyContext,
         req: RaftCmdRequest,
-    ) -> Result<(RaftCmdResponse, ApplyResult)> {
+    ) -> Result<(RaftCmdResponse, ApplyResult<RocksEngine>)> {
         // Include region for epoch not match after merge may cause key not in range.
         let include_region =
             req.get_header().get_region_epoch().get_version() >= self.last_merge_version;
@@ -1047,7 +1047,7 @@ impl ApplyDelegate {
         &mut self,
         ctx: &mut ApplyContext,
         req: &RaftCmdRequest,
-    ) -> Result<(RaftCmdResponse, ApplyResult)> {
+    ) -> Result<(RaftCmdResponse, ApplyResult<RocksEngine>)> {
         let request = req.get_admin_request();
         let cmd_type = request.get_cmd_type();
         if cmd_type != AdminCmdType::CompactLog && cmd_type != AdminCmdType::CommitMerge {
@@ -1090,7 +1090,7 @@ impl ApplyDelegate {
         &mut self,
         ctx: &ApplyContext,
         req: &RaftCmdRequest,
-    ) -> Result<(RaftCmdResponse, ApplyResult)> {
+    ) -> Result<(RaftCmdResponse, ApplyResult<RocksEngine>)> {
         fail_point!(
             "on_apply_write_cmd",
             cfg!(release) || self.id() == 3,
@@ -1366,7 +1366,7 @@ impl ApplyDelegate {
         &mut self,
         ctx: &mut ApplyContext,
         request: &AdminRequest,
-    ) -> Result<(AdminResponse, ApplyResult)> {
+    ) -> Result<(AdminResponse, ApplyResult<RocksEngine>)> {
         let request = request.get_change_peer();
         let peer = request.get_peer();
         let store_id = peer.get_store_id();
@@ -1561,7 +1561,7 @@ impl ApplyDelegate {
         &mut self,
         ctx: &mut ApplyContext,
         req: &AdminRequest,
-    ) -> Result<(AdminResponse, ApplyResult)> {
+    ) -> Result<(AdminResponse, ApplyResult<RocksEngine>)> {
         info!(
             "split is deprecated, redirect to use batch split";
             "region_id" => self.region_id(),
@@ -1583,7 +1583,7 @@ impl ApplyDelegate {
         &mut self,
         ctx: &mut ApplyContext,
         req: &AdminRequest,
-    ) -> Result<(AdminResponse, ApplyResult)> {
+    ) -> Result<(AdminResponse, ApplyResult<RocksEngine>)> {
         fail_point!(
             "apply_before_split_1_3",
             { self.id == 3 && self.region_id() == 1 },
@@ -1697,7 +1697,7 @@ impl ApplyDelegate {
         &mut self,
         ctx: &mut ApplyContext,
         req: &AdminRequest,
-    ) -> Result<(AdminResponse, ApplyResult)> {
+    ) -> Result<(AdminResponse, ApplyResult<RocksEngine>)> {
         fail_point!("apply_before_prepare_merge");
 
         PEER_ADMIN_CMD_COUNTER_VEC
@@ -1772,7 +1772,7 @@ impl ApplyDelegate {
         &mut self,
         ctx: &mut ApplyContext,
         req: &AdminRequest,
-    ) -> Result<(AdminResponse, ApplyResult)> {
+    ) -> Result<(AdminResponse, ApplyResult<RocksEngine>)> {
         {
             let apply_before_commit_merge = || {
                 fail_point!(
@@ -1910,7 +1910,7 @@ impl ApplyDelegate {
         &mut self,
         ctx: &mut ApplyContext,
         req: &AdminRequest,
-    ) -> Result<(AdminResponse, ApplyResult)> {
+    ) -> Result<(AdminResponse, ApplyResult<RocksEngine>)> {
         PEER_ADMIN_CMD_COUNTER_VEC
             .with_label_values(&["rollback_merge", "all"])
             .inc();
@@ -1957,7 +1957,7 @@ impl ApplyDelegate {
         &mut self,
         ctx: &mut ApplyContext,
         req: &AdminRequest,
-    ) -> Result<(AdminResponse, ApplyResult)> {
+    ) -> Result<(AdminResponse, ApplyResult<RocksEngine>)> {
         PEER_ADMIN_CMD_COUNTER_VEC
             .with_label_values(&["compact", "all"])
             .inc();
@@ -2021,7 +2021,7 @@ impl ApplyDelegate {
         &self,
         ctx: &ApplyContext,
         _: &AdminRequest,
-    ) -> Result<(AdminResponse, ApplyResult)> {
+    ) -> Result<(AdminResponse, ApplyResult<RocksEngine>)> {
         let resp = AdminResponse::default();
         Ok((
             resp,
@@ -2041,7 +2041,7 @@ impl ApplyDelegate {
         &self,
         _: &ApplyContext,
         req: &AdminRequest,
-    ) -> Result<(AdminResponse, ApplyResult)> {
+    ) -> Result<(AdminResponse, ApplyResult<RocksEngine>)> {
         let verify_req = req.get_verify_hash();
         let index = verify_req.get_index();
         let hash = verify_req.get_hash().to_vec();
