@@ -2181,7 +2181,7 @@ impl<'a, T: Transport, C: PdClient> PeerFsmDelegate<'a, T, C> {
 
     fn on_ready_result(
         &mut self,
-        exec_results: &mut VecDeque<ExecResult>,
+        exec_results: &mut VecDeque<ExecResult<RocksEngine>>,
         metrics: &ApplyMetrics,
     ) -> Option<Arc<AtomicBool>> {
         // handle executing committed log results
