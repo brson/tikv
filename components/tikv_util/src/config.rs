@@ -418,11 +418,12 @@ pub fn check_max_open_fds(expect: u64) -> Result<(), ConfigError> {
         if err == 0 {
             return Ok(());
         }
-        Err(ConfigError::Limit(format!(
+        warn!(
             "the maximum number of open file descriptors is too \
              small, got {}, expect greater or equal to {}",
             prev_limit, expect
-        )))
+        );
+        Ok(())
     }
 }
 
