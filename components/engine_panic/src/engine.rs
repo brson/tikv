@@ -15,7 +15,7 @@ impl KvEngine for PanicEngine {
     type Snapshot = PanicSnapshot;
     type WriteBatch = PanicWriteBatch;
 
-    fn write_opt(&self, opts: &WriteOptions, wb: &Self::WriteBatch) -> Result<()> {
+    fn write_opt(&self, wb: &Self::WriteBatch, opts: &WriteOptions) -> Result<()> {
         panic!()
     }
     fn write_batch(&self) -> Self::WriteBatch {
