@@ -1732,9 +1732,9 @@ mod tests {
     use crate::raftstore::store::worker::RegionTask;
     use crate::raftstore::store::{bootstrap_store, initial_region, prepare_bootstrap_cluster};
     use engine::rocks::util::new_engine;
-    use engine::rocks::WriteBatch;
     use engine::Engines;
     use engine::{ALL_CFS, CF_DEFAULT};
+    use engine_rocks::{Compat, RocksWriteBatch};
     use kvproto::raft_serverpb::RaftSnapshotData;
     use raft::eraftpb::HardState;
     use raft::eraftpb::{ConfState, Entry};
@@ -1765,24 +1765,33 @@ mod tests {
         PeerStorage::new(engines, &region, sched, 0, "".to_owned()).unwrap()
     }
 
-    #[derive(Default)]
     struct ReadyContext {
-        kv_wb: WriteBatch,
-        raft_wb: WriteBatch,
+        kv_wb: RocksWriteBatch,
+        raft_wb: RocksWriteBatch,
         sync_log: bool,
     }
 
+    impl ReadyContext {
+        fn new(s: &PeerStorage) -> ReadyContext {
+            ReadyContext {
+                kv_wb: s.engines.kv.c().write_batch(),
+                raft_wb: s.engines.raft.c().write_batch(),
+                sync_log: false,
+            }
+        }
+    }
+
     impl HandleRaftReadyContext for ReadyContext {
-        fn kv_wb(&self) -> &WriteBatch {
+        fn kv_wb(&self) -> &RocksWriteBatch {
             &self.kv_wb
         }
-        fn kv_wb_mut(&mut self) -> &mut WriteBatch {
+        fn kv_wb_mut(&mut self) -> &mut RocksWriteBatch {
             &mut self.kv_wb
         }
-        fn raft_wb(&self) -> &WriteBatch {
+        fn raft_wb(&self) -> &RocksWriteBatch {
             &self.raft_wb
         }
-        fn raft_wb_mut(&mut self) -> &mut WriteBatch {
+        fn raft_wb_mut(&mut self) -> &mut RocksWriteBatch {
             &mut self.raft_wb
         }
         fn sync_log(&self) -> bool {
@@ -1799,9 +1808,9 @@ mod tests {
         ents: &[Entry],
     ) -> PeerStorage {
         let mut store = new_storage(sched, path);
-        let mut kv_wb = WriteBatch::default();
+        let mut kv_wb = store.engines.kv.c().write_batch();
         let mut ctx = InvokeContext::new(&store);
-        let mut ready_ctx = ReadyContext::default();
+        let mut ready_ctx = ReadyContext::new(&store);
         store.append(&mut ctx, &ents[1..], &mut ready_ctx).unwrap();
         ctx.apply_state
             .mut_truncated_state()
@@ -1813,8 +1822,8 @@ mod tests {
             .set_applied_index(ents.last().unwrap().get_index());
         ctx.save_apply_state_to(&mut kv_wb)
             .unwrap();
-        store.engines.raft.write(&ready_ctx.raft_wb).unwrap();
-        store.engines.kv.write(&kv_wb).unwrap();
+        store.engines.raft.c().write(&ready_ctx.raft_wb).unwrap();
+        store.engines.kv.c().write(&kv_wb).unwrap();
         store.raft_state = ctx.raft_state;
         store.apply_state = ctx.apply_state;
         store
@@ -1822,10 +1831,10 @@ mod tests {
 
     fn append_ents(store: &mut PeerStorage, ents: &[Entry]) {
         let mut ctx = InvokeContext::new(store);
-        let mut ready_ctx = ReadyContext::default();
+        let mut ready_ctx = ReadyContext::new(store);
         store.append(&mut ctx, ents, &mut ready_ctx).unwrap();
         ctx.save_raft_state_to(&mut ready_ctx.raft_wb).unwrap();
-        store.engines.raft.write(&ready_ctx.raft_wb).unwrap();
+        store.engines.raft.c().write(&ready_ctx.raft_wb).unwrap();
         store.raft_state = ctx.raft_state;
     }
 
@@ -1924,11 +1933,11 @@ mod tests {
 
         assert_eq!(6, get_meta_key_count(&store));
 
-        let kv_wb = WriteBatch::default();
-        let raft_wb = WriteBatch::default();
+        let kv_wb = store.engines.kv.c().write_batch();
+        let raft_wb = store.engines.raft.c().write_batch();
         store.clear_meta(&kv_wb, &raft_wb).unwrap();
-        store.engines.kv.write(&kv_wb).unwrap();
-        store.engines.raft.write(&raft_wb).unwrap();
+        store.engines.kv.c().write(&kv_wb).unwrap();
+        store.engines.raft.c().write(&raft_wb).unwrap();
 
         assert_eq!(0, get_meta_key_count(&store));
     }
@@ -2032,10 +2041,10 @@ mod tests {
                 panic!("#{}: want {:?}, got {:?}", i, werr, res);
             }
             if res.is_ok() {
-                let mut kv_wb = WriteBatch::default();
+                let mut kv_wb = store.engines.kv.c().write_batch();
                 ctx.save_apply_state_to(&mut kv_wb)
                     .unwrap();
-                store.engines.kv.write(&kv_wb).unwrap();
+                store.engines.kv.c().write(&kv_wb).unwrap();
             }
         }
     }
@@ -2108,8 +2117,8 @@ mod tests {
         let _ = s.gen_snap_task.borrow_mut().take().unwrap();
 
         let mut ctx = InvokeContext::new(&s);
-        let mut kv_wb = WriteBatch::default();
-        let mut ready_ctx = ReadyContext::default();
+        let mut kv_wb = s.engines.kv.c().write_batch();
+        let mut ready_ctx = ReadyContext::new(&s);
         s.append(
             &mut ctx,
             &[new_entry(6, 5), new_entry(7, 5)],
@@ -2124,16 +2133,16 @@ mod tests {
         ctx.apply_state.set_applied_index(7);
         ctx.save_raft_state_to(&mut ready_ctx.raft_wb).unwrap();
         ctx.save_apply_state_to(&mut kv_wb).unwrap();
-        s.engines.kv.write(&kv_wb).unwrap();
-        s.engines.raft.write(&ready_ctx.raft_wb).unwrap();
+        s.engines.kv.c().write(&kv_wb).unwrap();
+        s.engines.raft.c().write(&ready_ctx.raft_wb).unwrap();
         s.apply_state = ctx.apply_state;
         s.raft_state = ctx.raft_state;
         ctx = InvokeContext::new(&s);
         let term = s.term(7).unwrap();
         compact_raft_log(&s.tag, &mut ctx.apply_state, 7, term).unwrap();
-        kv_wb = WriteBatch::default();
+        kv_wb = s.engines.kv.c().write_batch();
         ctx.save_apply_state_to(&mut kv_wb).unwrap();
-        s.engines.kv.write(&kv_wb).unwrap();
+        s.engines.kv.c().write(&kv_wb).unwrap();
         s.apply_state = ctx.apply_state;
 
         let (tx, rx) = channel();
@@ -2407,8 +2416,8 @@ mod tests {
         assert_eq!(s2.first_index(), s2.applied_index() + 1);
         let mut ctx = InvokeContext::new(&s2);
         assert_ne!(ctx.last_term, snap1.get_metadata().get_term());
-        let kv_wb = WriteBatch::default();
-        let raft_wb = WriteBatch::default();
+        let kv_wb = s2.engines.kv.c().write_batch();
+        let raft_wb = s2.engines.raft.c().write_batch();
         s2.apply_snapshot(&mut ctx, &snap1, &kv_wb, &raft_wb)
             .unwrap();
         assert_eq!(ctx.last_term, snap1.get_metadata().get_term());
@@ -2425,8 +2434,8 @@ mod tests {
         validate_cache(&s3, &ents[1..]);
         let mut ctx = InvokeContext::new(&s3);
         assert_ne!(ctx.last_term, snap1.get_metadata().get_term());
-        let kv_wb = WriteBatch::default();
-        let raft_wb = WriteBatch::default();
+        let kv_wb = s3.engines.kv.c().write_batch();
+        let raft_wb = s3.engines.raft.c().write_batch();
         s3.apply_snapshot(&mut ctx, &snap1, &kv_wb, &raft_wb)
             .unwrap();
         assert_eq!(ctx.last_term, snap1.get_metadata().get_term());
