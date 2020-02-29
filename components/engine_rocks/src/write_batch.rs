@@ -2,10 +2,10 @@
 
 use std::sync::Arc;
 
-use engine_traits::{self, Error, Mutable, Result, WriteBatchExt, WriteOptions};
-use rocksdb::{Writable, WriteBatch as RawWriteBatch, DB};
 use crate::engine::RocksEngine;
 use crate::options::RocksWriteOptions;
+use engine_traits::{self, Error, Mutable, Result, WriteBatchExt, WriteOptions};
+use rocksdb::{Writable, WriteBatch as RawWriteBatch, DB};
 
 use crate::util::get_cf_handle;
 
