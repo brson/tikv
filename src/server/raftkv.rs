@@ -5,7 +5,7 @@ use std::io::Error as IoError;
 use std::result;
 use std::time::Duration;
 
-use engine::IterOption;
+use engine_traits::IterOptions;
 use engine_rocks::{RocksEngine, RocksTablePropertiesCollection};
 use engine_traits::CfName;
 use engine_traits::Peekable;
@@ -384,7 +384,7 @@ impl Snapshot for RegionSnapshot<RocksEngine> {
         Ok(v.map(|v| v.to_vec()))
     }
 
-    fn iter(&self, iter_opt: IterOption, mode: ScanMode) -> kv::Result<Cursor<Self::Iter>> {
+    fn iter(&self, iter_opt: IterOptions, mode: ScanMode) -> kv::Result<Cursor<Self::Iter>> {
         fail_point!("raftkv_snapshot_iter", |_| Err(box_err!(
             "injected error for iter"
         )));
@@ -394,7 +394,7 @@ impl Snapshot for RegionSnapshot<RocksEngine> {
     fn iter_cf(
         &self,
         cf: CfName,
-        iter_opt: IterOption,
+        iter_opt: IterOptions,
         mode: ScanMode,
     ) -> kv::Result<Cursor<Self::Iter>> {
         fail_point!("raftkv_snapshot_iter_cf", |_| Err(box_err!(

@@ -4,7 +4,7 @@ use std::cell::Cell;
 use std::cmp::Ordering;
 use std::ops::Bound;
 
-use engine::{IterOption, DATA_KEY_PREFIX_LEN};
+use engine_traits::{IterOptions, DATA_KEY_PREFIX_LEN};
 use engine_traits::CfName;
 use tikv_util::keybuilder::KeyBuilder;
 use tikv_util::metrics::CRITICAL_ERROR;
@@ -482,7 +482,7 @@ impl<'a, S: 'a + Snapshot> CursorBuilder<'a, S> {
         } else {
             None
         };
-        let mut iter_opt = IterOption::new(l_bound, u_bound, self.fill_cache);
+        let mut iter_opt = IterOptions::new(l_bound, u_bound, self.fill_cache);
         if let Some(ts) = self.hint_min_ts {
             iter_opt.set_hint_min_ts(Bound::Included(ts.into_inner()));
         }
@@ -500,9 +500,9 @@ impl<'a, S: 'a + Snapshot> CursorBuilder<'a, S> {
 mod tests {
     use engine::rocks::Writable;
     use engine::Engines;
-    use engine::*;
 
     use engine_rocks::{RocksEngine, Compat};
+    use engine_traits::IterOptions;
     use keys::data_key;
     use kvproto::metapb::{Peer, Region};
     use tempfile::Builder;
@@ -542,7 +542,7 @@ mod tests {
 
         let snap = RegionSnapshot::<RocksEngine>::from_raw(engines.kv.c().clone(), region);
         let mut statistics = CfStatistics::default();
-        let it = snap.iter(IterOption::default());
+        let it = snap.iter(IterOptions::default());
         let mut iter = Cursor::new(it, ScanMode::Mixed);
         assert!(!iter
             .reverse_seek(&Key::from_encoded_slice(b"a2"), &mut statistics)
@@ -592,7 +592,7 @@ mod tests {
         let mut region = Region::default();
         region.mut_peers().push(Peer::default());
         let snap = RegionSnapshot::<RocksEngine>::from_raw(engines.kv.c().clone(), region);
-        let it = snap.iter(IterOption::default());
+        let it = snap.iter(IterOptions::default());
         let mut iter = Cursor::new(it, ScanMode::Mixed);
         assert!(!iter
             .reverse_seek(&Key::from_encoded_slice(b"a1"), &mut statistics)
