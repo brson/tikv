@@ -301,11 +301,13 @@ mod tests {
     }
 
     #[bench]
+    #[ignore]
     fn bench_encode_from_raw_int_datum(b: &mut Bencher) {
         bench_encode_from_raw_datum_impl(b, Datum::I64(32), FieldTypeTp::LongLong);
     }
 
     #[bench]
+    #[ignore]
     fn bench_encode_from_raw_decimal_datum(b: &mut Bencher) {
         let dec: Decimal = "1234.00".parse().unwrap();
         let datum = Datum::Dec(dec);
@@ -313,12 +315,14 @@ mod tests {
     }
 
     #[bench]
+    #[ignore]
     fn bench_encode_from_raw_bytes_datum(b: &mut Bencher) {
         let datum = Datum::Bytes("v".repeat(100).into_bytes());
         bench_encode_from_raw_datum_impl(b, datum, FieldTypeTp::String);
     }
 
     #[bench]
+    #[ignore]
     fn bench_encode_from_raw_json_datum(b: &mut Bencher) {
         let json: Json = r#"{"k1":"v1"}"#.parse().unwrap();
         let datum = Datum::Json(json);

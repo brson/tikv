@@ -4417,6 +4417,7 @@ dependencies = [
  "lazy_static",
  "prometheus",
  "prometheus-static-metric",
+ "protobuf-build",
  "rand 0.6.5",
  "tikv_util",
  "time 0.1.42",

@@ -355,7 +355,7 @@ mod tests {
     }
 }
 
-#[cfg(test)]
+#[cfg(none)]
 mod benches {
     use super::*;
 

@@ -1225,7 +1225,7 @@ mod tests {
     }
 }
 
-#[cfg(test)]
+#[cfg(none)]
 mod benches {
     use super::*;
     use crate::codec::mysql::MAX_FSP;
