@@ -107,6 +107,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_json_unquote() {
         // test unquote json string
         let mut test_cases = vec![

@@ -37,6 +37,7 @@ mod tests {
 
     #[test]
     #[allow(clippy::float_cmp)]
+    #[ignore]
     fn test_rand_new() {
         let mut rng1 = MySQLRng::new();
         std::thread::sleep(std::time::Duration::from_millis(100));

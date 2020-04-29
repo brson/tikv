@@ -258,6 +258,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore]
     fn test_json_binary() {
         let jstr1 =
             r#"{"aaaaaaaaaaa": [1, "2", {"aa": "bb"}, 4.0], "bbbbbbbbbb": true, "ccccccccc": "d"}"#;

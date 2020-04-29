@@ -490,6 +490,7 @@ mod tests {
     }
 
     #[bench]
+    #[ignore]
     fn bench_compare_in(b: &mut Bencher) {
         let mut builder = ExprDefBuilder::scalar_func(ScalarFuncSig::InInt, FieldTypeTp::LongLong)
             .push_child(ExprDefBuilder::column_ref(0, FieldTypeTp::LongLong));
