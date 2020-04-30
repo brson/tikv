@@ -697,6 +697,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_execution_summary() {
         let helper = TableScanTestHelper::new();
 
