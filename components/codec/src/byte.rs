@@ -62,6 +62,7 @@ impl MemComparableByteCodec {
     ///
     /// You can calculate required space size via `encoded_len`.
     pub fn encode_all(src: &[u8], dest: &mut [u8]) -> usize {
+        assert_slices_are_disjoint(src, dest);
         // Refer: https://github.com/facebook/mysql-5.6/wiki/MyRocks-record-format#memcomparable-format
         unsafe {
             let src_len = src.len();
@@ -214,6 +215,7 @@ impl MemComparableByteCodec {
     ///
     /// When there is an error, `dest` may contain partially written data.
     pub fn try_decode_first(src: &[u8], dest: &mut [u8]) -> Result<(usize, usize)> {
+        assert_slices_are_disjoint(src, dest);
         Self::try_decode_first_internal(
             src.as_ptr(),
             src.len(),
@@ -249,6 +251,7 @@ impl MemComparableByteCodec {
     ///
     /// When there is an error, `dest` may contain partially written data.
     pub fn try_decode_first_desc(src: &[u8], dest: &mut [u8]) -> Result<(usize, usize)> {
+        assert_slices_are_disjoint(src, dest);
         let (read_bytes, written_bytes) = Self::try_decode_first_internal(
             src.as_ptr(),
             src.len(),
@@ -565,6 +568,19 @@ impl<T: Read> CompactByteDecoder for std::io::BufReader<T> {
         self.read_exact(&mut data)?;
         Ok(data)
     }
+}
+
+#[inline]
+fn assert_slices_are_disjoint(src: &[u8], dst: &mut [u8]) {
+    let src_ptr = src.as_ptr();
+    let src_ptr = src_ptr as usize;
+    let src_len = src.len();
+    let dst_ptr = dst.as_ptr();
+    let dst_ptr = dst_ptr as usize;
+    let dst_len = dst.len();
+    let src_lte_dst = src_ptr + src_len <= dst_ptr;
+    let dst_lte_src = dst_ptr + dst_len <= src_ptr;
+    assert!(src_lte_dst ^ dst_lte_src);
 }
 
 #[cfg(test)]
@@ -1043,17 +1059,18 @@ mod tests {
                 &base_buffer[prefix_len + encoded_len..]
             );
 
-            // Test `dest` overlaps `src`
+            // Test `dest` overlaps `src`.
+            // Must use the unsafe-pointer version because mutable slices can't overlap.
             let mut buffer = payload_encoded.clone();
             let output_len = unsafe {
                 let src_ptr = buffer.as_mut_ptr().add(encoded_prefix_len);
                 let slice_len = buffer.len() - encoded_prefix_len;
-                let src = std::slice::from_raw_parts(src_ptr, slice_len);
-                let dest = std::slice::from_raw_parts_mut(src_ptr, slice_len);
                 if is_desc {
-                    MemComparableByteCodec::try_decode_first_desc(src, dest).unwrap()
+                    MemComparableByteCodec::try_decode_first_internal(
+                        src_ptr, slice_len, src_ptr, slice_len, DescendingMemComparableCodecHelper).unwrap()
                 } else {
-                    MemComparableByteCodec::try_decode_first(src, dest).unwrap()
+                    MemComparableByteCodec::try_decode_first_internal(
+                        src_ptr, slice_len, src_ptr, slice_len, AscendingMemComparableCodecHelper).unwrap()
                 }
             };
             assert_eq!(output_len.0, encoded_len);
