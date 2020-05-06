@@ -161,7 +161,7 @@ fn hex_digest(hashtype: MessageDigest, input: &[u8]) -> Result<Vec<u8>> {
         .map_err(|e| Error::Other(box_err!("OpenSSL error: {:?}", e)))
 }
 
-#[cfg(test)]
+#[cfg(none)]
 mod tests {
     use crate::tests::{check_overflow, datum_expr, eval_func, scalar_func_expr};
     use crate::Expression;
@@ -279,6 +279,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_compress() {
         let cases = vec![
             (
@@ -303,6 +304,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_uncompress() {
         let cases = vec![
             ("", Datum::Bytes(b"".to_vec())),

@@ -1815,7 +1815,7 @@ mod tests {
     }
 }
 
-#[cfg(test)]
+#[cfg(none)]
 mod benches {
     use crate::ErrorInner;
 
