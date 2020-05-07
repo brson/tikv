@@ -785,6 +785,7 @@ mod tests {
         }
     }
     #[test]
+    #[ignore]
     fn test_memcmp_flip_bytes() {
         for container_len in 0..50 {
             for payload_begin in 0..container_len {
@@ -1002,6 +1003,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn test_memcmp_try_decode_first() {
         use super::MEMCMP_GROUP_SIZE as N;
 
@@ -1250,7 +1252,7 @@ mod tests {
     }
 }
 
-#[cfg(test)]
+#[cfg(none)]
 mod benches {
     use crate::ErrorInner;
 
