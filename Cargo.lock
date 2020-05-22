@@ -4309,6 +4309,7 @@ dependencies = [
  "engine_traits",
  "keys",
  "kvproto",
+ "rocksdb",
  "uuid",
 ]
 
