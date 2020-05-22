@@ -618,8 +618,8 @@ mod tests {
 
     use std::sync::Arc;
 
-    use engine::rocks::{ColumnFamilyOptions, DBOptions, Writable};
-    use engine::rocks::{DBEntryType, TablePropertiesCollector};
+    use rocksdb::{ColumnFamilyOptions, DBOptions, Writable};
+    use rocksdb::{DBEntryType, TablePropertiesCollector};
     use tempfile::Builder;
     use test::Bencher;
 

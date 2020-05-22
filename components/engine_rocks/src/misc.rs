@@ -134,7 +134,7 @@ mod tests {
     use crate::engine::RocksEngine;
     use engine::rocks;
     use engine::rocks::util::{new_engine_opt, CFOptions};
-    use engine::rocks::{ColumnFamilyOptions, DBOptions};
+    use rocksdb::{ColumnFamilyOptions, DBOptions};
     use engine::DB;
     use std::sync::Arc;
 
