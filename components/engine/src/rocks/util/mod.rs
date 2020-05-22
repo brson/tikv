@@ -12,7 +12,7 @@ use rocksdb::{
     SliceTransform, DB,
 };
 
-pub use crate::rocks::CFHandle;
+pub use rocksdb::CFHandle;
 use engine_traits::CF_DEFAULT;
 
 // Zlib and bzip2 are too slow.
@@ -307,7 +307,7 @@ fn cfs_diff<'a>(a: &[&'a str], b: &[&str]) -> Vec<&'a str> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::rocks::{ColumnFamilyOptions, DBOptions, DB};
+    use rocksdb::{ColumnFamilyOptions, DBOptions, DB};
     use engine_traits::CF_DEFAULT;
     use tempfile::Builder;
 
