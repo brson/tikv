@@ -13,7 +13,7 @@ use engine_rocks::{RocksEngine as BaseRocksEngine, RocksEngineIterator};
 use engine_traits::{CfName, CF_DEFAULT, CF_LOCK, CF_RAFT, CF_WRITE};
 use engine_traits::{
     Engines, IterOptions, Iterable, Iterator, KvEngine, Mutable, Peekable, ReadOptions, SeekKey,
-    WriteBatchExt,
+    Snapshot as EngineSnapshot,
 };
 use kvproto::kvrpcpb::Context;
 use tempfile::{Builder, TempDir};
@@ -33,13 +33,13 @@ pub use engine_rocks::RocksSnapshot;
 
 const TEMP_DIR: &str = "";
 
-enum Task {
+enum Task<S> where S: EngineSnapshot {
     Write(Vec<Modify>, Callback<()>),
-    Snapshot(Callback<Arc<RocksSnapshot>>),
+    Snapshot(Callback<Arc<S>>),
     Pause(Duration),
 }
 
-impl Display for Task {
+impl<S> Display for Task<S> where S: EngineSnapshot {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match *self {
             Task::Write(..) => write!(f, "write task"),
@@ -52,9 +52,9 @@ impl Display for Task {
 struct Runner(Engines<BaseRocksEngine, BaseRocksEngine>);
 
 impl Runnable for Runner {
-    type Task = Task;
+    type Task = Task<RocksSnapshot>;
 
-    fn run(&mut self, t: Task) {
+    fn run(&mut self, t: Task<RocksSnapshot>) {
         match t {
             Task::Write(modifies, cb) => {
                 cb((CbContext::new(), write_modifies(&self.0.kv, modifies)))
@@ -68,7 +68,7 @@ impl Runnable for Runner {
 struct RocksEngineCore {
     // only use for memory mode
     temp_dir: Option<TempDir>,
-    worker: Worker<Task>,
+    worker: Worker<Task<RocksSnapshot>>,
 }
 
 impl Drop for RocksEngineCore {
@@ -87,7 +87,7 @@ impl Drop for RocksEngineCore {
 #[derive(Clone)]
 pub struct RocksEngine {
     core: Arc<Mutex<RocksEngineCore>>,
-    sched: Scheduler<Task>,
+    sched: Scheduler<Task<RocksSnapshot>>,
     engines: Engines<BaseRocksEngine, BaseRocksEngine>,
     not_leader: Arc<AtomicBool>,
 }
