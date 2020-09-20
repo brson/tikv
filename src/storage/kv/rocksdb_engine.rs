@@ -13,7 +13,7 @@ use engine_rocks::{RocksEngine as BaseRocksEngine, RocksEngineIterator};
 use engine_traits::{CfName, CF_DEFAULT, CF_LOCK, CF_RAFT, CF_WRITE};
 use engine_traits::{
     Engines, IterOptions, Iterable, Iterator, KvEngine, Mutable, Peekable, ReadOptions, SeekKey,
-    Snapshot as EngineSnapshot,
+    Snapshot as EngineSnapshot, RaftEngine,
 };
 use kvproto::kvrpcpb::Context;
 use tempfile::{Builder, TempDir};
@@ -49,12 +49,12 @@ impl<S> Display for Task<S> where S: EngineSnapshot {
     }
 }
 
-struct Runner(Engines<BaseRocksEngine, BaseRocksEngine>);
+struct Runner<EK, ER>(Engines<EK, ER>) where EK: KvEngine, ER: RaftEngine;
 
-impl Runnable for Runner {
-    type Task = Task<RocksSnapshot>;
+impl<EK, ER> Runnable for Runner<EK, ER> where EK: KvEngine, ER: RaftEngine {
+    type Task = Task<EK::Snapshot>;
 
-    fn run(&mut self, t: Task<RocksSnapshot>) {
+    fn run(&mut self, t: Task<EK::Snapshot>) {
         match t {
             Task::Write(modifies, cb) => {
                 cb((CbContext::new(), write_modifies(&self.0.kv, modifies)))
