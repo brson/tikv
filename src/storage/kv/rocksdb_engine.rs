@@ -228,7 +228,7 @@ impl TestEngineBuilder {
 }
 
 /// Write modifications into a `BaseRocksEngine` instance.
-pub fn write_modifies(kv_engine: &BaseRocksEngine, modifies: Vec<Modify>) -> Result<()> {
+pub fn write_modifies(kv_engine: &impl KvEngine, modifies: Vec<Modify>) -> Result<()> {
     fail_point!("rockskv_write_modifies", |_| Err(box_err!("write failed")));
 
     let mut wb = kv_engine.write_batch();
