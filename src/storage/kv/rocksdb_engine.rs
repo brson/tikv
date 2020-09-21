@@ -65,13 +65,13 @@ impl<EK, ER> Runnable for Runner<EK, ER> where EK: KvEngine, ER: RaftEngine {
     }
 }
 
-struct RocksEngineCore {
+struct RocksEngineCore<S> where S: EngineSnapshot {
     // only use for memory mode
     temp_dir: Option<TempDir>,
-    worker: Worker<Task<RocksSnapshot>>,
+    worker: Worker<Task<S>>,
 }
 
-impl Drop for RocksEngineCore {
+impl<S> Drop for RocksEngineCore<S> where S: EngineSnapshot {
     fn drop(&mut self) {
         if let Some(h) = self.worker.stop() {
             if let Err(e) = h.join() {
@@ -86,7 +86,7 @@ impl Drop for RocksEngineCore {
 /// This is intended for **testing use only**.
 #[derive(Clone)]
 pub struct RocksEngine {
-    core: Arc<Mutex<RocksEngineCore>>,
+    core: Arc<Mutex<RocksEngineCore<RocksSnapshot>>>,
     sched: Scheduler<Task<RocksSnapshot>>,
     engines: Engines<BaseRocksEngine, BaseRocksEngine>,
     not_leader: Arc<AtomicBool>,
