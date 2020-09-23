@@ -1120,6 +1120,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "engine_sled"
+version = "0.0.1"
+dependencies = [
+ "engine_traits",
+ "tikv_alloc",
+ "tikv_util",
+ "txn_types",
+]
+
+[[package]]
 name = "engine_test"
 version = "0.0.1"
 dependencies = [
@@ -4725,6 +4735,7 @@ dependencies = [
  "encryption",
  "engine_panic",
  "engine_rocks",
+ "engine_sled",
  "engine_test",
  "engine_traits",
  "error_code",
