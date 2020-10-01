@@ -93,6 +93,7 @@ engine_rocks = { path = "components/engine_rocks" }
 engine_sled = { path = "components/engine_sled" }
 engine_test = { path = "components/engine_test" }
 engine_traits = { path = "components/engine_traits" }
+engine_traits_tests = { path = "components/engine_traits_tests" }
 error_code = { path = "components/error_code" }
 fail = "0.4"
 failure = "0.1"
