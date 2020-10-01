@@ -9,13 +9,16 @@ publish = false
 default = []
 test-engine-kv-panic = []
 test-engine-kv-rocksdb = []
+test-engine-kv-sled = []
 test-engine-raft-panic = []
 test-engine-raft-rocksdb = []
+test-engine-raft-sled = []
 
 
 [dependencies]
 engine_traits = { path = "../engine_traits" }
 engine_rocks = { path = "../engine_rocks" }
+engine_sled = { path = "../engine_sled" }
 engine_panic = { path = "../engine_panic" }
 tempfile = "3.0"
 tikv_alloc = { path = "../tikv_alloc" }

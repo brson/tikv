@@ -23,10 +23,12 @@
 //!
 //! The engine for each module is chosen at compile time with feature flags:
 //!
-//! - `--features test-engine-kv-rocksdb`
-//! - `--features test-engine-raft-rocksdb`
 //! - `--features test-engine-kv-panic`
 //! - `--features test-engine-raft-panic`
+//! - `--features test-engine-kv-rocksdb`
+//! - `--features test-engine-raft-rocksdb`
+//! - `--features test-engine-kv-sled`
+//! - `--features test-engine-raft-sled`
 //!
 //! By default, the `tikv` crate turns on `test-engine-kv-rocksdb`,
 //! and `test-engine-raft-rocksdb`. This behavior can be disabled
@@ -35,8 +37,9 @@
 //! The `tikv` crate additionally provides two feature flags that
 //! contral both the `kv` and `raft` engines at the same time:
 //!
-//! - `--features test-engines-rocksdb`
 //! - `--features test-engines-panic`
+//! - `--features test-engines-rocksdb`
+//! - `--features test-engines-sled`
 //!
 //! So, e.g., to run the test suite with the panic engine:
 //!
@@ -68,6 +71,12 @@ pub mod raft {
     pub use engine_rocks::{
         RocksEngine as RaftTestEngine, RocksSnapshot as RaftTestSnapshot,
         RocksWriteBatch as RaftTestWriteBatch,
+    };
+
+    #[cfg(feature = "test-engine-raft-sled")]
+    pub use engine_sled::{
+        SledEngine as RaftTestEngine, SledSnapshot as RaftTestSnapshot,
+        SledWriteBatch as RaftTestWriteBatch,
     };
 
     pub fn new_engine(
@@ -106,6 +115,12 @@ pub mod kv {
     pub use engine_rocks::{
         RocksEngine as KvTestEngine, RocksSnapshot as KvTestSnapshot,
         RocksWriteBatch as KvTestWriteBatch,
+    };
+
+    #[cfg(feature = "test-engine-kv-sled")]
+    pub use engine_sled::{
+        SledEngine as KvTestEngine, SledSnapshot as KvTestSnapshot,
+        SledWriteBatch as KvTestWriteBatch,
     };
 
     pub fn new_engine(
@@ -426,6 +441,31 @@ pub mod ctor {
             }
             let rocks_db_opts = RocksDBOptions::from_raw(rocks_db_opts);
             Ok(rocks_db_opts)
+        }
+    }
+
+    mod sled {
+        use super::{CFOptions, DBOptions, EngineConstructorExt};
+        use engine_sled::SledEngine;
+        use engine_traits::Result;
+
+        impl EngineConstructorExt for engine_sled::SledEngine {
+            fn new_engine(
+                _path: &str,
+                _db_opt: Option<DBOptions>,
+                _cfs: &[&str],
+                _opts: Option<Vec<CFOptions>>,
+            ) -> Result<Self> {
+                Ok(SledEngine)
+            }
+
+            fn new_engine_opt(
+                _path: &str,
+                _db_opt: DBOptions,
+                _cfs_opts: Vec<CFOptions>,
+            ) -> Result<Self> {
+                Ok(SledEngine)
+            }
         }
     }
 }

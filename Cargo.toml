@@ -51,13 +51,17 @@ protobuf-codec = [
   "tikv_util/protobuf-codec",
 ]
 testexport = ["raftstore/testexport"]
+test-engines-panic = [
+  "engine_test/test-engine-kv-panic",
+  "engine_test/test-engine-raft-panic",
+]
 test-engines-rocksdb = [
   "engine_test/test-engine-kv-rocksdb",
   "engine_test/test-engine-raft-rocksdb",
 ]
-test-engines-panic = [
-  "engine_test/test-engine-kv-panic",
-  "engine_test/test-engine-raft-panic",
+test-engines-sled = [
+  "engine_test/test-engine-kv-sled",
+  "engine_test/test-engine-raft-sled",
 ]
 
 # for testing configure propegate to other crates
