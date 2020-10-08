@@ -96,10 +96,12 @@ impl SyncMutable for SledEngine {
     }
 
     fn delete(&self, key: &[u8]) -> Result<()> {
-        panic!()
+        self.cf_tree(CF_DEFAULT)?.remove(key).engine_result()?;
+        Ok(())
     }
     fn delete_cf(&self, cf: &str, key: &[u8]) -> Result<()> {
-        panic!()
+        self.cf_tree(cf)?.remove(key).engine_result()?;
+        Ok(())
     }
     fn delete_range_cf(&self, cf: &str, begin_key: &[u8], end_key: &[u8]) -> Result<()> {
         panic!()

@@ -148,6 +148,42 @@ mod basic_read_write {
         let value = value.expect("value");
         assert_eq!(b"bar", &*value);
     }
+
+    #[test]
+    fn delete_none() {
+        let db = default_engine();
+        let res = db.engine.delete(b"foo");
+        assert!(res.is_ok());
+    }
+
+    #[test]
+    fn delete_cf_none() {
+        let db = engine_cfs(ALL_CFS);
+        let res = db.engine.delete_cf(CF_WRITE, b"foo");
+        assert!(res.is_ok());
+    }
+
+    #[test]
+    fn delete() {
+        let db = default_engine();
+        db.engine.put(b"foo", b"bar").unwrap();
+        let value = db.engine.get_value(b"foo").unwrap();
+        assert!(value.is_some());
+        db.engine.delete(b"foo").unwrap();
+        let value = db.engine.get_value(b"foo").unwrap();
+        assert!(value.is_none());
+    }
+
+    #[test]
+    fn delete_cf() {
+        let db = engine_cfs(ALL_CFS);
+        db.engine.put_cf(CF_WRITE, b"foo", b"bar").unwrap();
+        let value = db.engine.get_value_cf(CF_WRITE, b"foo").unwrap();
+        assert!(value.is_some());
+        db.engine.delete_cf(CF_WRITE, b"foo").unwrap();
+        let value = db.engine.get_value_cf(CF_WRITE, b"foo").unwrap();
+        assert!(value.is_none());
+    }
 }
 
 mod cf_names {
