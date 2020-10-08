@@ -73,7 +73,7 @@ impl Peekable for SledEngine {
     type DBVector = SledDBVector;
 
     fn get_value_opt(&self, opts: &ReadOptions, key: &[u8]) -> Result<Option<Self::DBVector>> {
-        Ok(self.cf_tree(CF_DEFAULT)?.get(key).engine_result()?.map(SledDBVector::from_raw))
+        self.get_value_cf_opt(opts, CF_DEFAULT, key)
     }
     fn get_value_cf_opt(
         &self,
@@ -87,8 +87,7 @@ impl Peekable for SledEngine {
 
 impl SyncMutable for SledEngine {
     fn put(&self, key: &[u8], value: &[u8]) -> Result<()> {
-        self.cf_tree(CF_DEFAULT)?.insert(key, value).engine_result()?;
-        Ok(())
+        self.put_cf(CF_DEFAULT, key, value)
     }
     fn put_cf(&self, cf: &str, key: &[u8], value: &[u8]) -> Result<()> {
         self.cf_tree(cf)?.insert(key, value).engine_result()?;
@@ -96,8 +95,7 @@ impl SyncMutable for SledEngine {
     }
 
     fn delete(&self, key: &[u8]) -> Result<()> {
-        self.cf_tree(CF_DEFAULT)?.remove(key).engine_result()?;
-        Ok(())
+        self.delete_cf(CF_DEFAULT, key)
     }
     fn delete_cf(&self, cf: &str, key: &[u8]) -> Result<()> {
         self.cf_tree(cf)?.remove(key).engine_result()?;
