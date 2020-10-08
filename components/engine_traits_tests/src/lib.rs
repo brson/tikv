@@ -96,3 +96,17 @@ mod basic_read_write {
         assert_eq!(expected, &*actual);
     }
 }
+
+mod cf_names {
+    use super::default_engine;
+    use engine_traits::CFNamesExt;
+    use engine_traits::{CF_DEFAULT};
+
+    #[test]
+    fn default_names() {
+        let db = default_engine();
+        let names = db.engine.cf_names();
+        assert_eq!(names.len(), 1);
+        assert_eq!(names[0], CF_DEFAULT);
+    }
+}

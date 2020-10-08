@@ -5,6 +5,6 @@ use engine_traits::CFNamesExt;
 
 impl CFNamesExt for SledEngine {
     fn cf_names(&self) -> Vec<&str> {
-        panic!()
+        self.inner().cf_map.keys().map(|k| &**k).collect()
     }
 }

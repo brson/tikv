@@ -456,23 +456,40 @@ pub mod ctor {
             fn new_engine(
                 path: &str,
                 _db_opt: Option<DBOptions>,
-                _cfs: &[&str],
-                _opts: Option<Vec<CFOptions>>,
+                cfs: &[&str],
+                opts: Option<Vec<CFOptions>>,
             ) -> Result<Self> {
                 let db = sled::open(path).engine_result()?;
-                let db = SledEngine::from_raw(db);
-                Ok(db)
+                create_cfs(&db, cfs, opts)?;
+                SledEngine::from_raw(db)
             }
 
             fn new_engine_opt(
                 path: &str,
                 _db_opt: DBOptions,
-                _cfs_opts: Vec<CFOptions>,
+                cfs_opts: Vec<CFOptions>,
             ) -> Result<Self> {
                 let db = sled::open(path).engine_result()?;
-                let db = SledEngine::from_raw(db);
-                Ok(db)
+                create_cfs(&db, &[], Some(cfs_opts))?;
+                SledEngine::from_raw(db)
             }
+        }
+
+        fn create_cfs(db: &sled::Db, cfs: &[&str], cf_opts: Option<Vec<CFOptions>>) -> Result<()> {
+            // Per the rocksdb ctors, if given `opts` just ignore the `cfs` slice
+            if let Some(cf_opts) = cf_opts {
+                for cf_opts in cf_opts {
+                    // Just create the sled tree and drop the handle.
+                    // The SledEngine will reopen the handle later.
+                    let _tree = db.open_tree(cf_opts.cf).engine_result()?;
+                }
+            } else {
+                for cf in cfs {
+                    let _tree = db.open_tree(cf).engine_result()?;
+                }
+            }
+
+            Ok(())
         }
     }
 }
