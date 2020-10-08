@@ -7,6 +7,7 @@ use engine_traits::{
     IterOptions, Iterable, Iterator, KvEngine, Peekable, ReadOptions, Result, SeekKey, SyncMutable,
     WriteOptions,
 };
+use engine_traits::CF_DEFAULT;
 
 use std::str;
 use std::sync::Arc;
@@ -72,7 +73,7 @@ impl Peekable for SledEngine {
     type DBVector = SledDBVector;
 
     fn get_value_opt(&self, opts: &ReadOptions, key: &[u8]) -> Result<Option<Self::DBVector>> {
-        Ok(self.inner().db.get(key).engine_result()?.map(SledDBVector::from_raw))
+        Ok(self.cf_tree(CF_DEFAULT)?.get(key).engine_result()?.map(SledDBVector::from_raw))
     }
     fn get_value_cf_opt(
         &self,
@@ -86,7 +87,7 @@ impl Peekable for SledEngine {
 
 impl SyncMutable for SledEngine {
     fn put(&self, key: &[u8], value: &[u8]) -> Result<()> {
-        self.inner().db.insert(key, value).engine_result()?;
+        self.cf_tree(CF_DEFAULT)?.insert(key, value).engine_result()?;
         Ok(())
     }
     fn put_cf(&self, cf: &str, key: &[u8], value: &[u8]) -> Result<()> {
