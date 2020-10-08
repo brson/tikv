@@ -448,6 +448,7 @@ pub mod ctor {
         use super::{CFOptions, DBOptions, EngineConstructorExt};
         use engine_sled::SledEngine;
         use engine_traits::Result;
+        use engine_traits::CF_DEFAULT;
 
         use engine_sled::raw as sled;
         use engine_sled::EngineResult;
@@ -487,6 +488,11 @@ pub mod ctor {
                 for cf in cfs {
                     let _tree = db.open_tree(cf).engine_result()?;
                 }
+            }
+
+            // There's always a CF_DEFAULT
+            if !db.tree_names().contains(&sled::IVec::from(CF_DEFAULT)) {
+                let _tree = db.open_tree(CF_DEFAULT).engine_result()?;
             }
 
             Ok(())

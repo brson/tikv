@@ -124,6 +124,7 @@ mod basic_read_write {
         assert_eq!(b"bar", &*value);
     }
 
+    // Store using put; load using get_cf(CF_DEFAULT)
     #[test]
     fn non_cf_methods_are_default_cf() {
         let db = engine_cfs(ALL_CFS);
@@ -134,12 +135,25 @@ mod basic_read_write {
         let value = value.expect("value");
         assert_eq!(b"bar", &*value);
     }
+
+    #[test]
+    fn non_cf_methods_implicit_default_cf() {
+        let db = engine_cfs(&[CF_WRITE]);
+        db.engine.put(b"foo", b"bar").unwrap();
+        let value = db.engine.get_value(b"foo").unwrap();
+        let value = value.expect("value");
+        assert_eq!(b"bar", &*value);
+        // CF_DEFAULT always exists
+        let value = db.engine.get_value_cf(CF_DEFAULT, b"foo").unwrap();
+        let value = value.expect("value");
+        assert_eq!(b"bar", &*value);
+    }
 }
 
 mod cf_names {
     use super::{default_engine, engine_cfs};
     use engine_traits::CFNamesExt;
-    use engine_traits::{CF_DEFAULT, ALL_CFS};
+    use engine_traits::{CF_DEFAULT, ALL_CFS, CF_WRITE};
 
     #[test]
     fn default_names() {
@@ -157,5 +171,13 @@ mod cf_names {
         for cf in ALL_CFS {
             assert!(names.contains(cf));
         }
+    }
+
+    #[test]
+    fn implicit_default_cf() {
+        let db = engine_cfs(&[CF_WRITE]);
+        let names = db.engine.cf_names();
+        assert_eq!(names.len(), 2);
+        assert!(names.contains(&CF_DEFAULT));
     }
 }
