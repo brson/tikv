@@ -44,6 +44,18 @@ fn default_engine() -> TempDirEnginePair {
     }
 }
 
+fn engine_cfs(cfs: &[&str]) -> TempDirEnginePair {
+    use engine_test::kv::KvTestEngine;
+    use engine_test::ctor::EngineConstructorExt;
+
+    let dir = tempdir();
+    let path = dir.path().to_str().unwrap();
+    let engine = KvTestEngine::new_engine(path, None, cfs, None).unwrap();
+    TempDirEnginePair {
+        engine, tempdir: dir,
+    }
+}
+
 
 mod ctor {
     //! Constructor tests
@@ -98,9 +110,9 @@ mod basic_read_write {
 }
 
 mod cf_names {
-    use super::default_engine;
+    use super::{default_engine, engine_cfs};
     use engine_traits::CFNamesExt;
-    use engine_traits::{CF_DEFAULT};
+    use engine_traits::{CF_DEFAULT, ALL_CFS};
 
     #[test]
     fn default_names() {
@@ -108,5 +120,15 @@ mod cf_names {
         let names = db.engine.cf_names();
         assert_eq!(names.len(), 1);
         assert_eq!(names[0], CF_DEFAULT);
+    }
+
+    #[test]
+    fn cf_names() {
+        let db = engine_cfs(ALL_CFS);
+        let names = db.engine.cf_names();
+        assert_eq!(names.len(), ALL_CFS.len());
+        for cf in ALL_CFS {
+            assert!(names.contains(cf));
+        }
     }
 }
