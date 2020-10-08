@@ -38,6 +38,11 @@ impl SledEngine {
     pub (crate) fn inner(&self) -> &SledEngineInner {
         &self.0
     }
+
+    pub (crate) fn cf_tree(&self, cf: &str) -> Result<&sled::Tree> {
+        self.inner().cf_map.get(cf)
+            .ok_or_else(|| engine_traits::Error::CFName(cf.to_string()))
+    }
 }
 
 #[derive(Debug)]
@@ -75,7 +80,7 @@ impl Peekable for SledEngine {
         cf: &str,
         key: &[u8],
     ) -> Result<Option<Self::DBVector>> {
-        panic!()
+        Ok(self.cf_tree(cf)?.get(key).engine_result()?.map(SledDBVector::from_raw))
     }
 }
 
@@ -85,7 +90,8 @@ impl SyncMutable for SledEngine {
         Ok(())
     }
     fn put_cf(&self, cf: &str, key: &[u8], value: &[u8]) -> Result<()> {
-        panic!()
+        self.cf_tree(cf)?.insert(key, value).engine_result()?;
+        Ok(())
     }
 
     fn delete(&self, key: &[u8]) -> Result<()> {

@@ -88,8 +88,9 @@ mod ctor {
 mod basic_read_write {
     //! Reading and writing
 
-    use super::default_engine;
+    use super::{default_engine, engine_cfs};
     use engine_traits::{Peekable, SyncMutable};
+    use engine_traits::{CF_WRITE};
 
     #[test]
     fn get_value_none() {
@@ -99,13 +100,28 @@ mod basic_read_write {
     }
 
     #[test]
-    fn put_value_get_value() {
+    fn put_get() {
         let db = default_engine();
-        let expected = b"bar";
-        db.engine.put(b"foo", expected).unwrap();
-        let actual = db.engine.get_value(b"foo").unwrap();
-        let actual = actual.expect("value");
-        assert_eq!(expected, &*actual);
+        db.engine.put(b"foo", b"bar").unwrap();
+        let value = db.engine.get_value(b"foo").unwrap();
+        let value = value.expect("value");
+        assert_eq!(b"bar", &*value);
+    }
+
+    #[test]
+    fn get_value_cf_none() {
+        let db = engine_cfs(&[CF_WRITE]);
+        let value = db.engine.get_value_cf(CF_WRITE, b"foo").unwrap();
+        assert!(value.is_none());
+    }
+
+    #[test]
+    fn put_get_cf() {
+        let db = engine_cfs(&[CF_WRITE]);
+        db.engine.put_cf(CF_WRITE, b"foo", b"bar").unwrap();
+        let value = db.engine.get_value_cf(CF_WRITE, b"foo").unwrap();
+        let value = value.expect("value");
+        assert_eq!(b"bar", &*value);
     }
 }
 
