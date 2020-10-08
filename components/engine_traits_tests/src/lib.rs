@@ -90,7 +90,7 @@ mod basic_read_write {
 
     use super::{default_engine, engine_cfs};
     use engine_traits::{Peekable, SyncMutable};
-    use engine_traits::{CF_WRITE};
+    use engine_traits::{CF_WRITE, ALL_CFS, CF_DEFAULT};
 
     #[test]
     fn get_value_none() {
@@ -120,6 +120,17 @@ mod basic_read_write {
         let db = engine_cfs(&[CF_WRITE]);
         db.engine.put_cf(CF_WRITE, b"foo", b"bar").unwrap();
         let value = db.engine.get_value_cf(CF_WRITE, b"foo").unwrap();
+        let value = value.expect("value");
+        assert_eq!(b"bar", &*value);
+    }
+
+    #[test]
+    fn non_cf_methods_are_default_cf() {
+        let db = engine_cfs(ALL_CFS);
+        // Use the non-cf put function
+        db.engine.put(b"foo", b"bar").unwrap();
+        // Retreive with the cf get function
+        let value = db.engine.get_value_cf(CF_DEFAULT, b"foo").unwrap();
         let value = value.expect("value");
         assert_eq!(b"bar", &*value);
     }
