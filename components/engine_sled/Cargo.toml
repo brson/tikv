@@ -7,6 +7,7 @@ publish = false
 
 [dependencies]
 engine_traits = { path = "../engine_traits" }
+sled = "0.34.4"
 tikv_alloc = { path = "../tikv_alloc" }
 # FIXME: Remove this dep from the engine_traits interface
 tikv_util = { path = "../tikv_util" }
