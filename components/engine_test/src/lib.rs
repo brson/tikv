@@ -449,22 +449,29 @@ pub mod ctor {
         use engine_sled::SledEngine;
         use engine_traits::Result;
 
+        use engine_sled::raw as sled;
+        use engine_sled::EngineResult;
+
         impl EngineConstructorExt for engine_sled::SledEngine {
             fn new_engine(
-                _path: &str,
+                path: &str,
                 _db_opt: Option<DBOptions>,
                 _cfs: &[&str],
                 _opts: Option<Vec<CFOptions>>,
             ) -> Result<Self> {
-                Ok(SledEngine)
+                let db = sled::open(path).engine_result()?;
+                let db = SledEngine::from_raw(db);
+                Ok(db)
             }
 
             fn new_engine_opt(
-                _path: &str,
+                path: &str,
                 _db_opt: DBOptions,
                 _cfs_opts: Vec<CFOptions>,
             ) -> Result<Self> {
-                Ok(SledEngine)
+                let db = sled::open(path).engine_result()?;
+                let db = SledEngine::from_raw(db);
+                Ok(db)
             }
         }
     }

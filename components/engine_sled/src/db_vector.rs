@@ -4,7 +4,13 @@ use engine_traits::DBVector;
 use std::ops::Deref;
 
 #[derive(Debug)]
-pub struct SledDBVector;
+pub struct SledDBVector(sled::IVec);
+
+impl SledDBVector {
+    pub (crate) fn from_raw(v: sled::IVec) -> SledDBVector {
+        SledDBVector(v)
+    }
+}
 
 impl DBVector for SledDBVector {}
 
@@ -12,7 +18,7 @@ impl Deref for SledDBVector {
     type Target = [u8];
 
     fn deref(&self) -> &[u8] {
-        panic!()
+        self.0.deref()
     }
 }
 

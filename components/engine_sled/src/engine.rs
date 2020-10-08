@@ -8,8 +8,16 @@ use engine_traits::{
     WriteOptions,
 };
 
+use crate::EngineResult;
+
 #[derive(Clone, Debug)]
-pub struct SledEngine;
+pub struct SledEngine(sled::Db);
+
+impl SledEngine {
+    pub fn from_raw(db: sled::Db) -> SledEngine {
+        SledEngine(db)
+    }
+}
 
 impl KvEngine for SledEngine {
     type Snapshot = SledSnapshot;
@@ -29,7 +37,7 @@ impl Peekable for SledEngine {
     type DBVector = SledDBVector;
 
     fn get_value_opt(&self, opts: &ReadOptions, key: &[u8]) -> Result<Option<Self::DBVector>> {
-        panic!()
+        Ok(self.0.get(key).engine_result()?.map(SledDBVector::from_raw))
     }
     fn get_value_cf_opt(
         &self,
@@ -43,7 +51,8 @@ impl Peekable for SledEngine {
 
 impl SyncMutable for SledEngine {
     fn put(&self, key: &[u8], value: &[u8]) -> Result<()> {
-        panic!()
+        self.0.insert(key, value).engine_result()?;
+        Ok(())
     }
     fn put_cf(&self, cf: &str, key: &[u8], value: &[u8]) -> Result<()> {
         panic!()
