@@ -110,21 +110,36 @@ impl Iterable for SledEngine {
     type Iterator = SledEngineIterator;
 
     fn iterator_opt(&self, opts: IterOptions) -> Result<Self::Iterator> {
-        panic!()
+        self.iterator_cf_opt(CF_DEFAULT, opts)
     }
     fn iterator_cf_opt(&self, cf: &str, opts: IterOptions) -> Result<Self::Iterator> {
-        panic!()
+        let iter = self.cf_tree(cf)?.iter();
+        Ok(SledEngineIterator::from_raw(iter))
     }
 }
 
-pub struct SledEngineIterator;
+pub struct SledEngineIterator(SledEngineIteratorInner);
+
+struct SledEngineIteratorInner {
+    iter: sled::Iter,
+    curr: Option<sled::Result<(sled::IVec, sled::IVec)>>,
+}
+
+impl SledEngineIterator {
+    fn from_raw(mut iter: sled::Iter) -> SledEngineIterator {
+        let curr = iter.next();
+        SledEngineIterator(SledEngineIteratorInner {
+            iter, curr
+        })
+    }
+}
 
 impl Iterator for SledEngineIterator {
     fn seek(&mut self, key: SeekKey) -> Result<bool> {
-        panic!()
+        Ok(false)
     }
     fn seek_for_prev(&mut self, key: SeekKey) -> Result<bool> {
-        panic!()
+        Ok(false)
     }
 
     fn prev(&mut self) -> Result<bool> {
@@ -142,6 +157,17 @@ impl Iterator for SledEngineIterator {
     }
 
     fn valid(&self) -> Result<bool> {
-        panic!()
+        if let Some(ref curr) = self.0.curr {
+            match curr {
+                Err(ref e) => {
+                    Err(e.clone()).engine_result()
+                }
+                _ => {
+                    Ok(true)
+                }
+            }
+        } else {
+            Ok(false)
+        }
     }
 }

@@ -237,12 +237,12 @@ mod engine_iter {
         assert!(panic::catch_unwind(AssertUnwindSafe(|| {
             let _ = iter.next();
         })).is_err());
-        assert!(panic::catch_unwind(|| {
+        assert!(panic::catch_unwind(AssertUnwindSafe(|| {
             iter.key();
-        }).is_err());
-        assert!(panic::catch_unwind(|| {
+        })).is_err());
+        assert!(panic::catch_unwind(AssertUnwindSafe(|| {
             iter.value();
-        }).is_err());
+        })).is_err());
 
         assert_eq!(iter.seek(SeekKey::Start).unwrap(), false);
         assert_eq!(iter.seek(SeekKey::End).unwrap(), false);
