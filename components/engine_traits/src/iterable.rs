@@ -43,7 +43,14 @@ pub enum SeekKey<'a> {
 /// Iterators are implemented for `KvEngine`s and for `Snapshot`s. They see a
 /// consistent view of the database; an iterator created by an engine behaves as
 /// if a snapshot was created first, and the iterator created from the snapshot.
+///
+/// Most methods on iterators will panic if they are not "valid",
+/// as determined by the `valid` method.
 pub trait Iterator: Send {
+    /// # Returns
+    ///
+    /// `true` if seeking succeeded and the iterator is valid,
+    /// `false` if seeking failed and the iterator is invalid.
     fn seek(&mut self, key: SeekKey) -> Result<bool>;
 
     fn seek_for_prev(&mut self, key: SeekKey) -> Result<bool>;
@@ -56,12 +63,24 @@ pub trait Iterator: Send {
         self.seek(SeekKey::End)
     }
 
+    /// # Panics
+    ///
+    /// If the iterator is invalid
     fn prev(&mut self) -> Result<bool>;
+
+    /// # Panics
+    ///
+    /// If the iterator is invalid
     fn next(&mut self) -> Result<bool>;
 
-    /// Only be called when `self.valid() == Ok(true)`.
+    /// # Panics
+    ///
+    /// If the iterator is invalid
     fn key(&self) -> &[u8];
-    /// Only be called when `self.valid() == Ok(true)`.
+
+    /// # Panics
+    ///
+    /// If the iterator is invalid
     fn value(&self) -> &[u8];
 
     fn valid(&self) -> Result<bool>;
