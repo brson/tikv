@@ -113,30 +113,57 @@ impl Iterable for SledEngine {
         self.iterator_cf_opt(CF_DEFAULT, opts)
     }
     fn iterator_cf_opt(&self, cf: &str, opts: IterOptions) -> Result<Self::Iterator> {
-        let iter = self.cf_tree(cf)?.iter();
-        Ok(SledEngineIterator::from_raw(iter))
+        let tree = self.cf_tree(cf)?.clone();
+        Ok(SledEngineIterator::from_tree(tree))
     }
 }
 
 pub struct SledEngineIterator(SledEngineIteratorInner);
 
-struct SledEngineIteratorInner {
-    iter: sled::Iter,
-    curr: Option<sled::Result<(sled::IVec, sled::IVec)>>,
+enum SledEngineIteratorInner {
+    Uninit {
+        tree: sled::Tree,
+    },
+    Forward {
+        tree: sled::Tree,
+        iter: sled::Iter,
+        curr: (sled::IVec, sled::IVec),
+    },
+    Placeholder,
 }
 
 impl SledEngineIterator {
-    fn from_raw(mut iter: sled::Iter) -> SledEngineIterator {
-        let curr = iter.next();
-        SledEngineIterator(SledEngineIteratorInner {
-            iter, curr
+    fn from_tree(mut tree: sled::Tree) -> SledEngineIterator {
+        SledEngineIterator(SledEngineIteratorInner::Uninit {
+            tree
         })
     }
 }
 
 impl Iterator for SledEngineIterator {
     fn seek(&mut self, key: SeekKey) -> Result<bool> {
-        Ok(false)
+        let state = std::mem::replace(&mut self.0, SledEngineIteratorInner::Placeholder);
+        match (state, key) {
+            (SledEngineIteratorInner::Uninit { tree }, SeekKey::Start) => {
+                let mut iter = tree.iter();
+                let curr = iter.next();
+                match curr {
+                    Some(curr) => {
+                        let curr = curr.engine_result()?;
+                        self.0 = SledEngineIteratorInner::Forward {
+                            tree, iter, curr
+                        };
+                        Ok(true)
+                    }
+                    None => {
+                        Ok(false)
+                    }
+                }
+            }
+            _ => {
+                Ok(false)
+            }
+        }
     }
     fn seek_for_prev(&mut self, key: SeekKey) -> Result<bool> {
         Ok(false)
@@ -145,29 +172,70 @@ impl Iterator for SledEngineIterator {
     fn prev(&mut self) -> Result<bool> {
         panic!()
     }
+
     fn next(&mut self) -> Result<bool> {
-        panic!()
+        let state = std::mem::replace(&mut self.0, SledEngineIteratorInner::Placeholder);
+        match state {
+            SledEngineIteratorInner::Uninit { .. } => {
+                panic!("invalid iterator");
+            }
+            SledEngineIteratorInner::Forward { tree, mut iter, .. } => {
+                let curr = iter.next();
+                match curr {
+                    Some(curr) => {
+                        let curr = curr.engine_result()?;
+                        self.0 = SledEngineIteratorInner::Forward {
+                            tree, iter, curr
+                        };
+                        Ok(true)
+                    }
+                    None => {
+                        self.0 = SledEngineIteratorInner::Uninit {
+                            tree
+                        };
+                        Ok(false)
+                    }
+                }
+            }
+            SledEngineIteratorInner::Placeholder => {
+                panic!();
+            }
+        }
     }
 
     fn key(&self) -> &[u8] {
-        panic!()
+        match &self.0 {
+            SledEngineIteratorInner::Uninit { .. } => {
+                panic!("invalid iterator");
+            }
+            SledEngineIteratorInner::Forward { curr, .. } => {
+                &curr.0
+            }
+            SledEngineIteratorInner::Placeholder => {
+                panic!();
+            }
+        }
     }
+
     fn value(&self) -> &[u8] {
-        panic!()
+        match &self.0 {
+            SledEngineIteratorInner::Uninit { .. } => {
+                panic!("invalid iterator");
+            }
+            SledEngineIteratorInner::Forward { curr, .. } => {
+                &curr.1
+            }
+            SledEngineIteratorInner::Placeholder => {
+                panic!();
+            }
+        }
     }
 
     fn valid(&self) -> Result<bool> {
-        if let Some(ref curr) = self.0.curr {
-            match curr {
-                Err(ref e) => {
-                    Err(e.clone()).engine_result()
-                }
-                _ => {
-                    Ok(true)
-                }
-            }
-        } else {
-            Ok(false)
+        match self.0 {
+            SledEngineIteratorInner::Uninit { .. } => Ok(false),
+            SledEngineIteratorInner::Forward { .. } => Ok(true),
+            SledEngineIteratorInner::Placeholder => panic!(),
         }
     }
 }
