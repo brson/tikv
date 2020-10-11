@@ -62,7 +62,11 @@ impl KvEngine for SledEngine {
         panic!()
     }
     fn sync(&self) -> Result<()> {
-        panic!()
+        for tree_name in self.inner().db.tree_names() {
+            let tree = self.inner().db.open_tree(tree_name).engine_result()?;
+            tree.flush().engine_result()?;
+        }
+        Ok(())
     }
     fn bad_downcast<T: 'static>(&self) -> &T {
         panic!()
