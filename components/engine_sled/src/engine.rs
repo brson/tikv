@@ -213,8 +213,22 @@ impl Iterator for SledEngineIterator {
             SledEngineIteratorInner::Uninit { .. } => {
                 panic!("invalid iterator");
             }
-            SledEngineIteratorInner::Forward { .. } => {
-                panic!();
+            SledEngineIteratorInner::Forward { tree, curr, .. } => {
+                let key = curr.0;
+                let mut iter = tree.range(..key).rev();
+                let curr = iter.next();
+                match curr {
+                    Some(curr) => {
+                        let curr = curr.engine_result()?;
+                        self.0 = SledEngineIteratorInner::Reverse {
+                            tree, iter, curr
+                        };
+                        Ok(true)
+                    }
+                    None => {
+                        Ok(false)
+                    }
+                }
             }
             SledEngineIteratorInner::Reverse { tree, mut iter, .. } => {
                 let curr = iter.next();
