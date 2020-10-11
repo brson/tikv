@@ -129,6 +129,11 @@ enum SledEngineIteratorInner {
         iter: sled::Iter,
         curr: (sled::IVec, sled::IVec),
     },
+    Reverse {
+        tree: sled::Tree,
+        iter: std::iter::Rev<sled::Iter>,
+        curr: (sled::IVec, sled::IVec),
+    },
     Placeholder,
 }
 
@@ -160,6 +165,22 @@ impl Iterator for SledEngineIterator {
                     }
                 }
             }
+            (SledEngineIteratorInner::Uninit { tree }, SeekKey::End) => {
+                let mut iter = tree.iter().rev();
+                let curr = iter.next();
+                match curr {
+                    Some(curr) => {
+                        let curr = curr.engine_result()?;
+                        self.0 = SledEngineIteratorInner::Reverse {
+                            tree, iter, curr
+                        };
+                        Ok(true)
+                    }
+                    None => {
+                        Ok(false)
+                    }
+                }
+            }
             _ => {
                 Ok(false)
             }
@@ -170,7 +191,36 @@ impl Iterator for SledEngineIterator {
     }
 
     fn prev(&mut self) -> Result<bool> {
-        panic!()
+        let state = std::mem::replace(&mut self.0, SledEngineIteratorInner::Placeholder);
+        match state {
+            SledEngineIteratorInner::Uninit { .. } => {
+                panic!("invalid iterator");
+            }
+            SledEngineIteratorInner::Forward { .. } => {
+                panic!();
+            }
+            SledEngineIteratorInner::Reverse { tree, mut iter, .. } => {
+                let curr = iter.next();
+                match curr {
+                    Some(curr) => {
+                        let curr = curr.engine_result()?;
+                        self.0 = SledEngineIteratorInner::Reverse {
+                            tree, iter, curr
+                        };
+                        Ok(true)
+                    }
+                    None => {
+                        self.0 = SledEngineIteratorInner::Uninit {
+                            tree
+                        };
+                        Ok(false)
+                    }
+                }
+            }
+            SledEngineIteratorInner::Placeholder => {
+                panic!();
+            }
+        }
     }
 
     fn next(&mut self) -> Result<bool> {
@@ -197,6 +247,9 @@ impl Iterator for SledEngineIterator {
                     }
                 }
             }
+            SledEngineIteratorInner::Reverse { .. } => {
+                panic!();
+            }
             SledEngineIteratorInner::Placeholder => {
                 panic!();
             }
@@ -209,6 +262,9 @@ impl Iterator for SledEngineIterator {
                 panic!("invalid iterator");
             }
             SledEngineIteratorInner::Forward { curr, .. } => {
+                &curr.0
+            }
+            SledEngineIteratorInner::Reverse { curr, .. } => {
                 &curr.0
             }
             SledEngineIteratorInner::Placeholder => {
@@ -225,6 +281,9 @@ impl Iterator for SledEngineIterator {
             SledEngineIteratorInner::Forward { curr, .. } => {
                 &curr.1
             }
+            SledEngineIteratorInner::Reverse { curr, .. } => {
+                &curr.1
+            }
             SledEngineIteratorInner::Placeholder => {
                 panic!();
             }
@@ -235,6 +294,7 @@ impl Iterator for SledEngineIterator {
         match self.0 {
             SledEngineIteratorInner::Uninit { .. } => Ok(false),
             SledEngineIteratorInner::Forward { .. } => Ok(true),
+            SledEngineIteratorInner::Reverse { .. } => Ok(true),
             SledEngineIteratorInner::Placeholder => panic!(),
         }
     }
