@@ -278,8 +278,39 @@ impl Iterator for SledEngineIterator {
                     }
                 }
             }
-            SledEngineIteratorInner::Reverse { .. } => {
-                panic!();
+            SledEngineIteratorInner::Reverse { tree, iter, curr } => {
+                let key = curr.0;
+                let mut iter = tree.range(key.clone()..);
+                let curr = iter.next();
+                match curr {
+                    Some(curr) => {
+                        let curr = curr.engine_result()?;
+                        if curr.0 == key {
+                            let curr = iter.next();
+                            match curr {
+                                Some(curr) => {
+                                    let curr = curr.engine_result()?;
+                                    self.0 = SledEngineIteratorInner::Forward {
+                                        tree, iter, curr
+                                    };
+                                    Ok(true)
+                                }
+                                None => {
+                                    Ok(false)
+                                }
+                            }
+                        } else {
+                            panic!(); // FIXME add test first
+                            self.0 = SledEngineIteratorInner::Forward {
+                                tree, iter, curr
+                            };
+                            Ok(true)
+                        }
+                    }
+                    None => {
+                        Ok(false)
+                    }
+                }
             }
             SledEngineIteratorInner::Placeholder => {
                 panic!();
