@@ -486,3 +486,17 @@ mod engine_iter {
     }
 }
 
+mod misc {
+    use super::{default_engine};
+    use engine_traits::{KvEngine, SyncMutable, Peekable};
+
+    #[test]
+    fn sync_basic() {
+        let db = default_engine();
+        db.engine.put(b"foo", b"bar").unwrap();
+        db.engine.sync().unwrap();
+        let value = db.engine.get_value(b"foo").unwrap();
+        let value = value.expect("value");
+        assert_eq!(b"bar", &*value);
+    }
+}
