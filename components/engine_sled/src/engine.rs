@@ -181,11 +181,28 @@ impl Iterator for SledEngineIterator {
                     }
                 }
             }
+            (SledEngineIteratorInner::Uninit { tree }, SeekKey::Key(key)) => {
+                let mut iter = tree.range(key..);
+                let curr = iter.next();
+                match curr {
+                    Some(curr) => {
+                        let curr = curr.engine_result()?;
+                        self.0 = SledEngineIteratorInner::Forward {
+                            tree, iter, curr
+                        };
+                        Ok(true)
+                    }
+                    None => {
+                        Ok(false)
+                    }
+                }
+            }
             _ => {
                 Ok(false)
             }
         }
     }
+
     fn seek_for_prev(&mut self, key: SeekKey) -> Result<bool> {
         Ok(false)
     }
