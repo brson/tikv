@@ -70,6 +70,12 @@ pub mod raft {
         RocksWriteBatch as RaftTestWriteBatch,
     };
 
+    #[cfg(feature = "test-engine-raft-simple")]
+    pub use engine_simple::{
+        SimpleEngine as RaftTestEngine, SimpleSnapshot as RaftTestSnapshot,
+        SimpleWriteBatch as RaftTestWriteBatch,
+    };
+
     pub fn new_engine(
         path: &str,
         db_opt: Option<DBOptions>,
@@ -106,6 +112,12 @@ pub mod kv {
     pub use engine_rocks::{
         RocksEngine as KvTestEngine, RocksSnapshot as KvTestSnapshot,
         RocksWriteBatch as KvTestWriteBatch,
+    };
+
+    #[cfg(feature = "test-engine-kv-simple")]
+    pub use engine_simple::{
+        SimpleEngine as KvTestEngine, SimpleSnapshot as KvTestSnapshot,
+        SimpleWriteBatch as KvTestWriteBatch,
     };
 
     pub fn new_engine(
@@ -306,6 +318,31 @@ pub mod ctor {
                 _cfs_opts: Vec<CFOptions>,
             ) -> Result<Self> {
                 Ok(PanicEngine)
+            }
+        }
+    }
+
+    mod simple {
+        use super::{CFOptions, DBOptions, EngineConstructorExt};
+        use engine_simple::SimpleEngine;
+        use engine_traits::Result;
+
+        impl EngineConstructorExt for engine_simple::SimpleEngine {
+            fn new_engine(
+                _path: &str,
+                _db_opt: Option<DBOptions>,
+                _cfs: &[&str],
+                _opts: Option<Vec<CFOptions>>,
+            ) -> Result<Self> {
+                Ok(SimpleEngine)
+            }
+
+            fn new_engine_opt(
+                _path: &str,
+                _db_opt: DBOptions,
+                _cfs_opts: Vec<CFOptions>,
+            ) -> Result<Self> {
+                Ok(SimpleEngine)
             }
         }
     }

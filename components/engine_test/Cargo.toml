@@ -24,8 +24,10 @@ prost-codec = [
 
 test-engine-kv-panic = []
 test-engine-kv-rocksdb = []
+test-engine-kv-simple = []
 test-engine-raft-panic = []
 test-engine-raft-rocksdb = []
+test-engine-raft-simple = []
 
 test-engines-rocksdb = [
   "test-engine-kv-rocksdb",
@@ -35,12 +37,17 @@ test-engines-panic = [
   "test-engine-kv-panic",
   "test-engine-raft-panic",
 ]
+test-engines-simple = [
+  "test-engine-kv-simple",
+  "test-engine-raft-simple",
+]
 
 
 [dependencies]
 engine_panic = { path = "../engine_panic", default-features = false }
 engine_rocks = { path = "../engine_rocks", default-features = false }
 engine_traits = { path = "../engine_traits", default-features = false }
+engine_simple = { path = "../engine_simple", default-features = false }
 tempfile = "3.0"
 tikv_alloc = { path = "../tikv_alloc" }
 # FIXME: Remove this dep from the engine_traits interface

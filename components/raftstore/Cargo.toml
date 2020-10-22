@@ -49,6 +49,9 @@ test-engines-rocksdb = [
 test-engines-panic = [
   "engine_test/test-engines-panic",
 ]
+test-engines-simple = [
+  "engine_test/test-engines-simple",
+]
 
 [dependencies]
 batch-system = { path = "../batch-system", default-features = false }

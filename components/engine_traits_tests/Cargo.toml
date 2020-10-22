@@ -26,6 +26,9 @@ test-engines-rocksdb = [
 test-engines-panic = [
   "engine_test/test-engines-panic",
 ]
+test-engines-simple = [
+  "engine_test/test-engines-simple",
+]
 
 [dependencies]
 engine_test = { path = "../engine_test", default-features = false }
