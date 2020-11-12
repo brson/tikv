@@ -46,3 +46,6 @@ mod raft_engine;
 
 // Reexport of implementation for use in engine_test constructors
 pub use blocksy2 as raw;
+
+// Error / Result adaptors
+mod error;
