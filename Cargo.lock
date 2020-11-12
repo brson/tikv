@@ -1242,6 +1242,7 @@ version = "0.0.1"
 dependencies = [
  "blocksy2",
  "engine_traits",
+ "futures 0.3.12",
  "kvproto",
  "raft",
  "tikv_alloc",

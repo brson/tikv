@@ -9,13 +9,17 @@ use engine_traits::{
 };
 
 use blocksy2::{Db, DbConfig};
+use crate::error::ResultExt;
+use futures::executor::block_on;
 
 #[derive(Clone, Debug)]
 pub struct SimpleEngine(Db);
 
 impl SimpleEngine {
     pub fn open(config: DbConfig) -> Result<SimpleEngine> {
-        panic!()
+        block_on(Db::open(config))
+            .engine_result()
+            .map(SimpleEngine)
     }
 }
 
