@@ -325,24 +325,48 @@ pub mod ctor {
     mod simple {
         use super::{CFOptions, DBOptions, EngineConstructorExt};
         use engine_traits::Result;
+        use engine_simple::SimpleEngine;
+        use engine_simple::raw::DbConfig;
+        use std::path::PathBuf;
 
-        impl EngineConstructorExt for engine_simple::SimpleEngine {
+        impl EngineConstructorExt for SimpleEngine {
             fn new_engine(
-                _path: &str,
-                _db_opt: Option<DBOptions>,
-                _cfs: &[&str],
-                _opts: Option<Vec<CFOptions>>,
+                path: &str,
+                db_opt: Option<DBOptions>,
+                cfs: &[&str],
+                opts: Option<Vec<CFOptions>>,
             ) -> Result<Self> {
-                panic!()
+                make_engine(path, db_opt, cfs, opts)
             }
 
             fn new_engine_opt(
-                _path: &str,
-                _db_opt: DBOptions,
-                _cfs_opts: Vec<CFOptions>,
+                path: &str,
+                db_opt: DBOptions,
+                cfs_opts: Vec<CFOptions>,
             ) -> Result<Self> {
-                panic!()
+                make_engine(path, Some(db_opt), &[], Some(cfs_opts))
             }
+        }
+
+        fn make_engine(path: &str,
+                       _db_opt: Option<DBOptions>,
+                       cfs: &[&str],
+                       cfs_opts: Option<Vec<CFOptions>>) -> Result<SimpleEngine> {
+            let data_dir = PathBuf::from(path);
+            let trees: Vec<String> = if let Some(cfs_opts) = cfs_opts {
+                cfs_opts.iter().map(|cf| {
+                    cf.cf.to_string()
+                }).collect()
+            } else {
+                cfs.iter().map(ToString::to_string).collect()
+            };
+
+            let config = DbConfig {
+                data_dir,
+                trees,
+            };
+
+            SimpleEngine::open(config)
         }
     }
 
