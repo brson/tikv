@@ -8,8 +8,16 @@ use engine_traits::{
     WriteOptions,
 };
 
+use blocksy2::{Db, DbConfig};
+
 #[derive(Clone, Debug)]
-pub struct SimpleEngine;
+pub struct SimpleEngine(Db);
+
+impl SimpleEngine {
+    pub fn open(config: DbConfig) -> Result<SimpleEngine> {
+        panic!()
+    }
+}
 
 impl KvEngine for SimpleEngine {
     type Snapshot = SimpleSnapshot;

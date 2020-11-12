@@ -324,7 +324,6 @@ pub mod ctor {
 
     mod simple {
         use super::{CFOptions, DBOptions, EngineConstructorExt};
-        use engine_simple::SimpleEngine;
         use engine_traits::Result;
 
         impl EngineConstructorExt for engine_simple::SimpleEngine {
@@ -334,7 +333,7 @@ pub mod ctor {
                 _cfs: &[&str],
                 _opts: Option<Vec<CFOptions>>,
             ) -> Result<Self> {
-                Ok(SimpleEngine)
+                panic!()
             }
 
             fn new_engine_opt(
@@ -342,7 +341,7 @@ pub mod ctor {
                 _db_opt: DBOptions,
                 _cfs_opts: Vec<CFOptions>,
             ) -> Result<Self> {
-                Ok(SimpleEngine)
+                panic!()
             }
         }
     }
