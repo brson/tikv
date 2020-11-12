@@ -43,3 +43,6 @@ pub mod perf_context;
 pub use crate::perf_context::*;
 
 mod raft_engine;
+
+// Reexport of implementation for use in engine_test constructors
+pub use blocksy2 as raw;
