@@ -122,8 +122,22 @@ impl Iterator for SimpleEngineIterator {
             }
         }
     }
+
     fn seek_for_prev(&mut self, key: SeekKey) -> Result<bool> {
-        panic!()
+        match key {
+            SeekKey::Start => {
+                block_on(self.0.seek_first()).engine_result()?;
+                Ok(self.0.valid())
+            }
+            SeekKey::End => {
+                block_on(self.0.seek_last()).engine_result()?;
+                Ok(self.0.valid())
+            }
+            SeekKey::Key(k) => {
+                block_on(self.0.seek_key_rev(k)).engine_result()?;
+                Ok(self.0.valid())
+            }
+        }
     }
 
     fn prev(&mut self) -> Result<bool> {
