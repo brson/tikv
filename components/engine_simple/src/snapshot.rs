@@ -7,8 +7,18 @@ use engine_traits::{
 };
 use std::ops::Deref;
 
+use crate::error::ResultExt;
+use engine_traits::CF_DEFAULT;
+use futures::executor::block_on;
+
 #[derive(Clone, Debug)]
-pub struct SimpleSnapshot;
+pub struct SimpleSnapshot(blocksy2::ReadView);
+
+impl SimpleSnapshot {
+    pub (crate) fn from_inner(inner: blocksy2::ReadView) -> SimpleSnapshot {
+        SimpleSnapshot(inner)
+    }
+}
 
 impl Snapshot for SimpleSnapshot {
     fn cf_names(&self) -> Vec<&str> {
@@ -20,7 +30,7 @@ impl Peekable for SimpleSnapshot {
     type DBVector = SimpleDBVector;
 
     fn get_value_opt(&self, opts: &ReadOptions, key: &[u8]) -> Result<Option<Self::DBVector>> {
-        panic!()
+        self.get_value_cf_opt(opts, CF_DEFAULT, key)
     }
     fn get_value_cf_opt(
         &self,
@@ -28,7 +38,10 @@ impl Peekable for SimpleSnapshot {
         cf: &str,
         key: &[u8],
     ) -> Result<Option<Self::DBVector>> {
-        panic!()
+        let tree = self.0.tree(cf);
+        let value = tree.read(key);
+        let value = block_on(value).engine_result()?;
+        Ok(value.map(SimpleDBVector::from_inner))
     }
 }
 

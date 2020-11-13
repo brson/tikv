@@ -33,7 +33,8 @@ impl KvEngine for SimpleEngine {
     type Snapshot = SimpleSnapshot;
 
     fn snapshot(&self) -> Self::Snapshot {
-        panic!()
+        let view = self.db.read_view();
+        SimpleSnapshot::from_inner(view)
     }
     fn sync(&self) -> Result<()> {
         block_on(self.db.sync()).engine_result()
