@@ -54,38 +54,69 @@ impl Iterable for SimpleSnapshot {
     type Iterator = SimpleSnapshotIterator;
 
     fn iterator_opt(&self, opts: IterOptions) -> Result<Self::Iterator> {
-        panic!()
+        self.iterator_cf_opt(CF_DEFAULT, opts)
     }
     fn iterator_cf_opt(&self, cf: &str, opts: IterOptions) -> Result<Self::Iterator> {
-        panic!()
+        let tree = self.view.tree(cf);
+        let cursor = tree.cursor();
+        Ok(SimpleSnapshotIterator(cursor))
     }
 }
 
-pub struct SimpleSnapshotIterator;
+pub struct SimpleSnapshotIterator(blocksy2::Cursor);
 
 impl Iterator for SimpleSnapshotIterator {
     fn seek(&mut self, key: SeekKey) -> Result<bool> {
-        panic!()
+        match key {
+            SeekKey::Start => {
+                block_on(self.0.seek_first()).engine_result()?;
+                Ok(self.0.valid())
+            }
+            SeekKey::End => {
+                block_on(self.0.seek_last()).engine_result()?;
+                Ok(self.0.valid())
+            }
+            SeekKey::Key(k) => {
+                block_on(self.0.seek_key(k)).engine_result()?;
+                Ok(self.0.valid())
+            }
+        }
     }
+
     fn seek_for_prev(&mut self, key: SeekKey) -> Result<bool> {
-        panic!()
+        match key {
+            SeekKey::Start => {
+                block_on(self.0.seek_first()).engine_result()?;
+                Ok(self.0.valid())
+            }
+            SeekKey::End => {
+                block_on(self.0.seek_last()).engine_result()?;
+                Ok(self.0.valid())
+            }
+            SeekKey::Key(k) => {
+                block_on(self.0.seek_key_rev(k)).engine_result()?;
+                Ok(self.0.valid())
+            }
+        }
     }
 
     fn prev(&mut self) -> Result<bool> {
-        panic!()
+        block_on(self.0.prev()).engine_result()?;
+        Ok(self.0.valid())
     }
     fn next(&mut self) -> Result<bool> {
-        panic!()
+        block_on(self.0.next()).engine_result()?;
+        Ok(self.0.valid())
     }
 
     fn key(&self) -> &[u8] {
-        panic!()
+        self.0.key_value().0
     }
     fn value(&self) -> &[u8] {
-        panic!()
+        self.0.key_value().1
     }
 
     fn valid(&self) -> Result<bool> {
-        panic!()
+        Ok(self.0.valid())
     }
 }
