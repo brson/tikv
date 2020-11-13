@@ -34,7 +34,7 @@ impl KvEngine for SimpleEngine {
 
     fn snapshot(&self) -> Self::Snapshot {
         let view = self.db.read_view();
-        SimpleSnapshot::from_inner(view)
+        SimpleSnapshot::from_inner(view, self.tree_names.clone())
     }
     fn sync(&self) -> Result<()> {
         block_on(self.db.sync()).engine_result()

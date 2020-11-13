@@ -12,17 +12,22 @@ use engine_traits::CF_DEFAULT;
 use futures::executor::block_on;
 
 #[derive(Clone, Debug)]
-pub struct SimpleSnapshot(blocksy2::ReadView);
+pub struct SimpleSnapshot {
+    view: blocksy2::ReadView,
+    tree_names: Vec<String>,
+}
 
 impl SimpleSnapshot {
-    pub (crate) fn from_inner(inner: blocksy2::ReadView) -> SimpleSnapshot {
-        SimpleSnapshot(inner)
+    pub (crate) fn from_inner(view: blocksy2::ReadView, tree_names: Vec<String>) -> SimpleSnapshot {
+        SimpleSnapshot {
+            view, tree_names
+        }
     }
 }
 
 impl Snapshot for SimpleSnapshot {
     fn cf_names(&self) -> Vec<&str> {
-        panic!()
+        self.tree_names.iter().map(AsRef::as_ref).collect()
     }
 }
 
@@ -38,7 +43,7 @@ impl Peekable for SimpleSnapshot {
         cf: &str,
         key: &[u8],
     ) -> Result<Option<Self::DBVector>> {
-        let tree = self.0.tree(cf);
+        let tree = self.view.tree(cf);
         let value = tree.read(key);
         let value = block_on(value).engine_result()?;
         Ok(value.map(SimpleDBVector::from_inner))
