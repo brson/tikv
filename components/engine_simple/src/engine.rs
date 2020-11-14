@@ -85,8 +85,31 @@ impl SyncMutable for SimpleEngine {
     fn delete_range(&self, begin_key: &[u8], end_key: &[u8]) -> Result<()> {
         panic!()
     }
+
     fn delete_range_cf(&self, cf: &str, begin_key: &[u8], end_key: &[u8]) -> Result<()> {
-        panic!()
+        if end_key < begin_key {
+            panic!("end key less than begin key in delete_range_cf");
+        }
+
+        let batch = self.db.write_batch();
+        let batch_tree = batch.tree(cf);
+        let view = self.db.read_view();
+        let view_tree = view.tree(cf);
+        let mut cursor = view_tree.cursor();
+
+        block_on(cursor.seek_key(begin_key)).engine_result()?;
+
+        while cursor.valid() {
+            if cursor.key_value().0 < end_key {
+                batch_tree.delete(&cursor.key_value().0);
+            }
+            block_on(cursor.next()).engine_result()?;
+        }
+
+        drop(batch_tree);
+        block_on(batch.commit()).engine_result()?;
+
+        Ok(())
     }
 }
 
