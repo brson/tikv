@@ -5,11 +5,13 @@ use engine_traits::{DeleteStrategy, MiscExt, Range, Result};
 
 impl MiscExt for SimpleEngine {
     fn flush(&self, sync: bool) -> Result<()> {
-        panic!()
+        /* nop */
+        Ok(())
     }
 
     fn flush_cf(&self, cf: &str, sync: bool) -> Result<()> {
-        panic!()
+        /* nop */
+        Ok(())
     }
 
     fn delete_ranges_cf(&self, cf: &str, strategy: DeleteStrategy, ranges: &[Range]) -> Result<()> {
