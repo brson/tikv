@@ -3,6 +3,11 @@
 use crate::engine::SimpleEngine;
 use engine_traits::{Mutable, Result, WriteBatch, WriteBatchExt, WriteOptions};
 
+use std::cell::RefCell;
+use futures::executor::block_on;
+use crate::error::ResultExt;
+use engine_traits::CF_DEFAULT;
+
 impl WriteBatchExt for SimpleEngine {
     type WriteBatch = SimpleWriteBatch;
     type WriteBatchVec = SimpleWriteBatch;
@@ -14,14 +19,15 @@ impl WriteBatchExt for SimpleEngine {
     }
 
     fn write_batch(&self) -> Self::WriteBatch {
-        panic!()
+        let batch = self.db.write_batch();
+        SimpleWriteBatch(RefCell::new(Some(batch)))
     }
     fn write_batch_with_cap(&self, cap: usize) -> Self::WriteBatch {
         panic!()
     }
 }
 
-pub struct SimpleWriteBatch;
+pub struct SimpleWriteBatch(RefCell<Option<blocksy2::WriteBatch>>);
 
 impl WriteBatch<SimpleEngine> for SimpleWriteBatch {
     fn with_capacity(_: &SimpleEngine, _: usize) -> Self {
@@ -29,11 +35,12 @@ impl WriteBatch<SimpleEngine> for SimpleWriteBatch {
     }
 
     fn write_opt(&self, _: &WriteOptions) -> Result<()> {
-        panic!()
+        let batch = self.0.borrow_mut().take().expect("batch");
+        block_on(batch.commit()).engine_result()
     }
 
     fn write(&self) -> Result<()> {
-        panic!()
+        self.write_opt(&WriteOptions::default())
     }
 }
 
@@ -64,17 +71,25 @@ impl Mutable for SimpleWriteBatch {
         panic!()
     }
     fn put(&mut self, key: &[u8], value: &[u8]) -> Result<()> {
-        panic!()
+        self.put_cf(CF_DEFAULT, key, value)
     }
     fn put_cf(&mut self, cf: &str, key: &[u8], value: &[u8]) -> Result<()> {
-        panic!()
+        let batch = self.0.borrow();
+        let batch = batch.as_ref().expect("batch");
+        let tree = batch.tree(cf);
+        tree.write(key, value);
+        Ok(())
     }
 
     fn delete(&mut self, key: &[u8]) -> Result<()> {
-        panic!()
+        self.delete_cf(CF_DEFAULT, key)
     }
     fn delete_cf(&mut self, cf: &str, key: &[u8]) -> Result<()> {
-        panic!()
+        let batch = self.0.borrow();
+        let batch = batch.as_ref().expect("batch");
+        let tree = batch.tree(cf);
+        tree.delete(key);
+        Ok(())
     }
     fn delete_range(&mut self, begin_key: &[u8], end_key: &[u8]) -> Result<()> {
         panic!()
