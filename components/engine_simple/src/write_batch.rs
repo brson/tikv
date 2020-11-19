@@ -3,7 +3,6 @@
 use crate::engine::SimpleEngine;
 use engine_traits::{Mutable, Result, WriteBatch, WriteBatchExt, WriteOptions};
 
-use std::cell::RefCell;
 use futures::executor::block_on;
 use crate::error::ResultExt;
 use engine_traits::CF_DEFAULT;
@@ -19,15 +18,32 @@ impl WriteBatchExt for SimpleEngine {
     }
 
     fn write_batch(&self) -> Self::WriteBatch {
-        let batch = self.db.write_batch();
-        SimpleWriteBatch(RefCell::new(Some(batch)))
+        SimpleWriteBatch {
+            db: self.db.clone(),
+            cmds: vec![],
+        }
     }
     fn write_batch_with_cap(&self, cap: usize) -> Self::WriteBatch {
         panic!()
     }
 }
 
-pub struct SimpleWriteBatch(RefCell<Option<blocksy2::WriteBatch>>);
+pub struct SimpleWriteBatch {
+    db: blocksy2::Db,
+    cmds: Vec<WriteBatchCmd>,
+}
+
+enum WriteBatchCmd {
+    Put {
+        cf: String,
+        key: Vec<u8>,
+        value: Vec<u8>,
+    },
+    Delete {
+        cf: String,
+        key: Vec<u8>,
+    },
+}
 
 impl WriteBatch<SimpleEngine> for SimpleWriteBatch {
     fn with_capacity(_: &SimpleEngine, _: usize) -> Self {
@@ -35,8 +51,21 @@ impl WriteBatch<SimpleEngine> for SimpleWriteBatch {
     }
 
     fn write_opt(&self, _: &WriteOptions) -> Result<()> {
-        let batch = self.0.borrow_mut().take().expect("batch");
-        block_on(batch.commit()).engine_result()
+        let batch = self.db.write_batch();
+        for cmd in &self.cmds {
+            match cmd {
+                WriteBatchCmd::Put { cf, key, value } => {
+                    let tree = batch.tree(cf);
+                    tree.write(key, value);
+                }
+                WriteBatchCmd::Delete { cf, key } => {
+                    let tree = batch.tree(cf);
+                    tree.delete(key);
+                }
+            }
+        }
+        block_on(batch.commit()).engine_result()?;
+        Ok(())
     }
 
     fn write(&self) -> Result<()> {
@@ -74,10 +103,11 @@ impl Mutable for SimpleWriteBatch {
         self.put_cf(CF_DEFAULT, key, value)
     }
     fn put_cf(&mut self, cf: &str, key: &[u8], value: &[u8]) -> Result<()> {
-        let batch = self.0.borrow();
-        let batch = batch.as_ref().expect("batch");
-        let tree = batch.tree(cf);
-        tree.write(key, value);
+        self.cmds.push(WriteBatchCmd::Put {
+            cf: cf.to_owned(),
+            key: key.to_owned(),
+            value: value.to_owned(),
+        });
         Ok(())
     }
 
@@ -85,10 +115,10 @@ impl Mutable for SimpleWriteBatch {
         self.delete_cf(CF_DEFAULT, key)
     }
     fn delete_cf(&mut self, cf: &str, key: &[u8]) -> Result<()> {
-        let batch = self.0.borrow();
-        let batch = batch.as_ref().expect("batch");
-        let tree = batch.tree(cf);
-        tree.delete(key);
+        self.cmds.push(WriteBatchCmd::Delete {
+            cf: cf.to_owned(),
+            key: key.to_owned(),
+        });
         Ok(())
     }
     fn delete_range(&mut self, begin_key: &[u8], end_key: &[u8]) -> Result<()> {
