@@ -101,17 +101,17 @@ impl Mutable for SimpleWriteBatch {
         panic!()
     }
     fn count(&self) -> usize {
-        panic!()
+        self.cmds.len()
     }
     fn is_empty(&self) -> bool {
-        panic!()
+        self.cmds.is_empty()
     }
     fn should_write_to_engine(&self) -> bool {
         panic!()
     }
 
     fn clear(&mut self) {
-        panic!()
+        self.cmds.truncate(0);
     }
     fn set_save_point(&mut self) {
         panic!()
