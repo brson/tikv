@@ -43,6 +43,11 @@ enum WriteBatchCmd {
         cf: String,
         key: Vec<u8>,
     },
+    DeleteRange {
+        cf: String,
+        start: Vec<u8>,
+        end: Vec<u8>,
+    },
 }
 
 impl WriteBatch<SimpleEngine> for SimpleWriteBatch {
@@ -61,6 +66,25 @@ impl WriteBatch<SimpleEngine> for SimpleWriteBatch {
                 WriteBatchCmd::Delete { cf, key } => {
                     let tree = batch.tree(cf);
                     tree.delete(key);
+                }
+                WriteBatchCmd::DeleteRange { cf, start, end } => {
+                    let view = self.db.read_view();
+                    let read_tree = view.tree(cf);
+                    let write_tree = batch.tree(cf);
+                    let mut cursor = read_tree.cursor();
+                    block_on(cursor.seek_key(start)).engine_result()?;
+                    while cursor.valid() {
+                        let key = &cursor.key_value().0;
+                        write_tree.delete(key);
+                        block_on(cursor.next()).engine_result()?;
+                        if cursor.valid() {
+                            if cursor.key_value().0 >= &**end {
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -125,6 +149,11 @@ impl Mutable for SimpleWriteBatch {
         panic!()
     }
     fn delete_range_cf(&mut self, cf: &str, begin_key: &[u8], end_key: &[u8]) -> Result<()> {
-        panic!()
+        self.cmds.push(WriteBatchCmd::DeleteRange {
+            cf: cf.to_owned(),
+            start: begin_key.to_owned(),
+            end: end_key.to_owned(),
+        });
+        Ok(())
     }
 }
