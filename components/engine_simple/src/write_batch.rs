@@ -56,8 +56,8 @@ impl WriteBatch<SimpleEngine> for SimpleWriteBatch {
     }
 
     fn write_opt(&self, _: &WriteOptions) -> Result<()> {
-        let batch = self.db.write_batch();
         for cmd in &self.cmds {
+            let batch = self.db.write_batch();
             match cmd {
                 WriteBatchCmd::Put { cf, key, value } => {
                     let tree = batch.tree(cf);
@@ -86,8 +86,8 @@ impl WriteBatch<SimpleEngine> for SimpleWriteBatch {
                     }
                 }
             }
+            block_on(batch.commit()).engine_result()?;
         }
-        block_on(batch.commit()).engine_result()?;
         Ok(())
     }
 
