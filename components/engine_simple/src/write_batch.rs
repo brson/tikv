@@ -11,7 +11,7 @@ impl WriteBatchExt for SimpleEngine {
     type WriteBatch = SimpleWriteBatch;
     type WriteBatchVec = SimpleWriteBatch;
 
-    const WRITE_BATCH_MAX_KEYS: usize = 1;
+    const WRITE_BATCH_MAX_KEYS: usize = 256;
 
     fn support_write_batch_vec(&self) -> bool {
         panic!()
@@ -24,7 +24,10 @@ impl WriteBatchExt for SimpleEngine {
         }
     }
     fn write_batch_with_cap(&self, cap: usize) -> Self::WriteBatch {
-        panic!()
+        SimpleWriteBatch {
+            db: self.db.clone(),
+            cmds: vec![],
+        }
     }
 }
 
@@ -51,8 +54,8 @@ enum WriteBatchCmd {
 }
 
 impl WriteBatch<SimpleEngine> for SimpleWriteBatch {
-    fn with_capacity(_: &SimpleEngine, _: usize) -> Self {
-        panic!()
+    fn with_capacity(e: &SimpleEngine, cap: usize) -> Self {
+        e.write_batch_with_cap(cap)
     }
 
     fn write_opt(&self, _: &WriteOptions) -> Result<()> {
@@ -107,7 +110,7 @@ impl Mutable for SimpleWriteBatch {
         self.cmds.is_empty()
     }
     fn should_write_to_engine(&self) -> bool {
-        panic!()
+        self.count() > SimpleEngine::WRITE_BATCH_MAX_KEYS
     }
 
     fn clear(&mut self) {
