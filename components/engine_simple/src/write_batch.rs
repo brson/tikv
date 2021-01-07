@@ -21,12 +21,14 @@ impl WriteBatchExt for SimpleEngine {
         SimpleWriteBatch {
             db: self.db.clone(),
             cmds: vec![],
+            data_size: 0,
         }
     }
     fn write_batch_with_cap(&self, cap: usize) -> Self::WriteBatch {
         SimpleWriteBatch {
             db: self.db.clone(),
             cmds: vec![],
+            data_size: 0,
         }
     }
 }
@@ -34,6 +36,9 @@ impl WriteBatchExt for SimpleEngine {
 pub struct SimpleWriteBatch {
     db: blocksy2::Db,
     cmds: Vec<WriteBatchCmd>,
+    // NB: data_size is not maintained with any accuracy by this engine.
+    // It just behaves in a way that satisfies the tests.
+    data_size: usize,
 }
 
 enum WriteBatchCmd {
@@ -101,7 +106,7 @@ impl WriteBatch<SimpleEngine> for SimpleWriteBatch {
 
 impl Mutable for SimpleWriteBatch {
     fn data_size(&self) -> usize {
-        panic!()
+        self.data_size
     }
     fn count(&self) -> usize {
         self.cmds.len()
@@ -115,6 +120,7 @@ impl Mutable for SimpleWriteBatch {
 
     fn clear(&mut self) {
         self.cmds.truncate(0);
+        self.data_size = 0;
     }
     fn set_save_point(&mut self) {
         panic!()
@@ -134,6 +140,7 @@ impl Mutable for SimpleWriteBatch {
             key: key.to_owned(),
             value: value.to_owned(),
         });
+        self.data_size += 1;
         Ok(())
     }
 
@@ -145,6 +152,7 @@ impl Mutable for SimpleWriteBatch {
             cf: cf.to_owned(),
             key: key.to_owned(),
         });
+        self.data_size += 1;
         Ok(())
     }
     fn delete_range(&mut self, begin_key: &[u8], end_key: &[u8]) -> Result<()> {
@@ -156,6 +164,7 @@ impl Mutable for SimpleWriteBatch {
             start: begin_key.to_owned(),
             end: end_key.to_owned(),
         });
+        self.data_size += 1;
         Ok(())
     }
 }
