@@ -16,15 +16,17 @@ use engine_traits::CF_DEFAULT;
 pub struct SimpleEngine {
     pub (crate) db: blocksy2::Db,
     pub (crate) tree_names: Vec<String>,
+    pub (crate) data_dir: String,
 }
 
 impl SimpleEngine {
     pub fn open(config: blocksy2::DbConfig) -> Result<SimpleEngine> {
         let tree_names = config.trees.clone();
+        let data_dir = config.data_dir.to_str().expect("utf8-paths").to_owned();
         block_on(blocksy2::Db::open(config))
             .engine_result()
             .map(|db| SimpleEngine {
-                db, tree_names
+                db, tree_names, data_dir,
             })
     }
 }

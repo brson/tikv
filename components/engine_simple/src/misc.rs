@@ -35,7 +35,7 @@ impl MiscExt for SimpleEngine {
     }
 
     fn path(&self) -> &str {
-        panic!()
+        &*self.data_dir
     }
 
     fn sync_wal(&self) -> Result<()> {
