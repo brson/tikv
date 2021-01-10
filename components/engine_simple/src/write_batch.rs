@@ -2,6 +2,7 @@
 
 use crate::engine::SimpleEngine;
 use engine_traits::{Mutable, Result, WriteBatch, WriteBatchExt, WriteOptions};
+use engine_traits::Error as EngineTraitsError;
 
 use futures::executor::block_on;
 use crate::error::ResultExt;
@@ -22,6 +23,7 @@ impl WriteBatchExt for SimpleEngine {
             db: self.db.clone(),
             cmds: vec![],
             data_size: 0,
+            save_points: vec![],
         }
     }
     fn write_batch_with_cap(&self, cap: usize) -> Self::WriteBatch {
@@ -29,6 +31,7 @@ impl WriteBatchExt for SimpleEngine {
             db: self.db.clone(),
             cmds: vec![],
             data_size: 0,
+            save_points: vec![],
         }
     }
 }
@@ -39,6 +42,7 @@ pub struct SimpleWriteBatch {
     // NB: data_size is not maintained with any accuracy by this engine.
     // It just behaves in a way that satisfies the tests.
     data_size: usize,
+    save_points: Vec<usize>,
 }
 
 enum WriteBatchCmd {
@@ -123,13 +127,25 @@ impl Mutable for SimpleWriteBatch {
         self.data_size = 0;
     }
     fn set_save_point(&mut self) {
-        panic!()
+        self.save_points.push(self.cmds.len());
     }
     fn pop_save_point(&mut self) -> Result<()> {
-        panic!()
+        if let None = self.save_points.pop() {
+            Err(EngineTraitsError::Engine("no save point".to_string()))
+        } else {
+            Ok(())
+        }
     }
     fn rollback_to_save_point(&mut self) -> Result<()> {
-        panic!()
+        if let Some(len) = self.save_points.pop() {
+            assert!(self.cmds.len() >= len);
+            while self.cmds.len() > len {
+                self.cmds.pop();
+            }
+            Ok(())
+        } else {
+            Err(EngineTraitsError::Engine("no save point".to_string()))
+        }
     }
     fn put(&mut self, key: &[u8], value: &[u8]) -> Result<()> {
         self.put_cf(CF_DEFAULT, key, value)
