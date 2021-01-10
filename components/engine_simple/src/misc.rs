@@ -15,7 +15,7 @@ impl MiscExt for SimpleEngine {
     }
 
     fn delete_ranges_cf(&self, cf: &str, strategy: DeleteStrategy, ranges: &[Range]) -> Result<()> {
-        panic!()
+        Ok(())
     }
 
     fn get_approximate_memtable_stats_cf(&self, cf: &str, range: &Range) -> Result<(u64, u64)> {
@@ -23,7 +23,7 @@ impl MiscExt for SimpleEngine {
     }
 
     fn ingest_maybe_slowdown_writes(&self, cf: &str) -> Result<bool> {
-        panic!()
+        Ok(false)
     }
 
     fn get_engine_used_size(&self) -> Result<u64> {
@@ -51,11 +51,11 @@ impl MiscExt for SimpleEngine {
     }
 
     fn get_latest_sequence_number(&self) -> u64 {
-        panic!()
+        0
     }
 
     fn get_oldest_snapshot_sequence_number(&self) -> Option<u64> {
-        panic!()
+        None
     }
 
     fn get_total_sst_files_size_cf(&self, cf: &str) -> Result<Option<u64>> {
