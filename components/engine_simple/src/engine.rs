@@ -8,18 +8,24 @@ use engine_traits::{
     WriteOptions,
 };
 
-use blocksy2::{Db, DbConfig};
 use crate::error::ResultExt;
 use futures::executor::block_on;
+use engine_traits::CF_DEFAULT;
 
 #[derive(Clone, Debug)]
-pub struct SimpleEngine(Db);
+pub struct SimpleEngine {
+    pub (crate) db: blocksy2::Db,
+    pub (crate) tree_names: Vec<String>,
+}
 
 impl SimpleEngine {
-    pub fn open(config: DbConfig) -> Result<SimpleEngine> {
-        block_on(Db::open(config))
+    pub fn open(config: blocksy2::DbConfig) -> Result<SimpleEngine> {
+        let tree_names = config.trees.clone();
+        block_on(blocksy2::Db::open(config))
             .engine_result()
-            .map(SimpleEngine)
+            .map(|db| SimpleEngine {
+                db, tree_names
+            })
     }
 }
 
@@ -30,7 +36,7 @@ impl KvEngine for SimpleEngine {
         panic!()
     }
     fn sync(&self) -> Result<()> {
-        panic!()
+        block_on(self.db.sync()).engine_result()
     }
     fn bad_downcast<T: 'static>(&self) -> &T {
         panic!()
@@ -41,7 +47,7 @@ impl Peekable for SimpleEngine {
     type DBVector = SimpleDBVector;
 
     fn get_value_opt(&self, opts: &ReadOptions, key: &[u8]) -> Result<Option<Self::DBVector>> {
-        panic!()
+        self.get_value_cf_opt(opts, CF_DEFAULT, key)
     }
     fn get_value_cf_opt(
         &self,
@@ -49,23 +55,31 @@ impl Peekable for SimpleEngine {
         cf: &str,
         key: &[u8],
     ) -> Result<Option<Self::DBVector>> {
-        panic!()
+        let view = self.db.read_view();
+        let tree = view.tree(cf);
+        let value = tree.read(key);
+        let value = block_on(value).engine_result()?;
+        Ok(value.map(SimpleDBVector::from_inner))
     }
 }
 
 impl SyncMutable for SimpleEngine {
     fn put(&self, key: &[u8], value: &[u8]) -> Result<()> {
-        panic!()
+        self.put_cf(CF_DEFAULT, key, value)
     }
     fn put_cf(&self, cf: &str, key: &[u8], value: &[u8]) -> Result<()> {
-        panic!()
+        let batch = self.db.write_batch();
+        batch.tree(cf).write(key, value);
+        block_on(batch.commit()).engine_result()
     }
 
     fn delete(&self, key: &[u8]) -> Result<()> {
-        panic!()
+        self.delete_cf(CF_DEFAULT, key)
     }
     fn delete_cf(&self, cf: &str, key: &[u8]) -> Result<()> {
-        panic!()
+        let  batch = self.db.write_batch();
+        batch.tree(cf).delete(key);
+        block_on(batch.commit()).engine_result()
     }
     fn delete_range(&self, begin_key: &[u8], end_key: &[u8]) -> Result<()> {
         panic!()
@@ -79,38 +93,56 @@ impl Iterable for SimpleEngine {
     type Iterator = SimpleEngineIterator;
 
     fn iterator_opt(&self, opts: IterOptions) -> Result<Self::Iterator> {
-        panic!()
+        self.iterator_cf_opt(CF_DEFAULT, opts)
     }
     fn iterator_cf_opt(&self, cf: &str, opts: IterOptions) -> Result<Self::Iterator> {
-        panic!()
+        let view = self.db.read_view();
+        let tree = view.tree(cf);
+        let cursor = tree.cursor();
+        Ok(SimpleEngineIterator(cursor))
     }
 }
 
-pub struct SimpleEngineIterator;
+pub struct SimpleEngineIterator(blocksy2::Cursor);
 
 impl Iterator for SimpleEngineIterator {
     fn seek(&mut self, key: SeekKey) -> Result<bool> {
-        panic!()
+        match key {
+            SeekKey::Start => {
+                block_on(self.0.seek_first()).engine_result()?;
+                Ok(self.0.valid())
+            }
+            SeekKey::End => {
+                block_on(self.0.seek_last()).engine_result()?;
+                Ok(self.0.valid())
+            }
+            SeekKey::Key(k) => {
+                block_on(self.0.seek_key(k)).engine_result()?;
+                Ok(self.0.valid())
+            }
+        }
     }
     fn seek_for_prev(&mut self, key: SeekKey) -> Result<bool> {
         panic!()
     }
 
     fn prev(&mut self) -> Result<bool> {
-        panic!()
+        block_on(self.0.prev()).engine_result()?;
+        Ok(self.0.valid())
     }
     fn next(&mut self) -> Result<bool> {
-        panic!()
+        block_on(self.0.next()).engine_result()?;
+        Ok(self.0.valid())
     }
 
     fn key(&self) -> &[u8] {
-        panic!()
+        self.0.key_value().0
     }
     fn value(&self) -> &[u8] {
-        panic!()
+        self.0.key_value().1
     }
 
     fn valid(&self) -> Result<bool> {
-        panic!()
+        Ok(self.0.valid())
     }
 }

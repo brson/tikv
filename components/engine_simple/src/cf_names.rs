@@ -5,6 +5,6 @@ use engine_traits::CFNamesExt;
 
 impl CFNamesExt for SimpleEngine {
     fn cf_names(&self) -> Vec<&str> {
-        panic!()
+        self.tree_names.iter().map(AsRef::as_ref).collect()
     }
 }
