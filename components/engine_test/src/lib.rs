@@ -328,6 +328,7 @@ pub mod ctor {
         use engine_simple::SimpleEngine;
         use engine_simple::raw::DbConfig;
         use std::path::PathBuf;
+        use engine_traits::CF_DEFAULT;
 
         impl EngineConstructorExt for SimpleEngine {
             fn new_engine(
@@ -353,13 +354,18 @@ pub mod ctor {
                        cfs: &[&str],
                        cfs_opts: Option<Vec<CFOptions>>) -> Result<SimpleEngine> {
             let data_dir = PathBuf::from(path);
-            let trees: Vec<String> = if let Some(cfs_opts) = cfs_opts {
+            let mut trees: Vec<String> = if let Some(cfs_opts) = cfs_opts {
                 cfs_opts.iter().map(|cf| {
                     cf.cf.to_string()
                 }).collect()
             } else {
                 cfs.iter().map(ToString::to_string).collect()
             };
+
+            let cf_default = CF_DEFAULT.to_string();
+            if !trees.contains(&cf_default) {
+                trees.push(cf_default);
+            }
 
             let config = DbConfig {
                 data_dir,
