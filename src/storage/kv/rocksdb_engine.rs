@@ -9,7 +9,7 @@ use std::time::Duration;
 use engine_rocks::raw::ColumnFamilyOptions;
 use engine_rocks::raw_util::CFOptions;
 use engine_rocks::{RocksEngine as BaseRocksEngine, RocksEngineIterator};
-use engine_traits::{CfName, CF_DEFAULT, CF_LOCK, CF_RAFT, CF_WRITE};
+use engine_traits::{CfName, CF_DEFAULT, CF_LOCK, CF_RAFT, CF_WRITE, ALL_CFS};
 use engine_traits::{
     Engines, IterOptions, Iterable, Iterator, KvEngine, Mutable, Peekable, ReadOptions, SeekKey,
     WriteBatch, WriteBatchExt,
@@ -203,7 +203,7 @@ impl TestEngineBuilder {
             None => TEMP_DIR.to_owned(),
             Some(p) => p.to_str().unwrap().to_owned(),
         };
-        let cfs = self.cfs.unwrap_or_else(|| crate::storage::ALL_CFS.to_vec());
+        let cfs = self.cfs.unwrap_or_else(|| ALL_CFS.to_vec());
         let cache = BlockCacheConfig::default().build_shared_cache();
         let cfs_opts = cfs
             .iter()
