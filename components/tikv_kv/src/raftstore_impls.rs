@@ -4,7 +4,7 @@ use std::sync::atomic::Ordering;
 use engine_traits::CfName;
 use txn_types::{Key, Value};
 use engine_traits::{Snapshot, IterOptions, ReadOptions, Peekable};
-use crate::storage::kv::{Error, ErrorInner, Result, Snapshot as EngineSnapshot, Iterator as EngineIterator, ScanMode, Cursor, Error as KvError};
+use crate::{Error, ErrorInner, Result, Snapshot as EngineSnapshot, Iterator as EngineIterator, ScanMode, Cursor, Error as KvError};
 use raftstore::store::{RegionIterator, RegionSnapshot};
 use raftstore::Error as RaftServerError;
 

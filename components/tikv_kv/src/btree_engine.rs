@@ -12,7 +12,7 @@ use engine_traits::{CfName, IterOptions, ReadOptions, CF_DEFAULT, CF_LOCK, CF_WR
 use kvproto::kvrpcpb::Context;
 use txn_types::{Key, Value};
 
-use crate::storage::kv::{
+use crate::{
     Callback as EngineCallback, CbContext, Cursor, Engine, Error as EngineError,
     ErrorInner as EngineErrorInner, Iterator, Modify, Result as EngineResult, ScanMode, Snapshot,
     WriteData,
