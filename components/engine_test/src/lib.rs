@@ -70,6 +70,12 @@ pub mod raft {
         RocksWriteBatch as RaftTestWriteBatch,
     };
 
+    #[cfg(feature = "test-engine-raft-agatedb")]
+    pub use engine_agate::{
+        AgateEngine as RaftTestEngine, AgateSnapshot as RaftTestSnapshot,
+        AgateWriteBatch as RaftTestWriteBatch,
+    };
+
     pub fn new_engine(
         path: &str,
         db_opt: Option<DBOptions>,
@@ -106,6 +112,12 @@ pub mod kv {
     pub use engine_rocks::{
         RocksEngine as KvTestEngine, RocksSnapshot as KvTestSnapshot,
         RocksWriteBatch as KvTestWriteBatch,
+    };
+
+    #[cfg(feature = "test-engine-kv-agatedb")]
+    pub use engine_agate::{
+        AgateEngine as KvTestEngine, AgateSnapshot as KvTestSnapshot,
+        AgateWriteBatch as KvTestWriteBatch,
     };
 
     pub fn new_engine(
@@ -426,6 +438,31 @@ pub mod ctor {
             }
             let rocks_db_opts = RocksDBOptions::from_raw(rocks_db_opts);
             Ok(rocks_db_opts)
+        }
+    }
+
+    mod agate {
+        use super::{CFOptions, DBOptions, EngineConstructorExt};
+        use engine_agate::AgateEngine;
+        use engine_traits::Result;
+
+        impl EngineConstructorExt for engine_agate::AgateEngine {
+            fn new_engine(
+                _path: &str,
+                _db_opt: Option<DBOptions>,
+                _cfs: &[&str],
+                _opts: Option<Vec<CFOptions>>,
+            ) -> Result<Self> {
+                Ok(AgateEngine)
+            }
+
+            fn new_engine_opt(
+                _path: &str,
+                _db_opt: DBOptions,
+                _cfs_opts: Vec<CFOptions>,
+            ) -> Result<Self> {
+                Ok(AgateEngine)
+            }
         }
     }
 }

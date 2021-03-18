@@ -31,6 +31,7 @@ protobuf-codec = [
   "codec/protobuf-codec",
   "concurrency_manager/protobuf-codec",
   "encryption_export/protobuf-codec",
+  "engine_agate/protobuf-codec",
   "engine_panic/protobuf-codec",
   "engine_rocks/protobuf-codec",
   "engine_test/protobuf-codec",
@@ -62,6 +63,7 @@ prost-codec = [
   "codec/prost-codec",
   "concurrency_manager/prost-codec",
   "encryption_export/prost-codec",
+  "engine_agate/prost-codec",
   "engine_panic/prost-codec",
   "engine_rocks/prost-codec",
   "engine_test/prost-codec",
@@ -121,6 +123,7 @@ crc32fast = "1.2"
 crc64fast = "0.1"
 crossbeam = "0.7.2"
 encryption_export = { path = "components/encryption/export", default-features = false }
+engine_agate = { path = "components/engine_agate", default-features = false }
 engine_panic = { path = "components/engine_panic", default-features = false }
 engine_rocks = { path = "components/engine_rocks", default-features = false }
 engine_test = { path = "components/engine_test", default-features = false }

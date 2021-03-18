@@ -43,6 +43,9 @@ prost-codec = [
   "txn_types/prost-codec",
 ]
 testexport = []
+test-engines-agatedb = [
+  "engine_test/test-engines-agatedb",
+]
 test-engines-rocksdb = [
   "engine_test/test-engines-rocksdb",
 ]

@@ -20,6 +20,9 @@ prost-codec = [
   "engine_traits/prost-codec",
 ]
 
+test-engines-agatedb = [
+  "engine_test/test-engines-agatedb",
+]
 test-engines-rocksdb = [
   "engine_test/test-engines-rocksdb",
 ]
