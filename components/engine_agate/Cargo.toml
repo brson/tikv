@@ -23,6 +23,8 @@ prost-codec = [
 ]
 
 [dependencies]
+agatedb = { path = "../../../agatedb" }
+
 engine_traits = { path = "../engine_traits", default-features = false }
 tikv_alloc = { path = "../tikv_alloc" }
 # FIXME: Remove this dep from the engine_traits interface
