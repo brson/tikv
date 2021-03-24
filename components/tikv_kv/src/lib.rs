@@ -26,6 +26,7 @@ mod perf_context;
 mod raftstore_impls;
 mod rocksdb_engine;
 mod stats;
+mod stats_collector;
 
 use std::cell::UnsafeCell;
 use std::fmt;
@@ -46,8 +47,9 @@ pub use self::mock_engine::{ExpectedWrite, MockEngineBuilder};
 pub use self::perf_context::{PerfStatisticsDelta, PerfStatisticsInstant};
 pub use self::rocksdb_engine::{write_modifies, RocksEngine, RocksSnapshot};
 pub use self::stats::{
-    CfStatistics, FlowStatistics, FlowStatsReporter, Statistics, StatisticsSummary, TTL_TOMBSTONE,
+    CfStatistics, FlowStatistics, FlowStatsReporter, Statistics, StatisticsSummary,
 };
+pub use self::stats_collector::TTL_TOMBSTONE;
 use error_code::{self, ErrorCode, ErrorCodeExt};
 use into_other::IntoOther;
 use tikv_util::time::ThreadReadId;
