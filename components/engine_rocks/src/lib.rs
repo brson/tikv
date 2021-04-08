@@ -44,6 +44,7 @@ pub mod range_properties;
 mod snapshot;
 pub use crate::range_properties::*;
 pub use crate::snapshot::*;
+mod snapshot_iter_stats_counter;
 mod sst;
 pub use crate::sst::*;
 mod sst_partitioner;

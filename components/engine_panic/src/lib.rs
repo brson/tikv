@@ -29,6 +29,7 @@ mod misc;
 pub use crate::misc::*;
 mod snapshot;
 pub use crate::snapshot::*;
+mod snapshot_iter_stats_counter;
 mod sst;
 pub use crate::sst::*;
 mod table_properties;

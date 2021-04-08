@@ -306,6 +306,8 @@ mod ttl_properties;
 pub use crate::ttl_properties::*;
 mod perf_context;
 pub use crate::perf_context::*;
+mod iter_stats_counter;
+pub use crate::iter_stats_counter::*;
 
 // These modules contain more general traits, some of which may be implemented
 // by multiple types.
