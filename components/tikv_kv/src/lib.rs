@@ -36,6 +36,7 @@ use std::{error, ptr, result};
 use engine_traits::util::append_expire_ts;
 use engine_traits::{CfName, CF_DEFAULT};
 use engine_traits::{IterOptions, KvEngine as LocalEngine, MvccProperties, ReadOptions};
+use engine_traits::IterStatsCounter;
 use futures::prelude::*;
 use kvproto::errorpb::Error as ErrorHeader;
 use kvproto::kvrpcpb::{Context, ExtraOp as TxnExtraOp, KeyRange};
@@ -272,6 +273,12 @@ pub trait Snapshot: Sync + Send + Clone {
 }
 
 pub trait Iterator: Send {
+    /// Provides info to `StatsCollector`.
+    ///
+    /// For non-production engines this can be defined as `PanicSnapshotIterStatsCounter`:
+    /// The `stats_counter` method will return `None` by default and the type will be unused.
+    type IterStatsCounter: IterStatsCounter;
+
     fn next(&mut self) -> Result<bool>;
     fn prev(&mut self) -> Result<bool>;
     fn seek(&mut self, key: &Key) -> Result<bool>;
@@ -288,6 +295,10 @@ pub trait Iterator: Send {
     fn key(&self) -> &[u8];
     /// Only be called when `self.valid() == Ok(true)`.
     fn value(&self) -> &[u8];
+
+    fn stats_counter(&self) -> Option<Self::IterStatsCounter> {
+        None
+    }
 }
 
 #[derive(Debug, PartialEq, Clone, Copy)]

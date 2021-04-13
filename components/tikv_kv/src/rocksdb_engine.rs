@@ -9,11 +9,13 @@ use engine_rocks::file_system::get_env as get_inspected_env;
 use engine_rocks::raw::DBOptions;
 use engine_rocks::raw_util::CFOptions;
 use engine_rocks::{RocksEngine as BaseRocksEngine, RocksEngineIterator};
+use engine_rocks::RocksSnapshotIterStatsCounter;
 use engine_traits::{CfName, CF_DEFAULT};
 use engine_traits::{
     Engines, IterOptions, Iterable, Iterator, KvEngine, Mutable, Peekable, ReadOptions, SeekKey,
     WriteBatch, WriteBatchExt,
 };
+use engine_traits::IterStatsCountable;
 use kvproto::kvrpcpb::Context;
 use tempfile::{Builder, TempDir};
 use txn_types::{Key, Value};
@@ -310,6 +312,8 @@ impl Snapshot for Arc<RocksSnapshot> {
 }
 
 impl EngineIterator for RocksEngineIterator {
+    type IterStatsCounter = RocksSnapshotIterStatsCounter;
+
     fn next(&mut self) -> Result<bool> {
         Iterator::next(self).map_err(Error::from)
     }
@@ -344,5 +348,9 @@ impl EngineIterator for RocksEngineIterator {
 
     fn value(&self) -> &[u8] {
         Iterator::value(self)
+    }
+
+    fn stats_counter(&self) -> Option<RocksSnapshotIterStatsCounter> {
+        Some(IterStatsCountable::stats_counter(self))
     }
 }

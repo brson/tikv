@@ -8,6 +8,7 @@ use std::ops::RangeBounds;
 use std::sync::{Arc, RwLock};
 
 use engine_panic::PanicEngine;
+use engine_panic::PanicSnapshotIterStatsCounter;
 use engine_traits::{CfName, IterOptions, ReadOptions, CF_DEFAULT, CF_LOCK, CF_WRITE};
 use kvproto::kvrpcpb::Context;
 use txn_types::{Key, Value};
@@ -178,6 +179,8 @@ impl BTreeEngineIterator {
 }
 
 impl Iterator for BTreeEngineIterator {
+    type IterStatsCounter = PanicSnapshotIterStatsCounter;
+
     fn next(&mut self) -> EngineResult<bool> {
         let range = (Excluded(self.cur_key.clone().unwrap()), Unbounded);
         Ok(self.seek_to_range_endpoint(range, true))

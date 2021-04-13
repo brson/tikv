@@ -6,6 +6,7 @@ use crate::{
 };
 use engine_traits::CfName;
 use engine_traits::{IterOptions, Peekable, ReadOptions, Snapshot};
+use engine_traits::IterStatsCountable;
 use raftstore::store::{RegionIterator, RegionSnapshot};
 use raftstore::Error as RaftServerError;
 use std::sync::atomic::Ordering;
@@ -82,6 +83,8 @@ impl<S: Snapshot> EngineSnapshot for RegionSnapshot<S> {
 }
 
 impl<S: Snapshot> EngineIterator for RegionIterator<S> {
+    type IterStatsCounter = <S::Iterator as IterStatsCountable>::IterStatsCounter;
+
     fn next(&mut self) -> kv::Result<bool> {
         RegionIterator::next(self).map_err(KvError::from)
     }
@@ -126,5 +129,9 @@ impl<S: Snapshot> EngineIterator for RegionIterator<S> {
 
     fn value(&self) -> &[u8] {
         RegionIterator::value(self)
+    }
+
+    fn stats_counter(&self) -> Option<Self::IterStatsCounter> {
+        Some(RegionIterator::stats_counter(self))
     }
 }

@@ -25,7 +25,10 @@ use tikv_util::{panic_when_unexpected_key_or_data, set_panic_mark};
 ///
 /// Only data within a region can be accessed.
 #[derive(Debug)]
-pub struct RegionSnapshot<S: Snapshot> {
+pub struct RegionSnapshot<S>
+where S: Snapshot,
+      S::Iterator: IterStatsCountable,
+{
     snap: Arc<S>,
     region: Arc<Region>,
     apply_index: Arc<AtomicU64>,
@@ -34,8 +37,8 @@ pub struct RegionSnapshot<S: Snapshot> {
 }
 
 impl<S> RegionSnapshot<S>
-where
-    S: Snapshot,
+where S: Snapshot,
+      S::Iterator: IterStatsCountable,
 {
     #[allow(clippy::new_ret_no_self)] // temporary until this returns RegionSnapshot<E>
     pub fn new<EK>(ps: &PeerStorage<EK, impl RaftEngine>) -> RegionSnapshot<EK::Snapshot>
@@ -163,8 +166,8 @@ where
 }
 
 impl<S> Clone for RegionSnapshot<S>
-where
-    S: Snapshot,
+where S: Snapshot,
+      S::Iterator: IterStatsCountable,
 {
     fn clone(&self) -> Self {
         RegionSnapshot {
@@ -177,8 +180,8 @@ where
 }
 
 impl<S> Peekable for RegionSnapshot<S>
-where
-    S: Snapshot,
+where S: Snapshot,
+      S::Iterator: IterStatsCountable,
 {
     type DBVector = <S as Peekable>::DBVector;
 
@@ -251,7 +254,10 @@ where
 /// `RegionIterator` wrap a rocksdb iterator and only allow it to
 /// iterate in the region. It behaves as if underlying
 /// db only contains one region.
-pub struct RegionIterator<S: Snapshot> {
+pub struct RegionIterator<S>
+where S: Snapshot,
+      S::Iterator: IterStatsCountable,
+{
     iter: <S as Iterable>::Iterator,
     region: Arc<Region>,
 }
@@ -280,10 +286,21 @@ fn update_upper_bound(iter_opt: &mut IterOptions, region: &Region) {
     }
 }
 
+use engine_traits::IterStatsCountable;
+
+impl<S> RegionIterator<S>
+where S: Snapshot,
+      S::Iterator: IterStatsCountable,
+{
+    pub fn stats_counter(&self) -> <S::Iterator as IterStatsCountable>::IterStatsCounter {
+        self.iter.stats_counter()
+    }
+}
+
 // we use engine::rocks's style iterator, doesn't need to impl std iterator.
 impl<S> RegionIterator<S>
-where
-    S: Snapshot,
+where S: Snapshot,
+      S::Iterator: IterStatsCountable,
 {
     pub fn new(snap: &S, region: Arc<Region>, mut iter_opt: IterOptions) -> RegionIterator<S> {
         update_lower_bound(&mut iter_opt, &region);
