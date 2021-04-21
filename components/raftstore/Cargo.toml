@@ -52,6 +52,9 @@ test-engines-rocksdb = [
 test-engines-panic = [
   "engine_test/test-engines-panic",
 ]
+test-engines-simple = [
+  "engine_test/test-engines-simple",
+]
 
 cloud-aws = [ "sst_importer/cloud-aws" ]
 cloud-gcp = [ "sst_importer/cloud-gcp" ]

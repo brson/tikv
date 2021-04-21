@@ -70,6 +70,12 @@ pub mod raft {
         RocksWriteBatch as RaftTestWriteBatch,
     };
 
+    #[cfg(feature = "test-engine-raft-simple")]
+    pub use engine_simple::{
+        SimpleEngine as RaftTestEngine, SimpleSnapshot as RaftTestSnapshot,
+        SimpleWriteBatch as RaftTestWriteBatch,
+    };
+
     pub fn new_engine(
         path: &str,
         db_opt: Option<DBOptions>,
@@ -106,6 +112,12 @@ pub mod kv {
     pub use engine_rocks::{
         RocksEngine as KvTestEngine, RocksSnapshot as KvTestSnapshot,
         RocksWriteBatch as KvTestWriteBatch,
+    };
+
+    #[cfg(feature = "test-engine-kv-simple")]
+    pub use engine_simple::{
+        SimpleEngine as KvTestEngine, SimpleSnapshot as KvTestSnapshot,
+        SimpleWriteBatch as KvTestWriteBatch,
     };
 
     pub fn new_engine(
@@ -313,6 +325,60 @@ pub mod ctor {
             ) -> Result<Self> {
                 Ok(PanicEngine)
             }
+        }
+    }
+
+    mod simple {
+        use super::{CFOptions, DBOptions, EngineConstructorExt};
+        use engine_traits::Result;
+        use engine_simple::SimpleEngine;
+        use engine_simple::raw::DbConfig;
+        use std::path::PathBuf;
+        use engine_traits::CF_DEFAULT;
+
+        impl EngineConstructorExt for SimpleEngine {
+            fn new_engine(
+                path: &str,
+                db_opt: Option<DBOptions>,
+                cfs: &[&str],
+                opts: Option<Vec<CFOptions>>,
+            ) -> Result<Self> {
+                make_engine(path, db_opt, cfs, opts)
+            }
+
+            fn new_engine_opt(
+                path: &str,
+                db_opt: DBOptions,
+                cfs_opts: Vec<CFOptions>,
+            ) -> Result<Self> {
+                make_engine(path, Some(db_opt), &[], Some(cfs_opts))
+            }
+        }
+
+        fn make_engine(path: &str,
+                       _db_opt: Option<DBOptions>,
+                       cfs: &[&str],
+                       cfs_opts: Option<Vec<CFOptions>>) -> Result<SimpleEngine> {
+            let dir = PathBuf::from(path);
+            let mut trees: Vec<String> = if let Some(cfs_opts) = cfs_opts {
+                cfs_opts.iter().map(|cf| {
+                    cf.cf.to_string()
+                }).collect()
+            } else {
+                cfs.iter().map(ToString::to_string).collect()
+            };
+
+            let cf_default = CF_DEFAULT.to_string();
+            if !trees.contains(&cf_default) {
+                trees.push(cf_default);
+            }
+
+            let config = DbConfig {
+                dir: Some(dir),
+                trees,
+            };
+
+            SimpleEngine::open(config)
         }
     }
 
