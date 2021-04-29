@@ -471,7 +471,7 @@ mod tests {
     #[test]
     fn test_mvcc_info_collector() {
         use crate::storage::mvcc::Write;
-        use engine_test::ctor::{ColumnFamilyOptions, DBOptions, CFOptions};
+        use engine_test::ctor::{CFOptions, ColumnFamilyOptions, DBOptions};
         use engine_traits::SyncMutable;
         use txn_types::TimeStamp;
 
@@ -489,7 +489,8 @@ mod tests {
                 CFOptions::new(CF_LOCK, ColumnFamilyOptions::new()),
                 CFOptions::new(CF_RAFT, ColumnFamilyOptions::new()),
             ],
-        ).unwrap();
+        )
+        .unwrap();
 
         let cf_default_data = vec![
             (b"k1", b"v", 5.into()),
