@@ -188,7 +188,8 @@ struct Servers<ER: RaftEngine> {
     cdc_scheduler: tikv_util::worker::Scheduler<cdc::Task>,
 }
 
-type ServerType<ER> = Server<RaftRouter<RocksEngine, ER>, resolve::PdStoreAddrResolver, RaftKvType<ER>>;
+type ServerType<ER> =
+    Server<RaftRouter<RocksEngine, ER>, resolve::PdStoreAddrResolver, RaftKvType<ER>>;
 type RaftKvType<ER> = RaftKv<RocksEngine, ServerRaftStoreRouter<RocksEngine, ER>>;
 
 impl<ER: RaftEngine> TiKVServer<ER> {
