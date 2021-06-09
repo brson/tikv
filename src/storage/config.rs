@@ -6,8 +6,7 @@ use crate::server::ttl::TTLCheckerTask;
 use crate::server::CONFIG_ROCKSDB_GAUGE;
 use configuration::{ConfigChange, ConfigManager, ConfigValue, Configuration, Result as CfgResult};
 use engine_rocks::raw::{Cache, LRUCacheOptions, MemoryAllocator};
-use engine_rocks::RocksEngine;
-use engine_traits::{CFOptionsExt, ColumnFamilyOptions, CF_DEFAULT};
+use engine_traits::{ColumnFamilyOptions, CF_DEFAULT, KvEngine};
 use file_system::{get_io_rate_limiter, IOPriority, IORateLimitMode, IORateLimiter, IOType};
 use libc::c_int;
 use std::error::Error;
@@ -98,18 +97,18 @@ impl Config {
     }
 }
 
-pub struct StorageConfigManger {
-    kvdb: RocksEngine,
+pub struct StorageConfigManger<EK: KvEngine> {
+    kvdb: EK,
     shared_block_cache: bool,
     ttl_checker_scheduler: Scheduler<TTLCheckerTask>,
 }
 
-impl StorageConfigManger {
+impl<EK: KvEngine> StorageConfigManger<EK> {
     pub fn new(
-        kvdb: RocksEngine,
+        kvdb: EK,
         shared_block_cache: bool,
         ttl_checker_scheduler: Scheduler<TTLCheckerTask>,
-    ) -> StorageConfigManger {
+    ) -> StorageConfigManger<EK> {
         StorageConfigManger {
             kvdb,
             shared_block_cache,
@@ -118,7 +117,7 @@ impl StorageConfigManger {
     }
 }
 
-impl ConfigManager for StorageConfigManger {
+impl<EK: KvEngine> ConfigManager for StorageConfigManger<EK> {
     fn dispatch(&mut self, mut change: ConfigChange) -> CfgResult<()> {
         if let Some(ConfigValue::Module(mut block_cache)) = change.remove("block_cache") {
             if !self.shared_block_cache {
