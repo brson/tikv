@@ -763,6 +763,7 @@ pub mod tests {
     use test::Bencher;
 
     #[bench]
+    #[ignore]
     fn bench_get_region_approximate_size(b: &mut Bencher) {
         let path = Builder::new()
             .prefix("_bench_get_region_approximate_size")
