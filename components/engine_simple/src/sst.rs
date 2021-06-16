@@ -1,11 +1,21 @@
 // Copyright 2019 TiKV Project Authors. Licensed under Apache-2.0.
 
+use std::sync::Arc;
+use std::path::PathBuf;
+
+use crate::error::ResultExt;
 use crate::engine::SimpleEngine;
 use engine_traits::{
     CfName, ExternalSstFileInfo, IterOptions, Iterable, Iterator, Result, SeekKey,
     SstCompressionType, SstExt, SstReader, SstWriter, SstWriterBuilder,
 };
-use std::path::PathBuf;
+
+use blocksy3::raw::fs_thread::FsThread;
+use blocksy3::raw::log::Log;
+use blocksy3::raw::simple_log_file;
+use blocksy3::raw::tree::{Tree, BatchWriter, Cursor};
+use blocksy3::raw::types::{Key, Value, Batch, BatchCommit, Commit};
+use futures::executor::block_on;
 
 impl SstExt for SimpleEngine {
     type SstReader = SimpleSstReader;
@@ -13,17 +23,31 @@ impl SstExt for SimpleEngine {
     type SstWriterBuilder = SimpleSstWriterBuilder;
 }
 
-pub struct SimpleSstReader;
+pub struct SimpleSstReader {
+    tree: Tree,
+    fs_thread: Arc<FsThread>,
+}
 
 impl SstReader for SimpleSstReader {
     fn open(path: &str) -> Result<Self> {
-        panic!()
+        let fs_thread = Arc::new(FsThread::start().engine_result()?);
+        let log = Log::new(simple_log_file::create(PathBuf::from(path), fs_thread.clone()));
+        let tree = Tree::new(log);
+        let mut replay = tree.init_replayer();
+        block_on(replay.replay_commit(Batch(0), BatchCommit(0), Commit(0))).engine_result()?;
+        replay.init_success();
+        Ok(SimpleSstReader {
+            tree, fs_thread,
+        })
     }
     fn verify_checksum(&self) -> Result<()> {
-        panic!()
+        Ok(()) // todo fixme
     }
     fn iter(&self) -> Self::Iterator {
-        panic!()
+        SimpleSstReaderIterator {
+            cursor: self.tree.cursor(Commit(1)),
+            kv: None,
+        }
     }
 }
 
@@ -38,11 +62,35 @@ impl Iterable for SimpleSstReader {
     }
 }
 
-pub struct SimpleSstReaderIterator;
+pub struct SimpleSstReaderIterator {
+    cursor: Cursor,
+    kv: Option<(Key, Value)>,
+}
+
+impl SimpleSstReaderIterator {
+    fn maybe_update_kv(&mut self) -> Result<()> {
+        if self.cursor.valid() {
+            let key = self.cursor.key();
+            let value = block_on(self.cursor.value()).engine_result()?;
+            self.kv = Some((key, value));
+        } else {
+            self.kv = None;
+        }
+        Ok(())
+    }
+}
 
 impl Iterator for SimpleSstReaderIterator {
     fn seek(&mut self, key: SeekKey) -> Result<bool> {
-        panic!()
+        match key {
+            SeekKey::Start => self.cursor.seek_first(),
+            SeekKey::End => self.cursor.seek_last(),
+            SeekKey::Key(key) => self.cursor.seek_key(Key::from_slice(key)),
+        }
+
+        self.maybe_update_kv()?;
+
+        Ok(self.cursor.valid())
     }
     fn seek_for_prev(&mut self, key: SeekKey) -> Result<bool> {
         panic!()
@@ -56,25 +104,44 @@ impl Iterator for SimpleSstReaderIterator {
     }
 
     fn key(&self) -> &[u8] {
-        panic!()
+        self.kv.as_ref().expect("valid").0.0.as_ref()
     }
     fn value(&self) -> &[u8] {
-        panic!()
+        self.kv.as_ref().expect("valid").1.0.as_ref()
     }
 
     fn valid(&self) -> Result<bool> {
-        panic!()
+        Ok(self.cursor.valid())
     }
 }
 
-pub struct SimpleSstWriter;
+pub struct SimpleSstWriter {
+    tree: Tree,
+    batch_writer: BatchWriter,
+    fs_thread: Arc<FsThread>,
+}
+
+impl SimpleSstWriter {
+    fn new(path: &str) -> Result<SimpleSstWriter> {
+        let fs_thread = Arc::new(FsThread::start().engine_result()?);
+        let log = Log::new(simple_log_file::create(PathBuf::from(path), fs_thread.clone()));
+        let tree = Tree::new(log);
+        tree.skip_init();
+        let batch_writer = tree.batch(Batch(0));
+        block_on(batch_writer.open()).engine_result()?;
+
+        Ok(SimpleSstWriter {
+            tree, batch_writer, fs_thread,
+        })
+    }
+}
 
 impl SstWriter for SimpleSstWriter {
     type ExternalSstFileInfo = SimpleExternalSstFileInfo;
     type ExternalSstFileReader = SimpleExternalSstFileReader;
 
     fn put(&mut self, key: &[u8], val: &[u8]) -> Result<()> {
-        panic!()
+        block_on(self.batch_writer.write(Key::from_slice(key), Value::from_slice(val))).engine_result()
     }
     fn delete(&mut self, key: &[u8]) -> Result<()> {
         panic!()
@@ -83,7 +150,11 @@ impl SstWriter for SimpleSstWriter {
         panic!()
     }
     fn finish(self) -> Result<Self::ExternalSstFileInfo> {
-        panic!()
+        block_on(self.batch_writer.ready_commit(BatchCommit(0))).engine_result()?;
+        self.batch_writer.commit_to_index(BatchCommit(0), Commit(0));
+        block_on(self.batch_writer.close()).engine_result()?;
+        block_on(self.tree.sync()).engine_result()?;
+        Ok(SimpleExternalSstFileInfo)
     }
     fn finish_read(self) -> Result<(Self::ExternalSstFileInfo, Self::ExternalSstFileReader)> {
         panic!()
@@ -94,7 +165,7 @@ pub struct SimpleSstWriterBuilder;
 
 impl SstWriterBuilder<SimpleEngine> for SimpleSstWriterBuilder {
     fn new() -> Self {
-        panic!()
+        SimpleSstWriterBuilder
     }
     fn set_db(self, db: &SimpleEngine) -> Self {
         panic!()
@@ -113,7 +184,7 @@ impl SstWriterBuilder<SimpleEngine> for SimpleSstWriterBuilder {
     }
 
     fn build(self, path: &str) -> Result<SimpleSstWriter> {
-        panic!()
+        SimpleSstWriter::new(path)
     }
 }
 
