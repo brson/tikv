@@ -168,19 +168,19 @@ impl SstWriterBuilder<SimpleEngine> for SimpleSstWriterBuilder {
         SimpleSstWriterBuilder
     }
     fn set_db(self, db: &SimpleEngine) -> Self {
-        panic!()
+        self
     }
     fn set_cf(self, cf: &str) -> Self {
-        panic!()
+        self
     }
     fn set_in_memory(self, in_memory: bool) -> Self {
-        panic!()
+        self
     }
     fn set_compression_type(self, compression: Option<SstCompressionType>) -> Self {
-        panic!()
+        self
     }
     fn set_compression_level(self, level: i32) -> Self {
-        panic!()
+        self
     }
 
     fn build(self, path: &str) -> Result<SimpleSstWriter> {
