@@ -119,6 +119,7 @@ pub struct SimpleSstWriter {
     tree: Tree,
     batch_writer: BatchWriter,
     fs_thread: Arc<FsThread>,
+    file_path: PathBuf,
 }
 
 impl SimpleSstWriter {
@@ -130,8 +131,10 @@ impl SimpleSstWriter {
         let batch_writer = tree.batch(Batch(0));
         block_on(batch_writer.open()).engine_result()?;
 
+        let file_path = PathBuf::from(path);
+
         Ok(SimpleSstWriter {
-            tree, batch_writer, fs_thread,
+            tree, batch_writer, fs_thread, file_path,
         })
     }
 }
@@ -154,7 +157,10 @@ impl SstWriter for SimpleSstWriter {
         self.batch_writer.commit_to_index(BatchCommit(0), Commit(0));
         block_on(self.batch_writer.close()).engine_result()?;
         block_on(self.tree.sync()).engine_result()?;
-        Ok(SimpleExternalSstFileInfo)
+
+        Ok(SimpleExternalSstFileInfo {
+            file_path: self.file_path.clone(),
+        })
     }
     fn finish_read(self) -> Result<(Self::ExternalSstFileInfo, Self::ExternalSstFileReader)> {
         panic!()
@@ -188,14 +194,16 @@ impl SstWriterBuilder<SimpleEngine> for SimpleSstWriterBuilder {
     }
 }
 
-pub struct SimpleExternalSstFileInfo;
+pub struct SimpleExternalSstFileInfo {
+    file_path: PathBuf,
+}
 
 impl ExternalSstFileInfo for SimpleExternalSstFileInfo {
     fn new() -> Self {
         panic!()
     }
     fn file_path(&self) -> PathBuf {
-        panic!()
+        self.file_path.clone()
     }
     fn smallest_key(&self) -> &[u8] {
         panic!()
