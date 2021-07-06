@@ -9,10 +9,10 @@ impl CFOptionsExt for SimpleEngine {
     type ColumnFamilyOptions = SimpleColumnFamilyOptions;
 
     fn get_options_cf(&self, cf: &str) -> Result<Self::ColumnFamilyOptions> {
-        panic!()
+        Ok(SimpleColumnFamilyOptions)
     }
     fn set_options_cf(&self, cf: &str, options: &[(&str, &str)]) -> Result<()> {
-        panic!()
+        Ok(())
     }
 }
 

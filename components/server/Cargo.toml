@@ -84,6 +84,7 @@ encryption = { path = "../encryption", default-features = false }
 encryption_export = { path = "../encryption/export", default-features = false }
 engine_panic = { path = "../engine_panic", default-features = false }
 engine_rocks = { path = "../engine_rocks", default-features = false }
+engine_simple = { path = "../engine_simple", default-features = false }
 engine_traits = { path = "../engine_traits", default-features = false }
 error_code = { path = "../error_code", default-features = false }
 file_system = { path = "../file_system", default-features = false }

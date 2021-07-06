@@ -150,17 +150,23 @@ pub fn run_tikv(config: TiKvConfig) {
         }};
     }
 
-    if std::env::var("TIKV_USE_PANIC_ENGINE").ok().is_none() {
-        if !config.raft_engine.enable {
-            run_impl!(RocksEngine, RocksEngine)
-        } else {
-            run_impl!(RocksEngine, RaftLogEngine)
-        }
-    } else {
+    if std::env::var("TIKV_USE_PANIC_ENGINE").ok().is_some() {
         if !config.raft_engine.enable {
             run_impl!(engine_panic::PanicEngine, RocksEngine)
         } else {
             run_impl!(engine_panic::PanicEngine, RaftLogEngine)
+        }
+    } else if std::env::var("TIKV_USE_SIMPLE_ENGINE").ok().is_some() {
+        if !config.raft_engine.enable {
+            run_impl!(engine_simple::SimpleEngine, RocksEngine)
+        } else {
+            run_impl!(engine_simple::SimpleEngine, RaftLogEngine)
+        }
+    } else {
+        if !config.raft_engine.enable {
+            run_impl!(RocksEngine, RocksEngine)
+        } else {
+            run_impl!(RocksEngine, RaftLogEngine)
         }
     }
 }
@@ -1209,6 +1215,30 @@ impl<ER> CreateKvEngine<ER> for RocksEngine where ER: RaftEngine {
                 config.storage.block_cache.shared,
             )),
         );
+    }
+}
+
+impl<ER> CreateKvEngine<ER> for engine_simple::SimpleEngine where ER: RaftEngine {
+    fn create_kv_engine(config: &TiKvConfig,
+                        _region_info_accessor: &RegionInfoAccessor,
+                        _store_path: &Path,
+                        _router: &RaftRouter<Self, ER>,
+                        _env: Arc<engine_rocks::raw::Env>, _block_cache: &Option<engine_rocks::raw::Cache>) -> Self {
+        let trees = engine_traits::ALL_CFS.iter().map(|s| s.to_string()).collect();
+        error!("{}", config.cfg_path);
+        let config = engine_simple::raw::DbConfig {
+            dir: Some(PathBuf::from("db")),
+            trees: trees,
+        };
+
+        let db = engine_simple::SimpleEngine::open(config).expect("creating engine");
+
+        db
+    }
+
+    fn register_kv_config(&self,
+                          _config: &TiKvConfig,
+                          _cfg_controller: &mut Option<ConfigController>) {
     }
 }
 

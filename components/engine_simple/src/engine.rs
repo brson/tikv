@@ -48,9 +48,6 @@ impl KvEngine for SimpleEngine {
             self.db.sync().await.engine_result()
         })
     }
-    fn bad_downcast<T: 'static>(&self) -> &T {
-        panic!()
-    }
 }
 
 impl Peekable for SimpleEngine {

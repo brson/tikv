@@ -15,7 +15,7 @@ impl WriteBatchExt for SimpleEngine {
     const WRITE_BATCH_MAX_KEYS: usize = 256;
 
     fn support_write_batch_vec(&self) -> bool {
-        panic!()
+        false
     }
 
     fn write_batch(&self) -> Self::WriteBatch {

@@ -33,11 +33,11 @@ impl MiscExt for SimpleEngine {
     }
 
     fn get_engine_used_size(&self) -> Result<u64> {
-        panic!()
+        Ok(0)
     }
 
     fn roughly_cleanup_ranges(&self, ranges: &[(Vec<u8>, Vec<u8>)]) -> Result<()> {
-        panic!()
+        Ok(())
     }
 
     fn path(&self) -> &str {
