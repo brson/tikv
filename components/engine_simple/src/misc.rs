@@ -65,7 +65,7 @@ impl MiscExt for SimpleEngine {
     }
 
     fn get_total_sst_files_size_cf(&self, cf: &str) -> Result<Option<u64>> {
-        panic!()
+        Ok(None)
     }
 
     fn get_range_entries_and_versions(
@@ -74,22 +74,22 @@ impl MiscExt for SimpleEngine {
         start: &[u8],
         end: &[u8],
     ) -> Result<Option<(u64, u64)>> {
-        panic!()
+        Ok(None)
     }
 
     fn get_cf_num_files_at_level(&self, cf: &str, level: usize) -> Result<Option<u64>> {
-        panic!()
+        Ok(None)
     }
 
     fn get_cf_num_immutable_mem_table(&self, cf: &str) -> Result<Option<u64>> {
-        panic!()
+        Ok(None)
     }
 
     fn get_cf_compaction_pending_bytes(&self, cf: &str) -> Result<Option<u64>> {
-        panic!()
+        Ok(None)
     }
 
     fn is_stalled_or_stopped(&self) -> bool {
-        panic!()
+        false
     }
 }

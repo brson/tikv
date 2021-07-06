@@ -5,7 +5,7 @@ use engine_traits::{Range, RangePropertiesExt, Result};
 
 impl RangePropertiesExt for SimpleEngine {
     fn get_range_approximate_keys(&self, range: Range, large_threshold: u64) -> Result<u64> {
-        panic!()
+        Ok(0)
     }
 
     fn get_range_approximate_keys_cf(
@@ -14,11 +14,11 @@ impl RangePropertiesExt for SimpleEngine {
         range: Range,
         large_threshold: u64,
     ) -> Result<u64> {
-        panic!()
+        Ok(0)
     }
 
     fn get_range_approximate_size(&self, range: Range, large_threshold: u64) -> Result<u64> {
-        panic!()
+        Ok(0)
     }
 
     fn get_range_approximate_size_cf(
@@ -27,7 +27,7 @@ impl RangePropertiesExt for SimpleEngine {
         range: Range,
         large_threshold: u64,
     ) -> Result<u64> {
-        panic!()
+        Ok(0)
     }
 
     fn get_range_approximate_split_keys(
@@ -35,7 +35,7 @@ impl RangePropertiesExt for SimpleEngine {
         range: Range,
         key_count: usize,
     ) -> Result<Vec<Vec<u8>>> {
-        panic!()
+        Ok(vec![])
     }
 
     fn get_range_approximate_split_keys_cf(
@@ -44,6 +44,6 @@ impl RangePropertiesExt for SimpleEngine {
         range: Range,
         key_count: usize,
     ) -> Result<Vec<Vec<u8>>> {
-        panic!()
+        Ok(vec![])
     }
 }
